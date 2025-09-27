@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — CHAOS</title>
+<title>Today Is The Day I… — CHAOS (Piano)</title>
 <meta name="theme-color" content="#000000" />
 <style>
   :root{
@@ -21,7 +21,6 @@
   }
   .subtitle{margin:0 0 14px; color:#c7d2fe; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
 
-  /* Card with 3D hover */
   .card{
     background: rgba(255,255,255,.12);
     border:1px solid rgba(255,255,255,.2);
@@ -47,22 +46,17 @@
     border:1.5px solid rgba(255,255,255,.35);
     box-shadow: 0 10px 28px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15);
   }
-
-  /* ripple */
   .big::after{content:""; position:absolute; left:var(--x,50%); top:var(--y,50%); width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35); transform:translate(-50%,-50%); opacity:0; pointer-events:none; transition:width .5s ease, height .5s ease, opacity .7s ease}
   .big.rippling::after{width:220%; height:220%; opacity:1}
 
-  /* Tag + text */
   .badge{display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,#dff,#fed); color:#213; border:1px solid rgba(255,255,255,.5)}
   .today{font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px; color:#fff}
   .meta{font-size:13px; color:#cbd5e1}
   .footer{margin-top:14px; font-size:12px; color:#cbd5e1}
 
-  /* Nudge */
   .nudge{display:none; background:#fff0d1; border:1px solid #ffe18a; color:#6a5300; padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; box-shadow:0 6px 14px rgba(0,0,0,.08); animation:glow 2s ease-in-out infinite}
   @keyframes glow{0%,100%{box-shadow:0 6px 14px rgba(255,225,138,.3)} 50%{box-shadow:0 6px 14px rgba(255,225,138,.75)}}
 
-  /* Background FX layers */
   #aurora{position:fixed; inset:0; z-index:-4; background:
     radial-gradient(60% 80% at 20% 20%, rgba(123,92,255,.35), transparent 60%),
     radial-gradient(70% 90% at 80% 40%, rgba(0,212,255,.35), transparent 60%),
@@ -72,39 +66,27 @@
   @keyframes auroraShift{0%{transform:translateX(0)}100%{transform:translateX(-2%) scale(1.02)}}
   #conic{position:fixed; inset:-20% -20% -20% -20%; z-index:-5; background:conic-gradient(from var(--ang,0deg), #0a0b10, #0b0d18, #0c0f16, #0a0b10); animation:spin 40s linear infinite}
   @keyframes spin{to{--ang:360deg}}
-
-  /* Parallax stars */
   #stars{position:fixed; inset:0; z-index:-3; background:transparent; pointer-events:none}
-
-  /* Blobs */
   .blob{position:fixed; width:32vmax; height:32vmax; border-radius:50%; filter:blur(30px); opacity:.25; z-index:-2; mix-blend-mode:screen; animation:blobMorph 18s ease-in-out infinite alternate}
   .b1{background:linear-gradient(135deg,#7b5cff,#00d4ff); top:-10vmax; left:-8vmax}
   .b2{background:linear-gradient(135deg,#ff6bcb,#2df9a6); bottom:-12vmax; right:-10vmax; animation-duration:22s}
   @keyframes blobMorph{0%{transform:translate(0,0) scale(1)}100%{transform:translate(4vmax, -2vmax) scale(1.12)}}
 
-  /* Toast */
   #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%); background:#000; color:#fff; padding:12px 16px; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.45); font-size:14px; z-index:999; max-width:90vw; text-align:center; opacity:0; transition:transform .35s ease, opacity .35s ease}
 
-  /* Canvases */
   #confetti, #spark, #fx {position:fixed; inset:0; pointer-events:none; z-index:998}
   #fx{z-index:996}
 
-  /* Scramble text style */
   .scramble span{display:inline-block}
 
-  /* Accessibility: reduce motion */
   @media (prefers-reduced-motion: reduce){
     #aurora,#conic,.blob,.nudge,.card,.big::after{animation:none!important}
     #stars{display:none}
   }
-
-  /* Glitch effect class */
   .glitch{animation:glitch .35s steps(2,end) 2}
   @keyframes glitch{
     0%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,-2px)} 80%{transform:translate(1px,2px)} 100%{transform:translate(0)}
   }
-
-  /* Screen shake */
   .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) both}
   @keyframes shake{
     10%,90%{transform:translate3d(-1px,0,0)}
@@ -194,18 +176,45 @@
   /************ TOAST ************/
   function showToast(msg, ms=1800){ toastText.textContent=msg; toast.style.opacity="1"; toast.style.transform="translateX(-50%) translateY(0)"; clearTimeout(showToast._h); showToast._h=setTimeout(()=>{toast.style.opacity="0"; toast.style.transform="translateX(-50%) translateY(120%)"}, ms); }
 
-  /************ SIMPLE WEB AUDIO BLIP ************/
-  function blip(freq=520, dur=0.09){ try{const ac=blip.ac||(blip.ac=new (window.AudioContext||window.webkitAudioContext)()); const o=ac.createOscillator(); const g=ac.createGain(); o.type="sine"; o.frequency.value=freq; o.connect(g); g.connect(ac.destination); g.gain.value=.06; o.start(); o.stop(ac.currentTime+dur); }catch{}}
+  /************ PIANO SOUND (consistent tones, no randomness) ************/
+  let audioCtx=null;
+  function ensureAC(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; audioCtx=new AC(); } }
+  function noteToFreq(n){
+    // e.g., "C5","E5","G5","C6"
+    const A4=440, map={C:0, 'C#':1, Db:1, D:2, 'D#':3, Eb:3, E:4, F:5, 'F#':6, Gb:6, G:7, 'G#':8, Ab:8, A:9, 'A#':10, Bb:10, B:11};
+    const m=n.match(/^([A-G]#?|Db|Eb|Gb|Ab|Bb)(\d)$/); if(!m) return A4;
+    const semi=map[m[1]] + (parseInt(m[2],10)-4)*12;
+    return A4 * Math.pow(2, (semi-9)/12); // since A4 is index 9 from C
+  }
+  function pianoTone(note="C5", time=0.25, gain=0.08){
+    try{
+      ensureAC();
+      const t=audioCtx.currentTime;
+      // envelope
+      const g=audioCtx.createGain(); g.gain.setValueAtTime(0, t);
+      g.gain.linearRampToValueAtTime(gain, t+0.01); // quick attack
+      g.gain.exponentialRampToValueAtTime(0.0001, t+time); // decay
+      // body
+      const o1=audioCtx.createOscillator(); o1.type="sine"; o1.frequency.value=noteToFreq(note);
+      // slight bright overtone for piano "hammer"
+      const o2=audioCtx.createOscillator(); o2.type="triangle"; o2.frequency.value=noteToFreq(note)*2;
+      const lp=audioCtx.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2200; lp.Q.value=0.7;
+      o1.connect(lp); o2.connect(lp); lp.connect(g); g.connect(audioCtx.destination);
+      o1.start(t); o2.start(t); o1.stop(t+time); o2.stop(t+time);
+    }catch{}
+  }
+  // Chord helper
+  function pianoChord(notes, dur=0.3, g=0.06){ notes.forEach((n,i)=> setTimeout(()=>pianoTone(n, dur, g), i*10)); }
 
   /************ CONFETTI ************/
-  function fireConfetti(duration=900,count=160){
+  function fireConfetti(duration=900,count=140){
     const cvs=qs("#confetti"), ctx=cvs.getContext("2d"); cvs.width=innerWidth; cvs.height=innerHeight;
     const P=Array.from({length:count}).map(()=>({x:Math.random()*cvs.width, y:-20-Math.random()*cvs.height*.3, r:2+Math.random()*4, c:`hsl(${Math.floor(Math.random()*360)},80%,60%)`, vy:2+Math.random()*4, vx:-2+Math.random()*4, a:Math.random()*Math.PI, va:-.2+Math.random()*.4}));
     let start=performance.now();
     (function f(t){const e=t-start; ctx.clearRect(0,0,cvs.width,cvs.height); P.forEach(p=>{p.x+=p.vx; p.y+=p.vy; p.a+=p.va; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.c; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore();}); if(e<duration)requestAnimationFrame(f); else ctx.clearRect(0,0,cvs.width,cvs.height);})(start);
   }
 
-  /************ STARS (parallax) ************/
+  /************ STARS ************/
   (function stars(){
     const c=qs("#stars"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
     const S=Array.from({length:160}).map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,z:rand(.3,1.5)}));
@@ -219,21 +228,25 @@
   (function sparkles(){
     const c=qs("#spark"), g=c.getContext("2d"); function resize(){c.width=innerWidth;c.height=innerHeight} resize(); addEventListener('resize',resize);
     let parts=[];
-    addEventListener('pointerdown',e=>{for(let i=0;i<18;i++){parts.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:600,r:2+Math.random()*2,c:`hsl(${Math.floor(Math.random()*360)},90%,60%)`})}});
+    addEventListener('pointerdown',e=>{
+      // piano click sound on any pointerdown? Set to true if you want global clicks:
+      const PLAY_ON_ANY_CLICK = false;
+      if (PLAY_ON_ANY_CLICK) pianoTone("C5", 0.18, 0.06);
+      for(let i=0;i<16;i++){parts.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:560,r:2+Math.random()*2,c:`hsl(${Math.floor(Math.random()*360)},90%,60%)`})}
+    });
     (function loop(){g.clearRect(0,0,c.width,c.height); parts=parts.filter(p=>(p.life-=16)>0); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05; g.fillStyle=p.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill();}); requestAnimationFrame(loop)})();
   })();
 
-  /************ EXTRA FX CANVAS (fireworks, vortex, trails) ************/
+  /************ EXTRA FX (fireworks, vortex, trails) ************/
   const fxc=qs("#fx"), fxx=fxc.getContext("2d"); function resizeFX(){fxc.width=innerWidth; fxc.height=innerHeight} resizeFX(); addEventListener('resize',resizeFX);
-
-  function fireworks(n=6){
+  function fireworks(n=5){
     const bursts=[];
     for(let b=0;b<n;b++){
       const cx=rand(80, innerWidth-80), cy=rand(80, innerHeight*0.5);
       const color = `hsl(${Math.floor(rand(0,360))},90%,60%)`;
-      for(let i=0;i<80;i++){
+      for(let i=0;i<70;i++){
         const a=rand(0,Math.PI*2), sp=rand(1.2,5);
-        bursts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:900,c:color,r:rand(1,2.4)});
+        bursts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:900,c:color,r:rand(1,2.2)});
       }
     }
     let t0=performance.now();
@@ -243,24 +256,20 @@
       if(bursts.some(p=>p.life>0)) requestAnimationFrame(loop); else fxx.clearRect(0,0,fxc.width,fxc.height);
     })();
   }
-
   function vortex(){
-    // suck all sparkles/confetti to center for a moment
     const cx=innerWidth/2, cy=innerHeight/2;
     fxx.globalCompositeOperation="lighter";
-    for(let i=0;i<220;i++){
+    for(let i=0;i<180;i++){
       setTimeout(()=>{fxx.fillStyle=`hsl(${Math.floor(rand(0,360))},90%,60%)`; fxx.beginPath(); fxx.arc(cx+rand(-4,4), cy+rand(-4,4), rand(1,3), 0, Math.PI*2); fxx.fill();}, i*3);
     }
-    setTimeout(()=>{fxx.clearRect(0,0,fxc.width,fxc.height)}, 1200);
+    setTimeout(()=>{fxx.clearRect(0,0,fxc.width,fxc.height)}, 1100);
   }
-
   function rainbowTrails(){
-    // draw cursor trails for a few seconds
     let on=true; const pts=[];
     function move(e){pts.push({x:e.clientX,y:e.clientY,t:Date.now(),c:`hsl(${(Date.now()/8)%360},90%,60%)`})}
     addEventListener('pointermove',move);
-    const id=setInterval(()=>{const now=Date.now(); fxx.clearRect(0,0,fxc.width,fxc.height); pts.splice(0, pts.length-120); pts.forEach(p=>{const age=now-p.t; if(age>1200)return; fxx.fillStyle=p.c; fxx.beginPath(); fxx.arc(p.x,p.y,2.2,0,Math.PI*2); fxx.fill();});}, 16);
-    setTimeout(()=>{on=false; removeEventListener('pointermove',move); clearInterval(id); fxx.clearRect(0,0,fxc.width,fxc.height)}, 3000);
+    const id=setInterval(()=>{const now=Date.now(); fxx.clearRect(0,0,fxc.width,fxc.height); pts.splice(0, pts.length-110); pts.forEach(p=>{const age=now-p.t; if(age>1100)return; fxx.fillStyle=p.c; fxx.beginPath(); fxx.arc(p.x,p.y,2.2,0,Math.PI*2); fxx.fill();});}, 16);
+    setTimeout(()=>{on=false; removeEventListener('pointermove',move); clearInterval(id); fxx.clearRect(0,0,fxc.width,fxc.height)}, 2800);
   }
 
   /************ SCRAMBLE TEXT ************/
@@ -278,25 +287,40 @@
     }, speed);
   }
 
-  /************ SURPRISE MODES ************/
+  /************ SURPRISE MODES (emoji rain removed from rotation) ************/
   function screenShake(){ document.body.classList.add("shake"); setTimeout(()=>document.body.classList.remove("shake"),500); }
-  function invertScreen(ms=1200){ const prev=document.body.style.filter; document.body.style.filter="invert(1) hue-rotate(180deg)"; setTimeout(()=>{document.body.style.filter=prev||""}, ms); }
+  function invertScreen(ms=900){ const prev=document.body.style.filter; document.body.style.filter="invert(1) hue-rotate(180deg)"; setTimeout(()=>{document.body.style.filter=prev||""}, ms); }
   function glitchOnce(el){ el.classList.add("glitch"); setTimeout(()=>el.classList.remove("glitch"),350); }
-  function emojiStorm(emoji="✨"){ const N=80; for(let i=0;i<N;i++){ const e=document.createElement("div"); e.textContent=Math.random()<.5?emoji:["✨","🌈","💫","🎈","🎉","⭐","🪄","🦄"][Math.floor(Math.random()*8)]; e.style.position="fixed"; e.style.left=rand(0,innerWidth)+"px"; e.style.top=rand(-40,-10)+"px"; e.style.fontSize= rand(16,36)+"px"; e.style.pointerEvents="none"; e.style.transform=`rotate(${rand(-20,20)}deg)`; e.style.zIndex=997; document.body.appendChild(e); const vy=rand(2,5), vx=rand(-1.2,1.2); (function drop(){ const y=parseFloat(e.style.top); const x=parseFloat(e.style.left); e.style.top=(y+vy)+"px"; e.style.left=(x+vx)+"px"; if(y<innerHeight+40) requestAnimationFrame(drop); else e.remove(); })(); }}
+
+  // Kept (but NOT used) toned-down emoji rain if you ever want it again:
+  function emojiStorm(emoji="✨", COUNT=20, LIFE_MS=2000){
+    for(let i=0;i<COUNT;i++){
+      const e=document.createElement("div");
+      e.textContent=Math.random()<.5?emoji:["✨","🌈","💫","🎈","🎉","⭐","🪄","🦄"][Math.floor(Math.random()*8)];
+      e.style.position="fixed"; e.style.left=rand(0,innerWidth)+"px"; e.style.top=rand(-40,-10)+"px";
+      e.style.fontSize= rand(18,30)+"px"; e.style.pointerEvents="none"; e.style.transform=`rotate(${rand(-15,15)}deg)`; e.style.zIndex=997;
+      document.body.appendChild(e);
+      const vy=rand(2,4), vx=rand(-1,1); const start=performance.now();
+      (function drop(t0){function step(t){const y=parseFloat(e.style.top)||-20; const x=parseFloat(e.style.left)||0;
+        e.style.top=(y+vy)+"px"; e.style.left=(x+vx)+"px";
+        if(t-t0 < LIFE_MS && y < innerHeight+40) requestAnimationFrame(step); else e.remove(); }
+        requestAnimationFrame(step);
+      })(performance.now());
+    }
+  }
+
   function randomSurprise(targetEl){
-    const modes=[ ()=>fireConfetti(1000,200),
-                  ()=>fireworks(5),
+    const modes=[ ()=>fireConfetti(1000,180),
+                  ()=>fireworks(4),
                   ()=>vortex(),
                   ()=>rainbowTrails(),
-                  ()=>{invertScreen(1000); screenShake();},
-                  ()=>{emojiStorm();},
-                  ()=>{glitchOnce(targetEl||document.querySelector(".card"));},
-                  ()=>{blip(660,.08); blip(880,.08);} ];
+                  ()=>{invertScreen(800); screenShake();},
+                  ()=>{glitchOnce(targetEl||document.querySelector(".card"));} ];
     const m = modes[Math.floor(Math.random()*modes.length)];
     m();
   }
 
-  /************ BUTTON FX ************/
+  /************ BUTTON FX (ripple + play piano) ************/
   function attachRipple(btn){
     btn.addEventListener('pointerdown', e=>{
       const r=btn.getBoundingClientRect();
@@ -316,7 +340,8 @@
     const rec=state[todayKey]||{};
     todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
     screenIntro.style.display="none"; screenToday.style.display="block";
-    randomSurprise(screenToday); blip(520,.08);
+    randomSurprise(screenToday);
+    pianoTone("C5", 0.22, 0.07); // consistent reveal tone
   }
 
   /************ EVENTS ************/
@@ -335,6 +360,7 @@
     showToast("All good. Come back anytime today.");
     updateStreakInfo(); updateMascot();
     randomSurprise(screenIntro);
+    // no sound on skip
   };
 
   willDoBtn.onclick = ()=>{
@@ -344,6 +370,7 @@
     showToast("Nice! Come back later and tap “Done for today”.");
     updateStreakInfo(); updateMascot();
     randomSurprise(screenToday);
+    pianoTone("E5", 0.22, 0.07); // consistent "will do" tone
   };
 
   doneBtn.onclick = ()=>{
@@ -353,6 +380,7 @@
     fireConfetti(); fireworks(4); randomSurprise(screenToday);
     showToast("Great job! ✅");
     updateStreakInfo(); updateMascot();
+    pianoChord(["G5","C6"], 0.28, 0.07); // consistent "done" chord
   };
 
   /************ 3D tilt on cards ************/
@@ -367,18 +395,11 @@
   }
   tilt(screenIntro); tilt(screenToday);
 
-  /************ FLOATERS spawn ************/
-  function spawnFloaters(){
-    // (handled by CSS blobs + stars already; just reflow on resize)
-  }
-
-  /************ INIT ************/
-  function init(){
-    updateStreakInfo(); updateMascot(); spawnFloaters();
-    // subtle initial surprise
-    setTimeout(()=>randomSurprise(screenIntro), 600);
-  }
-  init();
+  /************ STARS, INIT ************/
+  function updateAll(){ updateStreakInfo(); updateMascot(); }
+  updateAll();
+  setTimeout(()=>randomSurprise(screenIntro), 600);
 </script>
 </body>
 </html>
+
