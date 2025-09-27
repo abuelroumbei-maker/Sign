@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — Calm Trail + Button Sparkles</title>
+<title>Today Is The Day I… — Stars + Trail + Global Sparkles</title>
 <meta name="theme-color" content="#0b0d12" />
 <style>
   :root{
     --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --accent4:#f59e0b;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
   }
   *{box-sizing:border-box} html,body{height:100%}
   body{ margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -16,7 +16,7 @@
 
   /* Subtle animated gradient background */
   .bg{
-    position:fixed; inset:0; z-index:-3;
+    position:fixed; inset:0; z-index:-4;
     background:
       radial-gradient(1100px 700px at 15% 20%, rgba(109,94,252,.28), transparent 60%),
       radial-gradient(1000px 700px at 85% 30%, rgba(0,194,255,.28), transparent 60%),
@@ -49,7 +49,7 @@
 
   /* Buttons with halo and ripple */
   .big{
-    --halo: #93c5fd; /* default */
+    --halo: #93c5fd; /* default halo color */
     position:relative; overflow:hidden; outline:none;
     flex:1 0 220px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
     border:0; cursor:pointer; color:#0a0b0f;
@@ -106,9 +106,10 @@
     text-align:center; opacity:0; transition:transform .35s ease, opacity .35s ease;
   }
 
-  /* Canvases */
-  #trail, #clickfx { position:fixed; inset:0; pointer-events:none; z-index:-1 }
-  #clickfx { z-index: 998; } /* above cards but below UI */
+  /* Canvas layers (ordered by depth) */
+  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* behind trail */
+  #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 } /* rainbow mouse trail */
+  #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 } /* sparkles above content */
 
   @media (prefers-reduced-motion: reduce){
     .bg{animation:none} .big::after{display:none} .big::before{animation:none}
@@ -117,6 +118,7 @@
 </head>
 <body>
   <div class="bg"></div>
+  <canvas id="stars"></canvas>
   <canvas id="trail"></canvas>
   <canvas id="clickfx"></canvas>
 
@@ -133,7 +135,6 @@
           <div id="streakInfo" class="meta">Current streak: 0 days</div>
         </div>
 
-        <!-- Per-button color themes via --halo and sparkle palette -->
         <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
         <div class="row">
           <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
@@ -223,7 +224,38 @@ function attachRipple(btn){
 }
 [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
 
-/* ====== MOUSE COLOR TRAIL ====== */
+/* ====== STARS BACKGROUND ====== */
+const stars = qs("#stars"), sctx = stars.getContext("2d");
+function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
+resizeStars(); addEventListener('resize', resizeStars);
+
+const STARS = Array.from({length: 160}).map(()=>({
+  x: Math.random()*innerWidth,
+  y: Math.random()*innerHeight,
+  z: Math.random()*1.5 + 0.3 // depth (0.3—1.8)
+}));
+
+let mousePX = 0.5, mousePY = 0.5; // for gentle parallax
+addEventListener('pointermove', e=>{
+  mousePX = e.clientX / innerWidth;
+  mousePY = e.clientY / innerHeight;
+});
+
+(function drawStars(){
+  requestAnimationFrame(drawStars);
+  sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{
+    // gentle drift + parallax
+    s.x += (mousePX - 0.5) * s.z * 0.3;
+    s.y += (mousePY - 0.5) * s.z * 0.3;
+    if (s.x < 0) s.x += stars.width; if (s.x > stars.width) s.x -= stars.width;
+    if (s.y < 0) s.y += stars.height; if (s.y > stars.height) s.y -= stars.height;
+    sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`;
+    sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
+  });
+})();
+
+/* ====== RAINBOW MOUSE TRAIL ====== */
 const trail = qs("#trail"), tctx = trail.getContext("2d");
 function resizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; }
 resizeTrail(); addEventListener('resize', resizeTrail);
@@ -233,7 +265,6 @@ addEventListener('pointermove', e=>{
   points.push({x:e.clientX, y:e.clientY, t:Date.now()});
   if(points.length>140) points.shift();
 });
-
 (function drawTrail(){
   requestAnimationFrame(drawTrail);
   const now=Date.now();
@@ -252,16 +283,17 @@ addEventListener('pointermove', e=>{
   }
 })();
 
-/* ====== CLICK SPARKLES (per-button palette) ====== */
+/* ====== GLOBAL CLICK SPARKLES (anywhere) ====== */
 const clickfx = qs("#clickfx"), cfx = clickfx.getContext("2d");
 function resizeFX(){ clickfx.width=innerWidth; clickfx.height=innerHeight; }
 resizeFX(); addEventListener('resize', resizeFX);
 
 const PALETTES = {
-  reveal: ['#60a5fa','#38bdf8','#93c5fd','#bae6fd'],
-  skip:   ['#a78bfa','#c4b5fd','#ddd6fe','#e9d5ff'],
-  willdo: ['#34d399','#2dd4bf','#6ee7b7','#a7f3d0'],
-  done:   ['#f59e0b','#fbbf24','#fde68a','#fcd34d']
+  bg:    ['#60a5fa','#38bdf8','#34d399','#fbbf24','#a78bfa'],
+  reveal:['#60a5fa','#38bdf8','#93c5fd','#bae6fd'],
+  skip:  ['#a78bfa','#c4b5fd','#ddd6fe','#e9d5ff'],
+  willdo:['#34d399','#2dd4bf','#6ee7b7','#a7f3d0'],
+  done:  ['#f59e0b','#fbbf24','#fde68a','#fcd34d']
 };
 
 function burst(x,y, palette, count=18){
@@ -289,18 +321,22 @@ function burst(x,y, palette, count=18){
   })(start);
 }
 
-/* helper to attach sparkles to a button with its palette */
-function sparkleButton(btn, palette){
-  btn.addEventListener('pointerdown', e=>{
-    const rect = btn.getBoundingClientRect();
-    const x = e.clientX, y = e.clientY; // sparkles at click point
-    burst(x, y, palette, 18);
-  });
+/* Choose palette by where you clicked */
+function paletteForTarget(target){
+  const btn = target.closest ? target.closest('button') : null;
+  if (btn){
+    if (btn.id === 'revealBtn') return PALETTES.reveal;
+    if (btn.id === 'skipBtn')   return PALETTES.skip;
+    if (btn.id === 'willDoBtn') return PALETTES.willdo;
+    if (btn.id === 'doneBtn')   return PALETTES.done;
+  }
+  return PALETTES.bg; // background default
 }
-sparkleButton(revealBtn, PALETTES.reveal);
-sparkleButton(skipBtn,   PALETTES.skip);
-sparkleButton(willDoBtn, PALETTES.willdo);
-sparkleButton(doneBtn,   PALETTES.done);
+
+/* Global click handler: sparkles anywhere */
+document.addEventListener('pointerdown', (e)=>{
+  burst(e.clientX, e.clientY, paletteForTarget(e.target), 20);
+});
 
 /* ====== TODAY CARD & EVENTS ====== */
 function showTodayCard(){
@@ -345,4 +381,5 @@ updateStreakInfo();
 </script>
 </body>
 </html>
+
 
