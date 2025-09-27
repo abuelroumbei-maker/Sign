@@ -3,18 +3,16 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — Calm Color + Mozart</title>
+<title>Today Is The Day I… — Calm Trail + Button Sparkles</title>
 <meta name="theme-color" content="#0b0d12" />
 <style>
   :root{
     --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --accent4:#f59e0b;
   }
   *{box-sizing:border-box} html,body{height:100%}
-  body{
-    margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    color:var(--fg); background:#0b0d12; overflow:hidden;
-  }
+  body{ margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        color:var(--fg); background:#0b0d12; overflow:hidden; }
 
   /* Subtle animated gradient background */
   .bg{
@@ -29,11 +27,10 @@
   }
   @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
 
-  /* App layout */
   .wrap{height:100%; display:grid; place-items:center; padding:22px}
   .app{width:min(860px, 94vw)}
   .title{
-    margin:0 0 6px; font-size:clamp(26px,6vw,46px); letter-spacing:.2px;
+    margin:0 0 6px; font-size:clamp(26px,6vw,46px);
     background:linear-gradient(90deg,#fff,#dbeafe,#fff);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     filter:drop-shadow(0 6px 16px rgba(255,255,255,.1));
@@ -50,22 +47,32 @@
 
   .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
 
-  /* Buttons */
+  /* Buttons with halo and ripple */
   .big{
+    --halo: #93c5fd; /* default */
+    position:relative; overflow:hidden; outline:none;
     flex:1 0 220px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
-    border:0; cursor:pointer; color:#0a0b0f; position:relative; overflow:hidden; outline:none;
+    border:0; cursor:pointer; color:#0a0b0f;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     box-shadow: 0 12px 28px rgba(13,148,255,.28);
     transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
   }
   .big:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
   .big:active{ transform: translateY(1px) scale(.995) }
-  .ghost{
-    color:var(--accent); background:#ffffff;
-    border:2px solid rgba(109,94,252,.35);
-    box-shadow: 0 10px 24px rgba(2,6,23,.08);
+
+  /* Soft pulsing halo */
+  .big::before{
+    content:""; position:absolute; inset:-18%; border-radius:24px;
+    background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
+    opacity:.0; transform:scale(.85); z-index:0;
+    animation:halo 2.6s ease-in-out infinite;
   }
-  /* ripple */
+  @keyframes halo{
+    0%,100%{opacity:.0; transform:scale(.85)}
+    50%    {opacity:.22; transform:scale(1)}
+  }
+
+  /* Ripple on click */
   .big::after{
     content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
     width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
@@ -74,20 +81,24 @@
   }
   .big.rippling::after{ width:220%; height:220%; opacity:1 }
 
+  .ghost{
+    color:var(--accent); background:#ffffff;
+    border:2px solid rgba(109,94,252,.35);
+    box-shadow: 0 10px 24px rgba(2,6,23,.08);
+  }
+
   .badge{display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
     background:linear-gradient(90deg,#e9ecff,#e5f9ff); color:#254ddf; border:1px solid #dae6ff}
   .today{ font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px }
   .meta{ font-size:13px; color:var(--muted) }
   .footer{ margin-top:14px; font-size:12px; color:var(--muted) }
 
-  /* Nudge */
   .nudge{
     display:none; background:#fff7d6; border:1px solid #ffe18a; color:#6a5300;
     padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px;
     box-shadow: 0 6px 14px rgba(0,0,0,.06);
   }
 
-  /* Toast */
   #toast{
     position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%);
     background:#111; color:#fff; padding:12px 16px; border-radius:12px;
@@ -95,34 +106,19 @@
     text-align:center; opacity:0; transition:transform .35s ease, opacity .35s ease;
   }
 
-  /* FX canvases (calm, consistent) */
-  #trail, #glow { position:fixed; inset:0; pointer-events:none; z-index:-1 }
-  #glow { z-index:-2; }
+  /* Canvases */
+  #trail, #clickfx { position:fixed; inset:0; pointer-events:none; z-index:-1 }
+  #clickfx { z-index: 998; } /* above cards but below UI */
 
-  /* Music control */
-  .music{
-    position:fixed; right:14px; bottom:14px; z-index:1000;
-    background:#0b1220cc; color:#dbeafe; backdrop-filter: blur(8px);
-    border:1px solid rgba(255,255,255,.15); border-radius:14px; padding:10px 12px;
-    box-shadow: 0 8px 28px rgba(0,0,0,.35); font-size:14px; display:flex; align-items:center; gap:10px;
-  }
-  .music button{
-    background:linear-gradient(135deg,#22d3ee,#60a5fa);
-    color:#0b0d12; border:0; font-weight:800; border-radius:10px; padding:8px 12px; cursor:pointer;
-    box-shadow: 0 6px 18px rgba(14,165,233,.35);
-  }
-  .music input[type="range"]{ width:120px }
-  .music .label{opacity:.8}
-  
   @media (prefers-reduced-motion: reduce){
-    .bg{animation:none} .big::after{display:none}
+    .bg{animation:none} .big::after{display:none} .big::before{animation:none}
   }
 </style>
 </head>
 <body>
   <div class="bg"></div>
-  <canvas id="glow"></canvas>
   <canvas id="trail"></canvas>
+  <canvas id="clickfx"></canvas>
 
   <div class="wrap">
     <main class="app">
@@ -137,9 +133,10 @@
           <div id="streakInfo" class="meta">Current streak: 0 days</div>
         </div>
 
-        <button id="revealBtn" class="big">Reveal today’s message ✨</button>
+        <!-- Per-button color themes via --halo and sparkle palette -->
+        <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
         <div class="row">
-          <button id="skipBtn" class="big ghost">Nah, maybe later</button>
+          <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
         </div>
       </div>
 
@@ -149,8 +146,8 @@
         <div class="meta" id="explain"></div>
 
         <div class="row">
-          <button id="willDoBtn" class="big">Will do ✅</button>
-          <button id="doneBtn"   class="big ghost">Done for today</button>
+          <button id="willDoBtn" class="big" style="--halo:#34d399;">Will do ✅</button>
+          <button id="doneBtn"   class="big ghost" style="--halo:#fbbf24;">Done for today</button>
         </div>
 
         <div class="footer" id="todayMeta"></div>
@@ -161,17 +158,8 @@
   <!-- Toast -->
   <div id="toast"><span id="toastText">Saved</span></div>
 
-  <!-- Music control -->
-  <div class="music">
-    <button id="musicToggle">Play music ♪</button>
-    <span class="label">Volume</span>
-    <input id="musicVol" type="range" min="0" max="1" step="0.01" value="0.25" />
-  </div>
-
 <script>
-/* =========================
-   DATA (edit your signs)
-   ========================= */
+/* ====== DATA ====== */
 const SIGNS = [
   { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
   { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
@@ -180,48 +168,38 @@ const SIGNS = [
   { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
 ];
 
-/* =========================
-   STATE & HELPERS
-   ========================= */
+/* ====== STATE/HELPERS ====== */
 const qs = s=>document.querySelector(s);
-const rand = (a,b)=>Math.random()*(b-a)+a;
-
 function dayOfYear(d=new Date()){const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)}
-function getSeed(){let s=localStorage.getItem("seed");if(!s){s=Math.floor(Math.random()*100000).toString();localStorage.setItem("seed",s)}return parseInt(s,10)}
-function pickTodayIndex(){const idx=(dayOfYear()+getSeed())%SIGNS.length;return idx<0?idx+SIGNS.length:idx}
+function getSeed(){let s=localStorage.getItem("seed"); if(!s){s=Math.floor(Math.random()*100000).toString(); localStorage.setItem("seed", s);} return parseInt(s,10)}
+function pickTodayIndex(){const idx=(dayOfYear()+getSeed())%SIGNS.length; return idx<0?idx+SIGNS.length:idx}
 function ymd(d=new Date()){return d.toISOString().slice(0,10)}
 function loadState(){try{return JSON.parse(localStorage.getItem("state_v1"))||{}}catch{return{}}}
-function saveState(s){localStorage.setItem("state_v1",JSON.stringify(s))}
+function saveState(s){localStorage.setItem("state_v1", JSON.stringify(s))}
 
 const state=loadState(); const todayKey=ymd();
 const yesterdayKey=(()=>{const d=new Date(); d.setDate(d.getDate()-1); return ymd(d)})();
 
-/* =========================
-   UI REFS
-   ========================= */
+/* ====== UI REFS ====== */
 const screenIntro=qs("#screen-intro"), screenToday=qs("#screen-today");
 const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoBtn"), doneBtn=qs("#doneBtn");
 const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
 const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
 const toast=qs("#toast"), toastText=qs("#toastText");
 
-/* =========================
-   STREAK & NUDGE
-   ========================= */
+/* ====== STREAK/NUDGE ====== */
 function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1);
   for(;;){const k=d.toISOString().slice(0,10); if(state[k]?.done===true){s++; d.setDate(d.getDate()-1)}else break;} return s}
 function mascotFor(streak){if(streak>=10)return"🌳"; if(streak>=5)return"🌿"; if(streak>=2)return"🌱"; return"🫘"}
 function getYesterdayNudge(){const y=state[yesterdayKey]; if(y&&y.planned===true&&y.done==null)return"Did you do yesterday’s sign?"; return null}
 function updateStreakInfo(){
   const n=getYesterdayNudge(); const s=computeStreak();
-  if(nudgeBanner) nudgeBanner.style.display= n ? "block" : "none";
-  streakInfo.textContent=`Current streak: ${s} day${s===1?"":"s"}`;
+  if(nudgeBanner) nudgeBanner.style.display = n ? "block" : "none";
+  streakInfo.textContent = `Current streak: ${s} day${s===1?"":"s"}`;
   const m=qs("#mascot"); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px";
 }
 
-/* =========================
-   TOAST
-   ========================= */
+/* ====== TOAST ====== */
 function showToast(msg, ms=1800){
   toastText.textContent=msg;
   toast.style.opacity="1";
@@ -233,9 +211,7 @@ function showToast(msg, ms=1800){
   }, ms);
 }
 
-/* =========================
-   BUTTON RIPPLE
-   ========================= */
+/* ====== RIPPLE ON BUTTON ====== */
 function attachRipple(btn){
   btn.addEventListener('pointerdown', e=>{
     const r=btn.getBoundingClientRect();
@@ -247,13 +223,10 @@ function attachRipple(btn){
 }
 [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
 
-/* =========================
-   CALM COLOR TRAIL (cursor)
-   ========================= */
+/* ====== MOUSE COLOR TRAIL ====== */
 const trail = qs("#trail"), tctx = trail.getContext("2d");
-const glow  = qs("#glow"),  gctx = glow.getContext("2d");
-function resizeCanvases(){ trail.width=innerWidth; trail.height=innerHeight; glow.width=innerWidth; glow.height=innerHeight; }
-resizeCanvases(); addEventListener('resize', resizeCanvases);
+function resizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; }
+resizeTrail(); addEventListener('resize', resizeTrail);
 
 let points=[]; // recent pointer positions
 addEventListener('pointermove', e=>{
@@ -264,132 +237,72 @@ addEventListener('pointermove', e=>{
 (function drawTrail(){
   requestAnimationFrame(drawTrail);
   const now=Date.now();
-  // Trail lines
   tctx.clearRect(0,0,trail.width,trail.height);
   if(points.length<2) return;
   tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
   for(let i=1;i<points.length;i++){
     const p0=points[i-1], p1=points[i];
-    const age = now - p1.t;
-    if(age>1600) continue;
+    const age = now - p1.t; if(age>1600) continue;
     const life = 1 - age/1600;
     const w = 2 + life*6;
     const hue = (p1.t/12) % 360;
     tctx.strokeStyle = `hsla(${hue}, 85%, 60%, ${0.12 + life*0.28})`;
     tctx.lineWidth = w;
-    tctx.beginPath();
-    tctx.moveTo(p0.x, p0.y);
-    tctx.lineTo(p1.x, p1.y);
-    tctx.stroke();
-  }
-  // Soft glow following cursor
-  const p = points[points.length-1];
-  gctx.clearRect(0,0,glow.width,glow.height);
-  if(p){
-    const hue = (p.t/12) % 360;
-    const grad = gctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 120);
-    grad.addColorStop(0, `hsla(${hue},90%,65%,.35)`);
-    grad.addColorStop(1, `hsla(${hue},90%,65%,0)`);
-    gctx.fillStyle = grad;
-    gctx.beginPath(); gctx.arc(p.x, p.y, 140, 0, Math.PI*2); gctx.fill();
+    tctx.beginPath(); tctx.moveTo(p0.x, p0.y); tctx.lineTo(p1.x, p1.y); tctx.stroke();
   }
 })();
 
-/* =========================
-   MOZART-STYLE PIANO LOOP
-   (K.545 opening motif; public domain)
-   ========================= */
-let AC=null, masterGain=null, musicGain=0.25, isPlaying=false, nextNoteTime=0, timerId=null;
-const bpm = 110; // gentle tempo
-const eighth = 60/bpm/2; // eighth note duration (seconds)
+/* ====== CLICK SPARKLES (per-button palette) ====== */
+const clickfx = qs("#clickfx"), cfx = clickfx.getContext("2d");
+function resizeFX(){ clickfx.width=innerWidth; clickfx.height=innerHeight; }
+resizeFX(); addEventListener('resize', resizeFX);
 
-function ensureAC(){
-  if(!AC){
-    const C = window.AudioContext || window.webkitAudioContext;
-    AC = new C();
-    masterGain = AC.createGain();
-    masterGain.gain.value = musicGain;
-    masterGain.connect(AC.destination);
+const PALETTES = {
+  reveal: ['#60a5fa','#38bdf8','#93c5fd','#bae6fd'],
+  skip:   ['#a78bfa','#c4b5fd','#ddd6fe','#e9d5ff'],
+  willdo: ['#34d399','#2dd4bf','#6ee7b7','#a7f3d0'],
+  done:   ['#f59e0b','#fbbf24','#fde68a','#fcd34d']
+};
+
+function burst(x,y, palette, count=18){
+  const parts=[];
+  for(let i=0;i<count;i++){
+    parts.push({
+      x, y,
+      vx:(Math.random()-.5)*5,
+      vy:(Math.random()-.5)*5-2,
+      life:560,
+      r:2+Math.random()*2,
+      c: palette[i % palette.length]
+    });
   }
-}
-function setMusicVolume(v){
-  musicGain = v;
-  if(masterGain) masterGain.gain.value = musicGain;
-}
-
-/* Simple piano-ish synth */
-function playPiano(note, time, dur=0.28, gain=0.08){
-  if(note===null) return;
-  const freq = noteToFreq(note);
-  const o1 = AC.createOscillator(); o1.type="sine"; o1.frequency.value=freq;
-  const o2 = AC.createOscillator(); o2.type="triangle"; o2.frequency.value=freq*2;
-  const g  = AC.createGain(); g.gain.setValueAtTime(0, time);
-  // quick hammer, soft body
-  g.gain.linearRampToValueAtTime(gain, time+0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001, time+dur);
-  const lp = AC.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=2400; lp.Q.value=0.7;
-  o1.connect(lp); o2.connect(lp); lp.connect(g); g.connect(masterGain);
-  o1.start(time); o2.start(time);
-  o1.stop(time+dur); o2.stop(time+dur);
+  const start=performance.now();
+  (function loop(t){
+    const elapsed = t - start;
+    cfx.clearRect(0,0,clickfx.width,clickfx.height);
+    const alive = [];
+    parts.forEach(p=>{
+      p.x += p.vx; p.y += p.vy; p.vy += .05; p.life -= 16;
+      if(p.life>0){ alive.push(p); cfx.fillStyle=p.c; cfx.beginPath(); cfx.arc(p.x,p.y,p.r,0,Math.PI*2); cfx.fill(); }
+    });
+    if(alive.length) requestAnimationFrame(loop);
+  })(start);
 }
 
-/* Note name → frequency */
-function noteToFreq(n){
-  const A4=440, map={C:0,'C#':1,Db:1,D:2,'D#':3,Eb:3,E:4,F:5,'F#':6,Gb:6,G:7,'G#':8,Ab:8,A:9,'A#':10,Bb:10,B:11};
-  const m=n.match(/^([A-G]#?|Db|Eb|Gb|Ab|Bb)(\d)$/); if(!m) return A4;
-  const semi = map[m[1]] + (parseInt(m[2],10)-4)*12;
-  return A4 * Math.pow(2, (semi-9)/12); // C4 is -9 semitones from A4
+/* helper to attach sparkles to a button with its palette */
+function sparkleButton(btn, palette){
+  btn.addEventListener('pointerdown', e=>{
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX, y = e.clientY; // sparkles at click point
+    burst(x, y, palette, 18);
+  });
 }
+sparkleButton(revealBtn, PALETTES.reveal);
+sparkleButton(skipBtn,   PALETTES.skip);
+sparkleButton(willDoBtn, PALETTES.willdo);
+sparkleButton(doneBtn,   PALETTES.done);
 
-/* K.545 opening pattern (right hand motif + simple left hand pedal) */
-const SEQ = [
-  // bars feel: C E G C E G | G F E D C
-  {n:"C5", d:1}, {n:"E5", d:1}, {n:"G5", d:1}, {n:"C6", d:1}, {n:"E5", d:1}, {n:"G5", d:1},
-  {n:"G5", d:1}, {n:"F5", d:1}, {n:"E5", d:1}, {n:"D5", d:1}, {n:"C5", d:2},
-  // repeat variation
-  {n:"C5", d:1}, {n:"E5", d:1}, {n:"G5", d:1}, {n:"C6", d:1}, {n:"E5", d:1}, {n:"G5", d:1},
-  {n:"G5", d:1}, {n:"F5", d:1}, {n:"E5", d:1}, {n:"D5", d:1}, {n:"C5", d:2},
-];
-// Simple left hand pedal C4 on downbeats
-function scheduleBass(time){ playPiano("C4", time, 0.5, 0.06); }
-
-let seqIndex=0;
-function scheduler(){
-  while(nextNoteTime < AC.currentTime + 0.25){
-    const step = SEQ[seqIndex];
-    playPiano(step.n, nextNoteTime, step.d*eighth*0.95, 0.09);
-    if((seqIndex % 6) === 0) scheduleBass(nextNoteTime); // every 6 eighths, a soft pedal
-    nextNoteTime += step.d * eighth;
-    seqIndex = (seqIndex + 1) % SEQ.length;
-  }
-  timerId = setTimeout(scheduler, 25);
-}
-function startMusic(){
-  ensureAC();
-  if(isPlaying) return;
-  nextNoteTime = AC.currentTime + 0.05;
-  seqIndex = 0;
-  scheduler();
-  isPlaying = true;
-}
-function stopMusic(){
-  if(timerId) clearTimeout(timerId);
-  isPlaying = false;
-}
-
-/* Music controls */
-const musicToggle = qs("#musicToggle");
-const musicVol = qs("#musicVol");
-musicToggle.addEventListener("click", ()=>{
-  ensureAC();
-  if(!isPlaying){ startMusic(); musicToggle.textContent="Pause music ⏸"; }
-  else { stopMusic(); musicToggle.textContent="Play music ♪"; }
-});
-musicVol.addEventListener("input", e=> setMusicVolume(parseFloat(e.target.value)));
-
-/* =========================
-   TODAY CARD & EVENTS
-   ========================= */
+/* ====== TODAY CARD & EVENTS ====== */
 function showTodayCard(){
   const idx=pickTodayIndex(), s=SIGNS[idx];
   tag.textContent=s.tag||"Sign";
@@ -398,8 +311,6 @@ function showTodayCard(){
   const rec=state[todayKey]||{};
   todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
   screenIntro.style.display="none"; screenToday.style.display="block";
-  // ensure audio context on first interaction so play works later without extra taps
-  ensureAC();
 }
 
 revealBtn.onclick = ()=>{
@@ -429,9 +340,7 @@ doneBtn.onclick = ()=>{
   updateStreakInfo();
 };
 
-/* =========================
-   INIT
-   ========================= */
+/* ====== INIT ====== */
 updateStreakInfo();
 </script>
 </body>
