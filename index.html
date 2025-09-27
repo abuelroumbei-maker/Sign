@@ -24,8 +24,17 @@
       width: 100%; padding: 16px 18px; border-radius: 14px; font-size: 18px; font-weight: 700;
       border: 0; cursor: pointer; background: var(--accent); color: #fff;
       transition: transform .03s ease-in-out, opacity .2s ease;
+      position: relative; overflow: hidden; /* ripple */
     }
     .big:active { transform: translateY(1px); }
+    .big::after { /* ripple effect */
+      content:""; position:absolute; left:50%; top:50%;
+      width:0; height:0; background:rgba(255,255,255,.35); border-radius:50%;
+      transform: translate(-50%,-50%);
+      transition: width .35s ease, height .35s ease, opacity .5s ease;
+      opacity:0;
+    }
+    .big:active::after { width:220%; height:220%; opacity:1; transition:0s; }
     .ghost {
       background: transparent; color: var(--accent); border: 2px solid var(--accent);
     }
@@ -36,19 +45,43 @@
     .row { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
     .badge { display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:#e9ecff; color:#254ddf; }
     .footer { margin-top: 14px; font-size: 12px; color: var(--muted); }
+
+    /* Mascot wiggle */
+    @keyframes wiggle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+    #mascot { animation: wiggle 2s ease-in-out infinite; }
+
+    /* Toast default styles */
+    #toast {
+      position:fixed; left:50%; bottom:24px;
+      transform:translateX(-50%) translateY(120%);
+      background:#111; color:#fff; padding:12px 16px; border-radius:12px;
+      box-shadow:0 8px 24px rgba(0,0,0,.2); font-size:14px;
+      opacity:0; transition:transform .35s ease, opacity .35s ease; z-index:999;
+      max-width: 90vw; text-align: center;
+    }
   </style>
 </head>
 <body>
   <main class="app">
     <h1>Today Is The Day I…</h1>
-    <p>Tap the button to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+    <p>Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
 
     <div id="screen-intro" class="card">
+      <!-- Nudge banner (shows only if yesterday was planned but not marked done) -->
+      <div id="nudgeBanner" style="display:none;background:#fff3c4;border:1px solid #ffe18a;color:#6a5300;padding:10px 12px;border-radius:12px;margin-bottom:10px;font-size:14px;">
+        Did you do yesterday’s sign?
+      </div>
+
+      <!-- Mascot that grows with your streak -->
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <div id="mascot" style="font-size:28px;display:inline-block;">🫘</div>
+        <div id="streakInfo" class="meta">Current streak: 0 days</div>
+      </div>
+
       <button id="revealBtn" class="big">Reveal today’s message ✨</button>
       <div class="row">
         <button id="skipBtn" class="big ghost">Nah, maybe later</button>
       </div>
-      <div class="footer" id="streakInfo"></div>
     </div>
 
     <div id="screen-today" class="card" style="display:none">
@@ -65,16 +98,24 @@
     </div>
   </main>
 
+  <!-- Confetti canvas -->
+  <canvas id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:998;"></canvas>
+
+  <!-- Toast -->
+  <div id="toast"><span id="toastText">Saved</span></div>
+
   <script>
-    // --- Edit this list with your own daily lines ---
+    /************ EDIT YOUR DAILY LINES HERE ************/
     const SIGNS = [
-      { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen." , tag:"Growth" },
+      { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
       { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
       { text: "Ask one curious question.", explain: "Questions are doors to new ideas.", tag:"Curiosity" },
       { text: "Tidy a tiny space for 60 seconds.", explain: "Small resets make big differences.", tag:"Care" },
       { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
+      // add more objects like { text:"...", explain:"...", tag:"..." }
     ];
 
+    /************ UTILITIES ************/
     function dayOfYear(d=new Date()) {
       const start = new Date(d.getFullYear(),0,0);
       return Math.floor((d - start) / 86400000);
@@ -88,11 +129,11 @@
       const idx = (dayOfYear() + getSeed()) % SIGNS.length;
       return idx < 0 ? idx + SIGNS.length : idx;
     }
-
     function loadState() { try { return JSON.parse(localStorage.getItem("state_v1")) || {}; } catch { return {}; } }
     function saveState(s) { localStorage.setItem("state_v1", JSON.stringify(s)); }
     function ymd(d=new Date()) { return d.toISOString().slice(0,10); }
 
+    /************ STATE ************/
     const state = loadState();
     const todayKey = ymd();
     const yesterdayKey = (()=>{ const d=new Date(); d.setDate(d.getDate()-1); return ymd(d); })();
@@ -103,6 +144,7 @@
       return null;
     }
 
+    /************ UI ELEMENTS ************/
     const screenIntro  = document.getElementById("screen-intro");
     const screenToday  = document.getElementById("screen-today");
     const revealBtn    = document.getElementById("revealBtn");
@@ -114,11 +156,59 @@
     const tag          = document.getElementById("tag");
     const todayMeta    = document.getElementById("todayMeta");
     const streakInfo   = document.getElementById("streakInfo");
+    const nudgeBanner  = document.getElementById("nudgeBanner");
 
-    function computeStreak() {
+    /************ TOAST ************/
+    function showToast(msg, ms=1800){
+      const t = document.getElementById("toast");
+      document.getElementById("toastText").textContent = msg;
+      t.style.opacity = "1";
+      t.style.transform = "translateX(-50%) translateY(0)";
+      clearTimeout(showToast._h);
+      showToast._h = setTimeout(()=>{
+        t.style.opacity = "0";
+        t.style.transform = "translateX(-50%) translateY(120%)";
+      }, ms);
+    }
+
+    /************ CONFETTI ************/
+    function fireConfetti(duration=900, count=120){
+      const cvs = document.getElementById("confetti");
+      const ctx = cvs.getContext("2d");
+      const W = cvs.width = window.innerWidth;
+      const H = cvs.height = window.innerHeight;
+
+      const pieces = Array.from({length: count}).map(()=>({
+        x: Math.random()*W,
+        y: -20 - Math.random()*H*0.3,
+        r: 2 + Math.random()*4,
+        c: `hsl(${Math.floor(Math.random()*360)},80%,60%)`,
+        vy: 2 + Math.random()*4,
+        vx: -2 + Math.random()*4,
+        a: Math.random()*Math.PI,
+        va: -0.2 + Math.random()*0.4
+      }));
+
+      let start = performance.now();
+      (function frame(t){
+        const elapsed = t - start;
+        ctx.clearRect(0,0,W,H);
+        pieces.forEach(p=>{
+          p.x += p.vx; p.y += p.vy; p.a += p.va;
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
+          ctx.fillStyle = p.c; ctx.fillRect(-p.r, -p.r, p.r*2, p.r*2);
+          ctx.restore();
+        });
+        if (elapsed < duration) requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,W,H);
+      })(start);
+    }
+
+    /************ STREAK & MASCOT ************/
+    function computeStreak(){
+      // Count consecutive days ending yesterday where done === true.
       let streak = 0;
-      const d = new Date();
-      d.setDate(d.getDate()-1);
+      const d = new Date(); d.setDate(d.getDate()-1);
       while (true) {
         const key = d.toISOString().slice(0,10);
         if (state[key]?.done === true) { streak++; d.setDate(d.getDate()-1); }
@@ -126,13 +216,27 @@
       }
       return streak;
     }
+    function mascotFor(streak){
+      if (streak >= 10) return "🌳"; // tree
+      if (streak >= 5)  return "🌿"; // leafy sprig
+      if (streak >= 2)  return "🌱"; // sprout
+      return "🫘"; // seed
+    }
+    function updateMascot(){
+      const m = document.getElementById("mascot");
+      if (!m) return;
+      const s = computeStreak();
+      m.textContent = mascotFor(s);
+    }
 
     function updateStreakInfo() {
       const nudge = getYesterdayNudge();
       const streak = computeStreak();
-      streakInfo.textContent = nudge ? (nudge + " (tap Reveal to log it)") : `Current streak: ${streak} day${streak===1?"":"s"}`;
+      if (nudgeBanner) nudgeBanner.style.display = nudge ? "block" : "none";
+      streakInfo.textContent = `Current streak: ${streak} day${streak===1?"":"s"}`;
     }
 
+    /************ TODAY CARD ************/
     function showTodayCard() {
       const idx = pickTodayIndex();
       const s = SIGNS[idx];
@@ -145,6 +249,7 @@
       screenToday.style.display = "block";
     }
 
+    /************ EVENTS ************/
     revealBtn.onclick = () => {
       if (!state[todayKey]) state[todayKey] = { planned: null, done: null, signIndex: pickTodayIndex() };
       saveState(state);
@@ -155,8 +260,8 @@
       if (!state[todayKey]) state[todayKey] = { planned: false, done: null, signIndex: pickTodayIndex() };
       else state[todayKey].planned = false;
       saveState(state);
-      alert("All good. Come back anytime today.");
-      updateStreakInfo();
+      showToast("All good. Come back anytime today.");
+      updateStreakInfo(); updateMascot();
     };
 
     willDoBtn.onclick = () => {
@@ -165,7 +270,8 @@
       state[todayKey].done = null;
       saveState(state);
       todayMeta.textContent = "You planned this today. Come back later to mark it done.";
-      alert("Nice! Come back later and tap “Done for today”.");
+      showToast("Nice! Come back later and tap “Done for today”.");
+      updateStreakInfo(); updateMascot();
     };
 
     doneBtn.onclick = () => {
@@ -173,11 +279,14 @@
       state[todayKey].done = true;
       saveState(state);
       todayMeta.textContent = "Marked done ✅";
-      alert("Great job!");
-      updateStreakInfo();
+      fireConfetti();
+      showToast("Great job! ✅");
+      updateStreakInfo(); updateMascot();
     };
 
+    // Initialize
     updateStreakInfo();
+    updateMascot();
   </script>
 </body>
 </html>
