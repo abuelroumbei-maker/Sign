@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Today Is The Day I…</title>
+  <meta name="theme-color" content="#ffffff" />
+  <style>
+    :root { --bg:#fff; --fg:#111; --muted:#666; --accent:#2b74ff; --card:#f6f7fb; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: var(--fg); background: var(--bg); display: grid; place-items: center;
+    }
+    .app { width: min(720px, 92vw); padding: 24px; }
+    h1 { font-size: clamp(24px, 5vw, 40px); margin: 0 0 8px; }
+    p { margin: 0.25rem 0 1rem; color: var(--muted); }
+    .card {
+      background: var(--card); border-radius: 18px; padding: 20px; margin-top: 16px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    }
+    .big {
+      width: 100%; padding: 16px 18px; border-radius: 14px; font-size: 18px; font-weight: 700;
+      border: 0; cursor: pointer; background: var(--accent); color: #fff;
+      transition: transform .03s ease-in-out, opacity .2s ease;
+    }
+    .big:active { transform: translateY(1px); }
+    .ghost {
+      background: transparent; color: var(--accent); border: 2px solid var(--accent);
+    }
+    .today {
+      font-size: clamp(18px, 3.6vw, 24px); line-height: 1.35; margin: 8px 0 10px;
+    }
+    .meta { font-size: 13px; color: var(--muted); }
+    .row { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
+    .badge { display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:#e9ecff; color:#254ddf; }
+    .footer { margin-top: 14px; font-size: 12px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <h1>Today Is The Day I…</h1>
+    <p>Tap the button to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+
+    <div id="screen-intro" class="card">
+      <button id="revealBtn" class="big">Reveal today’s message ✨</button>
+      <div class="row">
+        <button id="skipBtn" class="big ghost">Nah, maybe later</button>
+      </div>
+      <div class="footer" id="streakInfo"></div>
+    </div>
+
+    <div id="screen-today" class="card" style="display:none">
+      <div class="badge" id="tag">Sign</div>
+      <div class="today" id="messageText"></div>
+      <div class="meta" id="explain"></div>
+
+      <div class="row">
+        <button id="willDoBtn" class="big">Will do ✅</button>
+        <button id="doneBtn"   class="big ghost">Done for today</button>
+      </div>
+
+      <div class="footer" id="todayMeta"></div>
+    </div>
+  </main>
+
+  <script>
+    // --- Edit this list with your own daily lines ---
+    const SIGNS = [
+      { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen." , tag:"Growth" },
+      { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
+      { text: "Ask one curious question.", explain: "Questions are doors to new ideas.", tag:"Curiosity" },
+      { text: "Tidy a tiny space for 60 seconds.", explain: "Small resets make big differences.", tag:"Care" },
+      { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
+    ];
+
+    function dayOfYear(d=new Date()) {
+      const start = new Date(d.getFullYear(),0,0);
+      return Math.floor((d - start) / 86400000);
+    }
+    function getSeed() {
+      let s = localStorage.getItem("seed");
+      if (!s) { s = Math.floor(Math.random()*100000).toString(); localStorage.setItem("seed", s); }
+      return parseInt(s, 10);
+    }
+    function pickTodayIndex() {
+      const idx = (dayOfYear() + getSeed()) % SIGNS.length;
+      return idx < 0 ? idx + SIGNS.length : idx;
+    }
+
+    function loadState() { try { return JSON.parse(localStorage.getItem("state_v1")) || {}; } catch { return {}; } }
+    function saveState(s) { localStorage.setItem("state_v1", JSON.stringify(s)); }
+    function ymd(d=new Date()) { return d.toISOString().slice(0,10); }
+
+    const state = loadState();
+    const todayKey = ymd();
+    const yesterdayKey = (()=>{ const d=new Date(); d.setDate(d.getDate()-1); return ymd(d); })();
+
+    function getYesterdayNudge() {
+      const y = state[yesterdayKey];
+      if (y && y.planned === true && y.done == null) return "Did you do yesterday’s sign?";
+      return null;
+    }
+
+    const screenIntro  = document.getElementById("screen-intro");
+    const screenToday  = document.getElementById("screen-today");
+    const revealBtn    = document.getElementById("revealBtn");
+    const skipBtn      = document.getElementById("skipBtn");
+    const willDoBtn    = document.getElementById("willDoBtn");
+    const doneBtn      = document.getElementById("doneBtn");
+    const messageText  = document.getElementById("messageText");
+    const explain      = document.getElementById("explain");
+    const tag          = document.getElementById("tag");
+    const todayMeta    = document.getElementById("todayMeta");
+    const streakInfo   = document.getElementById("streakInfo");
+
+    function computeStreak() {
+      let streak = 0;
+      const d = new Date();
+      d.setDate(d.getDate()-1);
+      while (true) {
+        const key = d.toISOString().slice(0,10);
+        if (state[key]?.done === true) { streak++; d.setDate(d.getDate()-1); }
+        else break;
+      }
+      return streak;
+    }
+
+    function updateStreakInfo() {
+      const nudge = getYesterdayNudge();
+      const streak = computeStreak();
+      streakInfo.textContent = nudge ? (nudge + " (tap Reveal to log it)") : `Current streak: ${streak} day${streak===1?"":"s"}`;
+    }
+
+    function showTodayCard() {
+      const idx = pickTodayIndex();
+      const s = SIGNS[idx];
+      tag.textContent = s.tag || "Sign";
+      messageText.textContent = s.text;
+      explain.textContent = s.explain || "";
+      const rec = state[todayKey] || {};
+      todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
+      screenIntro.style.display = "none";
+      screenToday.style.display = "block";
+    }
+
+    revealBtn.onclick = () => {
+      if (!state[todayKey]) state[todayKey] = { planned: null, done: null, signIndex: pickTodayIndex() };
+      saveState(state);
+      showTodayCard();
+    };
+
+    skipBtn.onclick = () => {
+      if (!state[todayKey]) state[todayKey] = { planned: false, done: null, signIndex: pickTodayIndex() };
+      else state[todayKey].planned = false;
+      saveState(state);
+      alert("All good. Come back anytime today.");
+      updateStreakInfo();
+    };
+
+    willDoBtn.onclick = () => {
+      state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
+      state[todayKey].planned = true;
+      state[todayKey].done = null;
+      saveState(state);
+      todayMeta.textContent = "You planned this today. Come back later to mark it done.";
+      alert("Nice! Come back later and tap “Done for today”.");
+    };
+
+    doneBtn.onclick = () => {
+      state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
+      state[todayKey].done = true;
+      saveState(state);
+      todayMeta.textContent = "Marked done ✅";
+      alert("Great job!");
+      updateStreakInfo();
+    };
+
+    updateStreakInfo();
+  </script>
+</body>
+</html>
