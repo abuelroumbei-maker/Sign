@@ -1,455 +1,384 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Today Is The Day I…</title>
-  <meta name="theme-color" content="#ffffff" />
-  <style>
-    :root{
-      --bg1:#fff3f7; --bg2:#eef7ff; --bg3:#f3fff1;
-      --fg:#0f172a; --muted:#5b6476; --card:#ffffffcc; --accent:#6d5efc;
-      --accent2:#ff6b6b; --accent3:#00c2ff; --accent4:#2dd4bf;
-      --shadow: 0 10px 30px rgba(31, 41, 55, .18);
-    }
-    *{ box-sizing:border-box }
-    html,body{ height:100% }
-    body{
-      margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--fg); overflow:hidden; /* we'll manage scroll visually */
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Today Is The Day I… — CHAOS</title>
+<meta name="theme-color" content="#000000" />
+<style>
+  :root{
+    --fg:#0e0f12; --muted:#5f667a;
+    --accent:#7b5cff; --accent2:#ff6bcb; --accent3:#00d4ff; --accent4:#2df9a6;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:#05060a; overflow:hidden}
+  .wrap{height:100%; display:grid; place-items:center; padding:20px}
+  .app{width:min(900px,94vw)}
+  .title{
+    margin:0 0 6px; font-size:clamp(26px,6vw,48px); letter-spacing:.3px;
+    background:linear-gradient(90deg,#fff,#c8e3ff,#fff);
+    -webkit-background-clip:text; background-clip:text; color:transparent; filter:drop-shadow(0 6px 16px rgba(255,255,255,.15));
+  }
+  .subtitle{margin:0 0 14px; color:#c7d2fe; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
 
-    /* ===== Animated Gradient Background ===== */
-    .bg{
-      position:fixed; inset:0; z-index:-3;
-      background: radial-gradient(1200px 800px at 10% 10%, var(--bg1), transparent 60%),
-                  radial-gradient(1000px 700px at 90% 30%, var(--bg2), transparent 60%),
-                  radial-gradient(900px 700px at 40% 90%, var(--bg3), transparent 60%),
-                  linear-gradient(120deg, #fff, #fafcff 50%, #ffffff);
-      animation: bgShift 18s ease-in-out infinite alternate;
-    }
-    @keyframes bgShift{
-      0%  { filter:hue-rotate(0deg) saturate(1); }
-      100%{ filter:hue-rotate(12deg) saturate(1.15); }
-    }
+  /* Card with 3D hover */
+  .card{
+    background: rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:24px; padding:22px 20px; backdrop-filter: blur(10px) saturate(140%);
+    box-shadow: 0 18px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.15);
+    transform: perspective(800px) rotateX(0) rotateY(0) translateY(8px) scale(.98);
+    opacity:0; animation:cardIn .6s cubic-bezier(.2,.8,.2,1) forwards;
+  }
+  @keyframes cardIn{to{opacity:1; transform: perspective(800px) rotateX(0) rotateY(0) translateY(0) scale(1)}}
+  .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
 
-    /* ===== Floating Shapes (subtle) ===== */
-    .floaters{ position:fixed; inset:0; pointer-events:none; z-index:-2; overflow:hidden; }
-    .bubble{
-      position:absolute; width:20px; height:20px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.4) 60%, transparent 61%),
-                  linear-gradient(135deg, rgba(255,255,255,.4), rgba(255,255,255,.05));
-      box-shadow: 0 2px 8px rgba(0,0,0,.05);
-      animation: floatUp 16s linear infinite;
-      opacity:.65;
-    }
-    @keyframes floatUp{
-      from { transform: translateY(110vh) translateX(0) scale(.8); }
-      to   { transform: translateY(-15vh) translateX(0) scale(1.15); }
-    }
-    .star{
-      position:absolute; width:10px; height:10px; transform: rotate(45deg);
-      background: radial-gradient(circle, #fff, #fff0 70%);
-      box-shadow: 0 0 16px rgba(255,255,255,.45);
-      animation: drift 14s ease-in-out infinite;
-      opacity:.7;
-    }
-    @keyframes drift{
-      0%  { transform: translateY(0) translateX(0) rotate(45deg) scale(1); }
-      50% { transform: translateY(-20px) translateX(10px) rotate(45deg) scale(1.1); }
-      100%{ transform: translateY(0) translateX(0) rotate(45deg) scale(1); }
-    }
+  .big{
+    flex:1 0 220px; padding:16px 18px; border-radius:18px; font-size:18px; font-weight:900; border:0; cursor:pointer;
+    color:#0a0b0f; position:relative; overflow:hidden; outline:none;
+    background: conic-gradient(from 0deg, var(--accent), var(--accent2), var(--accent3), var(--accent4), var(--accent));
+    box-shadow: 0 14px 36px rgba(123,92,255,.4);
+    transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  }
+  .big:hover{ filter:brightness(1.05); box-shadow: 0 16px 44px rgba(123,92,255,.55) }
+  .big:active{ transform: translateY(1px) scale(.995) }
+  .ghost{
+    color:#fff; background:linear-gradient(135deg, rgba(255,255,255,.18), rgba(255,255,255,.05));
+    border:1.5px solid rgba(255,255,255,.35);
+    box-shadow: 0 10px 28px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.15);
+  }
 
-    /* ===== App Layout ===== */
-    .wrap{ height:100%; display:grid; place-items:center; padding:22px; }
-    .app{ width:min(820px, 92vw); }
+  /* ripple */
+  .big::after{content:""; position:absolute; left:var(--x,50%); top:var(--y,50%); width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35); transform:translate(-50%,-50%); opacity:0; pointer-events:none; transition:width .5s ease, height .5s ease, opacity .7s ease}
+  .big.rippling::after{width:220%; height:220%; opacity:1}
 
-    .title{
-      display:flex; align-items:center; gap:10px; margin:0 0 6px;
-      font-size: clamp(24px, 5vw, 44px); letter-spacing:.2px;
-      background: linear-gradient(90deg, #111, #334, #111);
-      -webkit-background-clip:text; background-clip:text; color:transparent;
-    }
-    .subtitle{ margin:0 0 14px; color:var(--muted); font-size:clamp(14px,2.2vw,16px) }
+  /* Tag + text */
+  .badge{display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,#dff,#fed); color:#213; border:1px solid rgba(255,255,255,.5)}
+  .today{font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px; color:#fff}
+  .meta{font-size:13px; color:#cbd5e1}
+  .footer{margin-top:14px; font-size:12px; color:#cbd5e1}
 
-    .card{
-      background: var(--card); border-radius: 22px; padding: 22px 20px;
-      box-shadow: var(--shadow); backdrop-filter: blur(6px);
-      transform: translateY(14px) scale(.98); opacity:0;
-      animation: cardIn .6s cubic-bezier(.2,.8,.2,1) forwards;
-    }
-    @keyframes cardIn{
-      to{ transform: translateY(0) scale(1); opacity:1; }
-    }
+  /* Nudge */
+  .nudge{display:none; background:#fff0d1; border:1px solid #ffe18a; color:#6a5300; padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px; box-shadow:0 6px 14px rgba(0,0,0,.08); animation:glow 2s ease-in-out infinite}
+  @keyframes glow{0%,100%{box-shadow:0 6px 14px rgba(255,225,138,.3)} 50%{box-shadow:0 6px 14px rgba(255,225,138,.75)}}
 
-    .row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px }
+  /* Background FX layers */
+  #aurora{position:fixed; inset:0; z-index:-4; background:
+    radial-gradient(60% 80% at 20% 20%, rgba(123,92,255,.35), transparent 60%),
+    radial-gradient(70% 90% at 80% 40%, rgba(0,212,255,.35), transparent 60%),
+    radial-gradient(70% 90% at 40% 80%, rgba(45,249,166,.3), transparent 60%);
+    filter: blur(40px) saturate(1.3) brightness(1.1); animation:auroraShift 14s ease-in-out infinite alternate;
+  }
+  @keyframes auroraShift{0%{transform:translateX(0)}100%{transform:translateX(-2%) scale(1.02)}}
+  #conic{position:fixed; inset:-20% -20% -20% -20%; z-index:-5; background:conic-gradient(from var(--ang,0deg), #0a0b10, #0b0d18, #0c0f16, #0a0b10); animation:spin 40s linear infinite}
+  @keyframes spin{to{--ang:360deg}}
 
-    /* ===== Buttons ===== */
-    .big{
-      flex:1 0 200px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
-      border:0; cursor:pointer; color:#fff; position:relative; overflow:hidden;
-      background: linear-gradient(135deg, var(--accent), var(--accent3));
-      box-shadow: 0 10px 24px rgba(109,94,252,.35);
-      transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
-      outline: none;
-    }
-    .big:hover{ filter:brightness(1.05); box-shadow: 0 12px 28px rgba(109,94,252,.45); }
-    .big:active{ transform: translateY(1px) scale(.995); }
-    .ghost{
-      background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
-      color: var(--accent);
-      border:2px solid rgba(109,94,252,.35);
-      box-shadow: 0 8px 18px rgba(31, 41, 55, .08);
-    }
+  /* Parallax stars */
+  #stars{position:fixed; inset:0; z-index:-3; background:transparent; pointer-events:none}
 
-    /* button ripple */
-    .big::after{
-      content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
-      width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
-      transform: translate(-50%,-50%); opacity:0; pointer-events:none;
-      transition: width .45s ease, height .45s ease, opacity .6s ease;
-    }
-    .big.rippling::after{ width:220%; height:220%; opacity:1; }
+  /* Blobs */
+  .blob{position:fixed; width:32vmax; height:32vmax; border-radius:50%; filter:blur(30px); opacity:.25; z-index:-2; mix-blend-mode:screen; animation:blobMorph 18s ease-in-out infinite alternate}
+  .b1{background:linear-gradient(135deg,#7b5cff,#00d4ff); top:-10vmax; left:-8vmax}
+  .b2{background:linear-gradient(135deg,#ff6bcb,#2df9a6); bottom:-12vmax; right:-10vmax; animation-duration:22s}
+  @keyframes blobMorph{0%{transform:translate(0,0) scale(1)}100%{transform:translate(4vmax, -2vmax) scale(1.12)}}
 
-    /* Tag + text */
-    .badge{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
-      background:linear-gradient(90deg,#e9ecff,#e5f9ff); color:#254ddf; border:1px solid #dae6ff; }
-    .today{ font-size:clamp(18px,3.6vw,26px); line-height:1.35; margin:10px 0 8px }
-    .meta{ font-size:13px; color:var(--muted) }
-    .footer{ margin-top:14px; font-size:12px; color:var(--muted) }
+  /* Toast */
+  #toast{position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%); background:#000; color:#fff; padding:12px 16px; border-radius:12px; box-shadow:0 12px 32px rgba(0,0,0,.45); font-size:14px; z-index:999; max-width:90vw; text-align:center; opacity:0; transition:transform .35s ease, opacity .35s ease}
 
-    /* Nudge banner */
-    .nudge{
-      display:none; background:#fff0d1; border:1px solid #ffe18a; color:#6a5300;
-      padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px;
-      box-shadow: 0 6px 14px rgba(0,0,0,.04);
-      animation: glow 2.2s ease-in-out infinite;
-    }
-    @keyframes glow{
-      0%,100%{ box-shadow: 0 6px 14px rgba(255, 225, 138,.25); }
-      50%    { box-shadow: 0 6px 14px rgba(255, 225, 138,.6); }
-    }
+  /* Canvases */
+  #confetti, #spark, #fx {position:fixed; inset:0; pointer-events:none; z-index:998}
+  #fx{z-index:996}
 
-    /* Mascot wiggle + size ramp with streak */
-    @keyframes wiggle { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-3px) rotate(-2deg)} }
-    #mascot{ animation: wiggle 2s ease-in-out infinite; will-change: transform; }
+  /* Scramble text style */
+  .scramble span{display:inline-block}
 
-    /* Toast */
-    #toast{
-      position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%);
-      background:#111; color:#fff; padding:12px 16px; border-radius:12px;
-      box-shadow:0 8px 24px rgba(0,0,0,.2); font-size:14px; z-index:999;
-      max-width: 90vw; text-align:center; opacity:0;
-      transition: transform .35s ease, opacity .35s ease;
-    }
+  /* Accessibility: reduce motion */
+  @media (prefers-reduced-motion: reduce){
+    #aurora,#conic,.blob,.nudge,.card,.big::after{animation:none!important}
+    #stars{display:none}
+  }
 
-    /* Click sparkle canvas */
-    #spark{ position:fixed; inset:0; pointer-events:none; z-index:997; }
+  /* Glitch effect class */
+  .glitch{animation:glitch .35s steps(2,end) 2}
+  @keyframes glitch{
+    0%{transform:translate(0)} 20%{transform:translate(-2px,1px)} 40%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,-2px)} 80%{transform:translate(1px,2px)} 100%{transform:translate(0)}
+  }
 
-    /* Reduce motion for accessibility */
-    @media (prefers-reduced-motion: reduce){
-      .bg, .bubble, .star, #mascot{ animation:none !important }
-      .card{ animation:none; opacity:1; transform:none }
-      .big.rippling::after{ display:none }
-    }
-  </style>
+  /* Screen shake */
+  .shake{animation:shake .5s cubic-bezier(.36,.07,.19,.97) both}
+  @keyframes shake{
+    10%,90%{transform:translate3d(-1px,0,0)}
+    20%,80%{transform:translate3d(2px,0,0)}
+    30%,50%,70%{transform:translate3d(-4px,0,0)}
+    40%,60%{transform:translate3d(4px,0,0)}
+  }
+</style>
 </head>
 <body>
-  <!-- animated background & floaters -->
-  <div class="bg"></div>
-  <div class="floaters" id="floaters"></div>
+<div id="conic"></div>
+<div id="aurora"></div>
+<canvas id="stars"></canvas>
+<div class="blob b1"></div><div class="blob b2"></div>
 
-  <div class="wrap">
-    <main class="app">
-      <h1 class="title">Today Is The Day I…</h1>
-      <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+<div class="wrap">
+  <main class="app">
+    <h1 class="title">Today Is The Day I…</h1>
+    <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
 
-      <div id="screen-intro" class="card">
-        <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
-
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-          <div id="mascot" style="font-size:28px;display:inline-block;">🫘</div>
-          <div id="streakInfo" class="meta">Current streak: 0 days</div>
-        </div>
-
-        <button id="revealBtn" class="big">Reveal today’s message ✨</button>
-        <div class="row">
-          <button id="skipBtn" class="big ghost">Nah, maybe later</button>
-        </div>
+    <div id="screen-intro" class="card">
+      <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div id="mascot" style="font-size:28px;display:inline-block">🫘</div>
+        <div id="streakInfo" class="meta">Current streak: 0 days</div>
       </div>
-
-      <div id="screen-today" class="card" style="display:none">
-        <div class="badge" id="tag">Sign</div>
-        <div class="today" id="messageText"></div>
-        <div class="meta" id="explain"></div>
-
-        <div class="row">
-          <button id="willDoBtn" class="big">Will do ✅</button>
-          <button id="doneBtn"   class="big ghost">Done for today</button>
-        </div>
-
-        <div class="footer" id="todayMeta"></div>
+      <button id="revealBtn" class="big">Reveal today’s message ✨</button>
+      <div class="row">
+        <button id="skipBtn" class="big ghost">Nah, maybe later</button>
       </div>
-    </main>
-  </div>
+    </div>
 
-  <!-- FX layers -->
-  <canvas id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:998;"></canvas>
-  <canvas id="spark"></canvas>
-  <div id="toast"><span id="toastText">Saved</span></div>
+    <div id="screen-today" class="card" style="display:none">
+      <div class="badge" id="tag">Sign</div>
+      <div class="today scramble" id="messageText"></div>
+      <div class="meta" id="explain"></div>
+      <div class="row">
+        <button id="willDoBtn" class="big">Will do ✅</button>
+        <button id="doneBtn" class="big ghost">Done for today</button>
+      </div>
+      <div class="footer" id="todayMeta"></div>
+    </div>
+  </main>
+</div>
 
-  <script>
-    /************ EDIT YOUR DAILY LINES HERE ************/
-    const SIGNS = [
-      { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
-      { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
-      { text: "Ask one curious question.", explain: "Questions are doors to new ideas.", tag:"Curiosity" },
-      { text: "Tidy a tiny space for 60 seconds.", explain: "Small resets make big differences.", tag:"Care" },
-      { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
-      // add more objects like { text:"...", explain:"...", tag:"..." }
-    ];
+<!-- FX layers -->
+<canvas id="confetti"></canvas>
+<canvas id="spark"></canvas>
+<canvas id="fx"></canvas>
+<div id="toast"><span id="toastText">Saved</span></div>
 
-    /************ UTILITIES ************/
-    function dayOfYear(d=new Date()) {
-      const start = new Date(d.getFullYear(),0,0);
-      return Math.floor((d - start) / 86400000);
-    }
-    function getSeed() {
-      let s = localStorage.getItem("seed");
-      if (!s) { s = Math.floor(Math.random()*100000).toString(); localStorage.setItem("seed", s); }
-      return parseInt(s, 10);
-    }
-    function pickTodayIndex() {
-      const idx = (dayOfYear() + getSeed()) % SIGNS.length;
-      return idx < 0 ? idx + SIGNS.length : idx;
-    }
-    function loadState() { try { return JSON.parse(localStorage.getItem("state_v1")) || {}; } catch { return {}; } }
-    function saveState(s) { localStorage.setItem("state_v1", JSON.stringify(s)); }
-    function ymd(d=new Date()) { return d.toISOString().slice(0,10); }
+<script>
+  /************ CONTENT ************/
+  const SIGNS = [
+    { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
+    { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
+    { text: "Ask one curious question.", explain: "Questions are doors to new ideas.", tag:"Curiosity" },
+    { text: "Tidy a tiny space for 60 seconds.", explain: "Small resets make big differences.", tag:"Care" },
+    { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
+  ];
 
-    /************ STATE ************/
-    const state = loadState();
-    const todayKey = ymd();
-    const yesterdayKey = (()=>{ const d=new Date(); d.setDate(d.getDate()-1); return ymd(d); })();
+  /************ UTIL ************/
+  const qs = s=>document.querySelector(s);
+  const rand = (a,b)=>Math.random()*(b-a)+a;
+  function dayOfYear(d=new Date()){const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)}
+  function getSeed(){let s=localStorage.getItem("seed");if(!s){s=Math.floor(Math.random()*100000).toString();localStorage.setItem("seed",s)}return parseInt(s,10)}
+  function pickTodayIndex(){const idx=(dayOfYear()+getSeed())%SIGNS.length;return idx<0?idx+SIGNS.length:idx}
+  function ymd(d=new Date()){return d.toISOString().slice(0,10)}
+  function loadState(){try{return JSON.parse(localStorage.getItem("state_v1"))||{}}catch{return{}}}
+  function saveState(s){localStorage.setItem("state_v1",JSON.stringify(s))}
+  const state=loadState(); const todayKey=ymd(); const yesterdayKey=(()=>{const d=new Date(); d.setDate(d.getDate()-1); return ymd(d)})();
 
-    function getYesterdayNudge() {
-      const y = state[yesterdayKey];
-      if (y && y.planned === true && y.done == null) return "Did you do yesterday’s sign?";
-      return null;
-    }
+  /************ ELEMENTS ************/
+  const screenIntro=qs("#screen-intro"), screenToday=qs("#screen-today");
+  const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoBtn"), doneBtn=qs("#doneBtn");
+  const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
+  const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
+  const toast=qs("#toast"), toastText=qs("#toastText");
 
-    /************ UI ELEMENTS ************/
-    const screenIntro  = document.getElementById("screen-intro");
-    const screenToday  = document.getElementById("screen-today");
-    const revealBtn    = document.getElementById("revealBtn");
-    const skipBtn      = document.getElementById("skipBtn");
-    const willDoBtn    = document.getElementById("willDoBtn");
-    const doneBtn      = document.getElementById("doneBtn");
-    const messageText  = document.getElementById("messageText");
-    const explain      = document.getElementById("explain");
-    const tag          = document.getElementById("tag");
-    const todayMeta    = document.getElementById("todayMeta");
-    const streakInfo   = document.getElementById("streakInfo");
-    const nudgeBanner  = document.getElementById("nudgeBanner");
+  /************ STREAK ************/
+  function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1); for(;;){const k=d.toISOString().slice(0,10); if(state[k]?.done===true){s++; d.setDate(d.getDate()-1)}else break;} return s}
+  function mascotFor(streak){if(streak>=10)return"🌳"; if(streak>=5)return"🌿"; if(streak>=2)return"🌱"; return"🫘"}
+  function updateMascot(){const m=qs("#mascot"); const s=computeStreak(); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px"}
+  function getYesterdayNudge(){const y=state[yesterdayKey]; if(y&&y.planned===true&&y.done==null)return"Did you do yesterday’s sign?"; return null}
+  function updateStreakInfo(){const n=getYesterdayNudge(); const s=computeStreak(); if(nudgeBanner) nudgeBanner.style.display=n?"block":"none"; streakInfo.textContent=`Current streak: ${s} day${s===1?"":"s"}`}
 
-    /************ TOAST ************/
-    function showToast(msg, ms=1800){
-      const t = document.getElementById("toast");
-      document.getElementById("toastText").textContent = msg;
-      t.style.opacity = "1";
-      t.style.transform = "translateX(-50%) translateY(0)";
-      clearTimeout(showToast._h);
-      showToast._h = setTimeout(()=>{
-        t.style.opacity = "0";
-        t.style.transform = "translateX(-50%) translateY(120%)";
-      }, ms);
-    }
+  /************ TOAST ************/
+  function showToast(msg, ms=1800){ toastText.textContent=msg; toast.style.opacity="1"; toast.style.transform="translateX(-50%) translateY(0)"; clearTimeout(showToast._h); showToast._h=setTimeout(()=>{toast.style.opacity="0"; toast.style.transform="translateX(-50%) translateY(120%)"}, ms); }
 
-    /************ CONFETTI ************/
-    function fireConfetti(duration=900, count=140){
-      const cvs = document.getElementById("confetti");
-      const ctx = cvs.getContext("2d");
-      const W = cvs.width = window.innerWidth;
-      const H = cvs.height = window.innerHeight;
+  /************ SIMPLE WEB AUDIO BLIP ************/
+  function blip(freq=520, dur=0.09){ try{const ac=blip.ac||(blip.ac=new (window.AudioContext||window.webkitAudioContext)()); const o=ac.createOscillator(); const g=ac.createGain(); o.type="sine"; o.frequency.value=freq; o.connect(g); g.connect(ac.destination); g.gain.value=.06; o.start(); o.stop(ac.currentTime+dur); }catch{}}
 
-      const pieces = Array.from({length: count}).map(()=>({
-        x: Math.random()*W,
-        y: -20 - Math.random()*H*0.3,
-        r: 2 + Math.random()*4,
-        c: `hsl(${Math.floor(Math.random()*360)},80%,60%)`,
-        vy: 2 + Math.random()*4,
-        vx: -2 + Math.random()*4,
-        a: Math.random()*Math.PI,
-        va: -0.2 + Math.random()*0.4
-      }));
+  /************ CONFETTI ************/
+  function fireConfetti(duration=900,count=160){
+    const cvs=qs("#confetti"), ctx=cvs.getContext("2d"); cvs.width=innerWidth; cvs.height=innerHeight;
+    const P=Array.from({length:count}).map(()=>({x:Math.random()*cvs.width, y:-20-Math.random()*cvs.height*.3, r:2+Math.random()*4, c:`hsl(${Math.floor(Math.random()*360)},80%,60%)`, vy:2+Math.random()*4, vx:-2+Math.random()*4, a:Math.random()*Math.PI, va:-.2+Math.random()*.4}));
+    let start=performance.now();
+    (function f(t){const e=t-start; ctx.clearRect(0,0,cvs.width,cvs.height); P.forEach(p=>{p.x+=p.vx; p.y+=p.vy; p.a+=p.va; ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.a); ctx.fillStyle=p.c; ctx.fillRect(-p.r,-p.r,p.r*2,p.r*2); ctx.restore();}); if(e<duration)requestAnimationFrame(f); else ctx.clearRect(0,0,cvs.width,cvs.height);})(start);
+  }
 
-      let start = performance.now();
-      (function frame(t){
-        const elapsed = t - start;
-        ctx.clearRect(0,0,W,H);
-        pieces.forEach(p=>{
-          p.x += p.vx; p.y += p.vy; p.a += p.va;
-          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.a);
-          ctx.fillStyle = p.c; ctx.fillRect(-p.r, -p.r, p.r*2, p.r*2);
-          ctx.restore();
-        });
-        if (elapsed < duration) requestAnimationFrame(frame);
-        else ctx.clearRect(0,0,W,H);
-      })(start);
-    }
+  /************ STARS (parallax) ************/
+  (function stars(){
+    const c=qs("#stars"),x=c.getContext("2d"); c.width=innerWidth; c.height=innerHeight;
+    const S=Array.from({length:160}).map(()=>({x:Math.random()*c.width,y:Math.random()*c.height,z:rand(.3,1.5)}));
+    function draw(){x.clearRect(0,0,c.width,c.height); S.forEach(s=>{x.fillStyle=`rgba(255,255,255,${.25*s.z})`; x.fillRect(s.x,s.y,1.2*s.z,1.2*s.z)}); requestAnimationFrame(draw)}
+    draw();
+    window.addEventListener('mousemove',e=>{const nx=e.clientX/c.width- .5, ny=e.clientY/c.height- .5; S.forEach(s=>{s.x += nx* s.z * .8; s.y += ny* s.z * .8});});
+    window.addEventListener('resize',()=>{c.width=innerWidth;c.height=innerHeight;});
+  })();
 
-    /************ STREAK & MASCOT ************/
-    function computeStreak(){
-      let streak = 0;
-      const d = new Date(); d.setDate(d.getDate()-1);
-      while (true) {
-        const key = d.toISOString().slice(0,10);
-        if (state[key]?.done === true) { streak++; d.setDate(d.getDate()-1); }
-        else break;
-      }
-      return streak;
-    }
-    function mascotFor(streak){
-      if (streak >= 10) return "🌳";
-      if (streak >= 5)  return "🌿";
-      if (streak >= 2)  return "🌱";
-      return "🫘";
-    }
-    function updateMascot(){
-      const m = document.getElementById("mascot");
-      if (!m) return;
-      const s = computeStreak();
-      m.textContent = mascotFor(s);
-      m.style.fontSize = (28 + Math.min(s*2, 22)) + "px";
-    }
-    function updateStreakInfo() {
-      const nudge = getYesterdayNudge();
-      const streak = computeStreak();
-      if (nudgeBanner) nudgeBanner.style.display = nudge ? "block" : "none";
-      streakInfo.textContent = `Current streak: ${streak} day${streak===1?"":"s"}`;
-    }
+  /************ SPARKLES ON TAP ************/
+  (function sparkles(){
+    const c=qs("#spark"), g=c.getContext("2d"); function resize(){c.width=innerWidth;c.height=innerHeight} resize(); addEventListener('resize',resize);
+    let parts=[];
+    addEventListener('pointerdown',e=>{for(let i=0;i<18;i++){parts.push({x:e.clientX,y:e.clientY,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:600,r:2+Math.random()*2,c:`hsl(${Math.floor(Math.random()*360)},90%,60%)`})}});
+    (function loop(){g.clearRect(0,0,c.width,c.height); parts=parts.filter(p=>(p.life-=16)>0); parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05; g.fillStyle=p.c; g.beginPath(); g.arc(p.x,p.y,p.r,0,Math.PI*2); g.fill();}); requestAnimationFrame(loop)})();
+  })();
 
-    /************ TODAY CARD ************/
-    function showTodayCard() {
-      const idx = pickTodayIndex();
-      const s = SIGNS[idx];
-      tag.textContent = s.tag || "Sign";
-      messageText.textContent = s.text;
-      explain.textContent = s.explain || "";
-      const rec = state[todayKey] || {};
-      todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
-      screenIntro.style.display = "none";
-      screenToday.style.display = "block";
-    }
+  /************ EXTRA FX CANVAS (fireworks, vortex, trails) ************/
+  const fxc=qs("#fx"), fxx=fxc.getContext("2d"); function resizeFX(){fxc.width=innerWidth; fxc.height=innerHeight} resizeFX(); addEventListener('resize',resizeFX);
 
-    /************ BUTTON ENHANCEMENTS (ripple & sparkle) ************/
-    function attachRipple(btn){
-      btn.addEventListener('pointerdown', e=>{
-        const rect = btn.getBoundingClientRect();
-        btn.style.setProperty('--x', (e.clientX - rect.left) + 'px');
-        btn.style.setProperty('--y', (e.clientY - rect.top) + 'px');
-        btn.classList.add('rippling');
-        setTimeout(()=>btn.classList.remove('rippling'), 450);
-        sparkleAt(e.clientX, e.clientY);
-      });
-    }
-
-    /************ CLICK SPARKLES ************/
-    const spark = document.getElementById('spark');
-    const sctx = spark.getContext('2d');
-    function resizeSpark(){ spark.width = innerWidth; spark.height = innerHeight; }
-    window.addEventListener('resize', resizeSpark); resizeSpark();
-
-    let sparkles = [];
-    function sparkleAt(x,y){
-      for (let i=0;i<18;i++){
-        sparkles.push({
-          x, y,
-          vx: (Math.random()-0.5)*5,
-          vy: (Math.random()-0.5)*5 - 2,
-          life: 600, r: 2 + Math.random()*2,
-          c: `hsl(${Math.floor(Math.random()*360)},90%,60%)`
-        });
+  function fireworks(n=6){
+    const bursts=[];
+    for(let b=0;b<n;b++){
+      const cx=rand(80, innerWidth-80), cy=rand(80, innerHeight*0.5);
+      const color = `hsl(${Math.floor(rand(0,360))},90%,60%)`;
+      for(let i=0;i<80;i++){
+        const a=rand(0,Math.PI*2), sp=rand(1.2,5);
+        bursts.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp,life:900,c:color,r:rand(1,2.4)});
       }
     }
-    (function loopSpark(t0=performance.now()){
-      function f(t){
-        sctx.clearRect(0,0,spark.width,spark.height);
-        sparkles = sparkles.filter(p => (p.life -= 16) > 0);
-        sparkles.forEach(p=>{
-          p.x += p.vx; p.y += p.vy; p.vy += .05;
-          sctx.fillStyle = p.c;
-          sctx.beginPath(); sctx.arc(p.x, p.y, p.r, 0, Math.PI*2); sctx.fill();
-        });
-        requestAnimationFrame(f);
-      }
-      requestAnimationFrame(f);
+    let t0=performance.now();
+    (function loop(t){
+      const dt= t - t0; fxx.clearRect(0,0,fxc.width,fxc.height);
+      bursts.forEach(p=>{p.x+=p.vx; p.y+=p.vy; p.vy+=.02; p.life-=16; fxx.fillStyle=p.c; fxx.globalCompositeOperation="lighter"; fxx.beginPath(); fxx.arc(p.x,p.y,p.r,0,Math.PI*2); fxx.fill(); fxx.globalCompositeOperation="source-over";});
+      if(bursts.some(p=>p.life>0)) requestAnimationFrame(loop); else fxx.clearRect(0,0,fxc.width,fxc.height);
     })();
+  }
 
-    /************ FLOATERS (bubbles/stars) ************/
-    const floaters = document.getElementById('floaters');
-    function spawnFloaters(){
-      const W = innerWidth, H = innerHeight;
-      floaters.innerHTML = "";
-      const bubbles = 12, stars = 14;
-      for (let i=0;i<bubbles;i++){
-        const b = document.createElement('div');
-        b.className = 'bubble';
-        const size = 12 + Math.random()*26;
-        b.style.width = size+'px'; b.style.height = size+'px';
-        b.style.left = Math.random()*W+'px';
-        b.style.animationDuration = (12 + Math.random()*10) + 's';
-        b.style.animationDelay = (-Math.random()*12) + 's';
-        floaters.appendChild(b);
-      }
-      for (let i=0;i<stars;i++){
-        const s = document.createElement('div');
-        s.className = 'star';
-        const size = 8 + Math.random()*10;
-        s.style.width = size+'px'; s.style.height = size+'px';
-        s.style.left = Math.random()*W+'px'; s.style.top = Math.random()*H+'px';
-        s.style.animationDuration = (8 + Math.random()*10) + 's';
-        floaters.appendChild(s);
-      }
+  function vortex(){
+    // suck all sparkles/confetti to center for a moment
+    const cx=innerWidth/2, cy=innerHeight/2;
+    fxx.globalCompositeOperation="lighter";
+    for(let i=0;i<220;i++){
+      setTimeout(()=>{fxx.fillStyle=`hsl(${Math.floor(rand(0,360))},90%,60%)`; fxx.beginPath(); fxx.arc(cx+rand(-4,4), cy+rand(-4,4), rand(1,3), 0, Math.PI*2); fxx.fill();}, i*3);
     }
-    window.addEventListener('resize', spawnFloaters);
+    setTimeout(()=>{fxx.clearRect(0,0,fxc.width,fxc.height)}, 1200);
+  }
 
-    /************ EVENTS ************/
-    revealBtn.onclick = () => {
-      if (!state[todayKey]) state[todayKey] = { planned: null, done: null, signIndex: pickTodayIndex() };
-      saveState(state);
-      showTodayCard();
-    };
-    skipBtn.onclick = () => {
-      if (!state[todayKey]) state[todayKey] = { planned: false, done: null, signIndex: pickTodayIndex() };
-      else state[todayKey].planned = false;
-      saveState(state);
-      showToast("All good. Come back anytime today.");
-      updateStreakInfo(); updateMascot();
-    };
-    willDoBtn.onclick = () => {
-      state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
-      state[todayKey].planned = true;
-      state[todayKey].done = null;
-      saveState(state);
-      todayMeta.textContent = "You planned this today. Come back later to mark it done.";
-      showToast("Nice! Come back later and tap “Done for today”.");
-      updateStreakInfo(); updateMascot();
-    };
-    doneBtn.onclick = () => {
-      state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
-      state[todayKey].done = true;
-      saveState(state);
-      todayMeta.textContent = "Marked done ✅";
-      fireConfetti();
-      showToast("Great job! ✅");
-      updateStreakInfo(); updateMascot();
-    };
+  function rainbowTrails(){
+    // draw cursor trails for a few seconds
+    let on=true; const pts=[];
+    function move(e){pts.push({x:e.clientX,y:e.clientY,t:Date.now(),c:`hsl(${(Date.now()/8)%360},90%,60%)`})}
+    addEventListener('pointermove',move);
+    const id=setInterval(()=>{const now=Date.now(); fxx.clearRect(0,0,fxc.width,fxc.height); pts.splice(0, pts.length-120); pts.forEach(p=>{const age=now-p.t; if(age>1200)return; fxx.fillStyle=p.c; fxx.beginPath(); fxx.arc(p.x,p.y,2.2,0,Math.PI*2); fxx.fill();});}, 16);
+    setTimeout(()=>{on=false; removeEventListener('pointermove',move); clearInterval(id); fxx.clearRect(0,0,fxc.width,fxc.height)}, 3000);
+  }
 
-    // Init
-    [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
+  /************ SCRAMBLE TEXT ************/
+  function scramble(el, text, speed=14){
+    el.innerHTML = text.split("").map(ch=>`<span>${ch}</span>`).join("");
+    const spans = [...el.querySelectorAll("span")];
+    const letters="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!?@#$%";
+    let i=0; const timer=setInterval(()=>{
+      spans.forEach((s,idx)=>{
+        if(idx<i) s.textContent=text[idx];
+        else s.textContent=letters[Math.floor(Math.random()*letters.length)];
+      });
+      i++;
+      if(i>spans.length){ clearInterval(timer); }
+    }, speed);
+  }
+
+  /************ SURPRISE MODES ************/
+  function screenShake(){ document.body.classList.add("shake"); setTimeout(()=>document.body.classList.remove("shake"),500); }
+  function invertScreen(ms=1200){ const prev=document.body.style.filter; document.body.style.filter="invert(1) hue-rotate(180deg)"; setTimeout(()=>{document.body.style.filter=prev||""}, ms); }
+  function glitchOnce(el){ el.classList.add("glitch"); setTimeout(()=>el.classList.remove("glitch"),350); }
+  function emojiStorm(emoji="✨"){ const N=80; for(let i=0;i<N;i++){ const e=document.createElement("div"); e.textContent=Math.random()<.5?emoji:["✨","🌈","💫","🎈","🎉","⭐","🪄","🦄"][Math.floor(Math.random()*8)]; e.style.position="fixed"; e.style.left=rand(0,innerWidth)+"px"; e.style.top=rand(-40,-10)+"px"; e.style.fontSize= rand(16,36)+"px"; e.style.pointerEvents="none"; e.style.transform=`rotate(${rand(-20,20)}deg)`; e.style.zIndex=997; document.body.appendChild(e); const vy=rand(2,5), vx=rand(-1.2,1.2); (function drop(){ const y=parseFloat(e.style.top); const x=parseFloat(e.style.left); e.style.top=(y+vy)+"px"; e.style.left=(x+vx)+"px"; if(y<innerHeight+40) requestAnimationFrame(drop); else e.remove(); })(); }}
+  function randomSurprise(targetEl){
+    const modes=[ ()=>fireConfetti(1000,200),
+                  ()=>fireworks(5),
+                  ()=>vortex(),
+                  ()=>rainbowTrails(),
+                  ()=>{invertScreen(1000); screenShake();},
+                  ()=>{emojiStorm();},
+                  ()=>{glitchOnce(targetEl||document.querySelector(".card"));},
+                  ()=>{blip(660,.08); blip(880,.08);} ];
+    const m = modes[Math.floor(Math.random()*modes.length)];
+    m();
+  }
+
+  /************ BUTTON FX ************/
+  function attachRipple(btn){
+    btn.addEventListener('pointerdown', e=>{
+      const r=btn.getBoundingClientRect();
+      btn.style.setProperty('--x', (e.clientX-r.left)+'px');
+      btn.style.setProperty('--y', (e.clientY-r.top)+'px');
+      btn.classList.add('rippling');
+      setTimeout(()=>btn.classList.remove('rippling'), 500);
+    });
+  }
+
+  /************ TODAY CARD ************/
+  function showTodayCard(){
+    const idx=pickTodayIndex(), s=SIGNS[idx];
+    tag.textContent=s.tag||"Sign";
+    scramble(messageText, s.text);
+    explain.textContent=s.explain||"";
+    const rec=state[todayKey]||{};
+    todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
+    screenIntro.style.display="none"; screenToday.style.display="block";
+    randomSurprise(screenToday); blip(520,.08);
+  }
+
+  /************ EVENTS ************/
+  [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
+
+  revealBtn.onclick = ()=>{
+    if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
+    saveState(state);
+    showTodayCard();
+  };
+
+  skipBtn.onclick = ()=>{
+    if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()};
+    else state[todayKey].planned=false;
+    saveState(state);
+    showToast("All good. Come back anytime today.");
     updateStreakInfo(); updateMascot();
-    spawnFloaters();
-  </script>
+    randomSurprise(screenIntro);
+  };
+
+  willDoBtn.onclick = ()=>{
+    state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
+    state[todayKey].planned=true; state[todayKey].done=null; saveState(state);
+    todayMeta.textContent="You planned this today. Come back later to mark it done.";
+    showToast("Nice! Come back later and tap “Done for today”.");
+    updateStreakInfo(); updateMascot();
+    randomSurprise(screenToday);
+  };
+
+  doneBtn.onclick = ()=>{
+    state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
+    state[todayKey].done=true; saveState(state);
+    todayMeta.textContent="Marked done ✅";
+    fireConfetti(); fireworks(4); randomSurprise(screenToday);
+    showToast("Great job! ✅");
+    updateStreakInfo(); updateMascot();
+  };
+
+  /************ 3D tilt on cards ************/
+  function tilt(el){
+    const r=()=>{const b=el.getBoundingClientRect(); return {cx:b.left+b.width/2, cy:b.top+b.height/2, w:b.width, h:b.height}};
+    let bb=r();
+    addEventListener('resize',()=>bb=r());
+    addEventListener('pointermove',e=>{
+      const dx=(e.clientX-bb.cx)/bb.w, dy=(e.clientY-bb.cy)/bb.h;
+      el.style.transform=`perspective(800px) rotateX(${dy*-6}deg) rotateY(${dx*8}deg) translateY(0) scale(1)`;
+    });
+  }
+  tilt(screenIntro); tilt(screenToday);
+
+  /************ FLOATERS spawn ************/
+  function spawnFloaters(){
+    // (handled by CSS blobs + stars already; just reflow on resize)
+  }
+
+  /************ INIT ************/
+  function init(){
+    updateStreakInfo(); updateMascot(); spawnFloaters();
+    // subtle initial surprise
+    setTimeout(()=>randomSurprise(screenIntro), 600);
+  }
+  init();
+</script>
 </body>
 </html>
