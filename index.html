@@ -6,102 +6,196 @@
   <title>Today Is The Day I…</title>
   <meta name="theme-color" content="#ffffff" />
   <style>
-    :root { --bg:#fff; --fg:#111; --muted:#666; --accent:#2b74ff; --card:#f6f7fb; }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-    body {
-      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--fg); background: var(--bg); display: grid; place-items: center;
+    :root{
+      --bg1:#fff3f7; --bg2:#eef7ff; --bg3:#f3fff1;
+      --fg:#0f172a; --muted:#5b6476; --card:#ffffffcc; --accent:#6d5efc;
+      --accent2:#ff6b6b; --accent3:#00c2ff; --accent4:#2dd4bf;
+      --shadow: 0 10px 30px rgba(31, 41, 55, .18);
     }
-    .app { width: min(720px, 92vw); padding: 24px; }
-    h1 { font-size: clamp(24px, 5vw, 40px); margin: 0 0 8px; }
-    p { margin: 0.25rem 0 1rem; color: var(--muted); }
-    .card {
-      background: var(--card); border-radius: 18px; padding: 20px; margin-top: 16px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color:var(--fg); overflow:hidden; /* we'll manage scroll visually */
     }
-    .big {
-      width: 100%; padding: 16px 18px; border-radius: 14px; font-size: 18px; font-weight: 700;
-      border: 0; cursor: pointer; background: var(--accent); color: #fff;
-      transition: transform .03s ease-in-out, opacity .2s ease;
-      position: relative; overflow: hidden; /* ripple */
-    }
-    .big:active { transform: translateY(1px); }
-    .big::after { /* ripple effect */
-      content:""; position:absolute; left:50%; top:50%;
-      width:0; height:0; background:rgba(255,255,255,.35); border-radius:50%;
-      transform: translate(-50%,-50%);
-      transition: width .35s ease, height .35s ease, opacity .5s ease;
-      opacity:0;
-    }
-    .big:active::after { width:220%; height:220%; opacity:1; transition:0s; }
-    .ghost {
-      background: transparent; color: var(--accent); border: 2px solid var(--accent);
-    }
-    .today {
-      font-size: clamp(18px, 3.6vw, 24px); line-height: 1.35; margin: 8px 0 10px;
-    }
-    .meta { font-size: 13px; color: var(--muted); }
-    .row { display:flex; gap:10px; margin-top: 12px; flex-wrap: wrap; }
-    .badge { display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:#e9ecff; color:#254ddf; }
-    .footer { margin-top: 14px; font-size: 12px; color: var(--muted); }
 
-    /* Mascot wiggle */
-    @keyframes wiggle { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
-    #mascot { animation: wiggle 2s ease-in-out infinite; }
+    /* ===== Animated Gradient Background ===== */
+    .bg{
+      position:fixed; inset:0; z-index:-3;
+      background: radial-gradient(1200px 800px at 10% 10%, var(--bg1), transparent 60%),
+                  radial-gradient(1000px 700px at 90% 30%, var(--bg2), transparent 60%),
+                  radial-gradient(900px 700px at 40% 90%, var(--bg3), transparent 60%),
+                  linear-gradient(120deg, #fff, #fafcff 50%, #ffffff);
+      animation: bgShift 18s ease-in-out infinite alternate;
+    }
+    @keyframes bgShift{
+      0%  { filter:hue-rotate(0deg) saturate(1); }
+      100%{ filter:hue-rotate(12deg) saturate(1.15); }
+    }
 
-    /* Toast default styles */
-    #toast {
-      position:fixed; left:50%; bottom:24px;
-      transform:translateX(-50%) translateY(120%);
+    /* ===== Floating Shapes (subtle) ===== */
+    .floaters{ position:fixed; inset:0; pointer-events:none; z-index:-2; overflow:hidden; }
+    .bubble{
+      position:absolute; width:20px; height:20px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(255,255,255,.4) 60%, transparent 61%),
+                  linear-gradient(135deg, rgba(255,255,255,.4), rgba(255,255,255,.05));
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+      animation: floatUp 16s linear infinite;
+      opacity:.65;
+    }
+    @keyframes floatUp{
+      from { transform: translateY(110vh) translateX(0) scale(.8); }
+      to   { transform: translateY(-15vh) translateX(0) scale(1.15); }
+    }
+    .star{
+      position:absolute; width:10px; height:10px; transform: rotate(45deg);
+      background: radial-gradient(circle, #fff, #fff0 70%);
+      box-shadow: 0 0 16px rgba(255,255,255,.45);
+      animation: drift 14s ease-in-out infinite;
+      opacity:.7;
+    }
+    @keyframes drift{
+      0%  { transform: translateY(0) translateX(0) rotate(45deg) scale(1); }
+      50% { transform: translateY(-20px) translateX(10px) rotate(45deg) scale(1.1); }
+      100%{ transform: translateY(0) translateX(0) rotate(45deg) scale(1); }
+    }
+
+    /* ===== App Layout ===== */
+    .wrap{ height:100%; display:grid; place-items:center; padding:22px; }
+    .app{ width:min(820px, 92vw); }
+
+    .title{
+      display:flex; align-items:center; gap:10px; margin:0 0 6px;
+      font-size: clamp(24px, 5vw, 44px); letter-spacing:.2px;
+      background: linear-gradient(90deg, #111, #334, #111);
+      -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .subtitle{ margin:0 0 14px; color:var(--muted); font-size:clamp(14px,2.2vw,16px) }
+
+    .card{
+      background: var(--card); border-radius: 22px; padding: 22px 20px;
+      box-shadow: var(--shadow); backdrop-filter: blur(6px);
+      transform: translateY(14px) scale(.98); opacity:0;
+      animation: cardIn .6s cubic-bezier(.2,.8,.2,1) forwards;
+    }
+    @keyframes cardIn{
+      to{ transform: translateY(0) scale(1); opacity:1; }
+    }
+
+    .row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:12px }
+
+    /* ===== Buttons ===== */
+    .big{
+      flex:1 0 200px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
+      border:0; cursor:pointer; color:#fff; position:relative; overflow:hidden;
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      box-shadow: 0 10px 24px rgba(109,94,252,.35);
+      transition: transform .05s ease, box-shadow .2s ease, filter .2s ease;
+      outline: none;
+    }
+    .big:hover{ filter:brightness(1.05); box-shadow: 0 12px 28px rgba(109,94,252,.45); }
+    .big:active{ transform: translateY(1px) scale(.995); }
+    .ghost{
+      background: linear-gradient(135deg, rgba(255,255,255,.2), rgba(255,255,255,.05));
+      color: var(--accent);
+      border:2px solid rgba(109,94,252,.35);
+      box-shadow: 0 8px 18px rgba(31, 41, 55, .08);
+    }
+
+    /* button ripple */
+    .big::after{
+      content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
+      width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
+      transform: translate(-50%,-50%); opacity:0; pointer-events:none;
+      transition: width .45s ease, height .45s ease, opacity .6s ease;
+    }
+    .big.rippling::after{ width:220%; height:220%; opacity:1; }
+
+    /* Tag + text */
+    .badge{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+      background:linear-gradient(90deg,#e9ecff,#e5f9ff); color:#254ddf; border:1px solid #dae6ff; }
+    .today{ font-size:clamp(18px,3.6vw,26px); line-height:1.35; margin:10px 0 8px }
+    .meta{ font-size:13px; color:var(--muted) }
+    .footer{ margin-top:14px; font-size:12px; color:var(--muted) }
+
+    /* Nudge banner */
+    .nudge{
+      display:none; background:#fff0d1; border:1px solid #ffe18a; color:#6a5300;
+      padding:10px 12px; border-radius:12px; margin-bottom:12px; font-size:14px;
+      box-shadow: 0 6px 14px rgba(0,0,0,.04);
+      animation: glow 2.2s ease-in-out infinite;
+    }
+    @keyframes glow{
+      0%,100%{ box-shadow: 0 6px 14px rgba(255, 225, 138,.25); }
+      50%    { box-shadow: 0 6px 14px rgba(255, 225, 138,.6); }
+    }
+
+    /* Mascot wiggle + size ramp with streak */
+    @keyframes wiggle { 0%,100%{transform:translateY(0) rotate(0)} 50%{transform:translateY(-3px) rotate(-2deg)} }
+    #mascot{ animation: wiggle 2s ease-in-out infinite; will-change: transform; }
+
+    /* Toast */
+    #toast{
+      position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%);
       background:#111; color:#fff; padding:12px 16px; border-radius:12px;
-      box-shadow:0 8px 24px rgba(0,0,0,.2); font-size:14px;
-      opacity:0; transition:transform .35s ease, opacity .35s ease; z-index:999;
-      max-width: 90vw; text-align: center;
+      box-shadow:0 8px 24px rgba(0,0,0,.2); font-size:14px; z-index:999;
+      max-width: 90vw; text-align:center; opacity:0;
+      transition: transform .35s ease, opacity .35s ease;
+    }
+
+    /* Click sparkle canvas */
+    #spark{ position:fixed; inset:0; pointer-events:none; z-index:997; }
+
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce){
+      .bg, .bubble, .star, #mascot{ animation:none !important }
+      .card{ animation:none; opacity:1; transform:none }
+      .big.rippling::after{ display:none }
     }
   </style>
 </head>
 <body>
-  <main class="app">
-    <h1>Today Is The Day I…</h1>
-    <p>Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+  <!-- animated background & floaters -->
+  <div class="bg"></div>
+  <div class="floaters" id="floaters"></div>
 
-    <div id="screen-intro" class="card">
-      <!-- Nudge banner (shows only if yesterday was planned but not marked done) -->
-      <div id="nudgeBanner" style="display:none;background:#fff3c4;border:1px solid #ffe18a;color:#6a5300;padding:10px 12px;border-radius:12px;margin-bottom:10px;font-size:14px;">
-        Did you do yesterday’s sign?
+  <div class="wrap">
+    <main class="app">
+      <h1 class="title">Today Is The Day I…</h1>
+      <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+
+      <div id="screen-intro" class="card">
+        <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
+
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div id="mascot" style="font-size:28px;display:inline-block;">🫘</div>
+          <div id="streakInfo" class="meta">Current streak: 0 days</div>
+        </div>
+
+        <button id="revealBtn" class="big">Reveal today’s message ✨</button>
+        <div class="row">
+          <button id="skipBtn" class="big ghost">Nah, maybe later</button>
+        </div>
       </div>
 
-      <!-- Mascot that grows with your streak -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-        <div id="mascot" style="font-size:28px;display:inline-block;">🫘</div>
-        <div id="streakInfo" class="meta">Current streak: 0 days</div>
+      <div id="screen-today" class="card" style="display:none">
+        <div class="badge" id="tag">Sign</div>
+        <div class="today" id="messageText"></div>
+        <div class="meta" id="explain"></div>
+
+        <div class="row">
+          <button id="willDoBtn" class="big">Will do ✅</button>
+          <button id="doneBtn"   class="big ghost">Done for today</button>
+        </div>
+
+        <div class="footer" id="todayMeta"></div>
       </div>
+    </main>
+  </div>
 
-      <button id="revealBtn" class="big">Reveal today’s message ✨</button>
-      <div class="row">
-        <button id="skipBtn" class="big ghost">Nah, maybe later</button>
-      </div>
-    </div>
-
-    <div id="screen-today" class="card" style="display:none">
-      <div class="badge" id="tag">Sign</div>
-      <div class="today" id="messageText"></div>
-      <div class="meta" id="explain"></div>
-
-      <div class="row">
-        <button id="willDoBtn" class="big">Will do ✅</button>
-        <button id="doneBtn"   class="big ghost">Done for today</button>
-      </div>
-
-      <div class="footer" id="todayMeta"></div>
-    </div>
-  </main>
-
-  <!-- Confetti canvas -->
+  <!-- FX layers -->
   <canvas id="confetti" style="position:fixed;inset:0;pointer-events:none;z-index:998;"></canvas>
-
-  <!-- Toast -->
+  <canvas id="spark"></canvas>
   <div id="toast"><span id="toastText">Saved</span></div>
 
   <script>
@@ -172,7 +266,7 @@
     }
 
     /************ CONFETTI ************/
-    function fireConfetti(duration=900, count=120){
+    function fireConfetti(duration=900, count=140){
       const cvs = document.getElementById("confetti");
       const ctx = cvs.getContext("2d");
       const W = cvs.width = window.innerWidth;
@@ -206,7 +300,6 @@
 
     /************ STREAK & MASCOT ************/
     function computeStreak(){
-      // Count consecutive days ending yesterday where done === true.
       let streak = 0;
       const d = new Date(); d.setDate(d.getDate()-1);
       while (true) {
@@ -217,18 +310,18 @@
       return streak;
     }
     function mascotFor(streak){
-      if (streak >= 10) return "🌳"; // tree
-      if (streak >= 5)  return "🌿"; // leafy sprig
-      if (streak >= 2)  return "🌱"; // sprout
-      return "🫘"; // seed
+      if (streak >= 10) return "🌳";
+      if (streak >= 5)  return "🌿";
+      if (streak >= 2)  return "🌱";
+      return "🫘";
     }
     function updateMascot(){
       const m = document.getElementById("mascot");
       if (!m) return;
       const s = computeStreak();
       m.textContent = mascotFor(s);
+      m.style.fontSize = (28 + Math.min(s*2, 22)) + "px";
     }
-
     function updateStreakInfo() {
       const nudge = getYesterdayNudge();
       const streak = computeStreak();
@@ -249,13 +342,84 @@
       screenToday.style.display = "block";
     }
 
+    /************ BUTTON ENHANCEMENTS (ripple & sparkle) ************/
+    function attachRipple(btn){
+      btn.addEventListener('pointerdown', e=>{
+        const rect = btn.getBoundingClientRect();
+        btn.style.setProperty('--x', (e.clientX - rect.left) + 'px');
+        btn.style.setProperty('--y', (e.clientY - rect.top) + 'px');
+        btn.classList.add('rippling');
+        setTimeout(()=>btn.classList.remove('rippling'), 450);
+        sparkleAt(e.clientX, e.clientY);
+      });
+    }
+
+    /************ CLICK SPARKLES ************/
+    const spark = document.getElementById('spark');
+    const sctx = spark.getContext('2d');
+    function resizeSpark(){ spark.width = innerWidth; spark.height = innerHeight; }
+    window.addEventListener('resize', resizeSpark); resizeSpark();
+
+    let sparkles = [];
+    function sparkleAt(x,y){
+      for (let i=0;i<18;i++){
+        sparkles.push({
+          x, y,
+          vx: (Math.random()-0.5)*5,
+          vy: (Math.random()-0.5)*5 - 2,
+          life: 600, r: 2 + Math.random()*2,
+          c: `hsl(${Math.floor(Math.random()*360)},90%,60%)`
+        });
+      }
+    }
+    (function loopSpark(t0=performance.now()){
+      function f(t){
+        sctx.clearRect(0,0,spark.width,spark.height);
+        sparkles = sparkles.filter(p => (p.life -= 16) > 0);
+        sparkles.forEach(p=>{
+          p.x += p.vx; p.y += p.vy; p.vy += .05;
+          sctx.fillStyle = p.c;
+          sctx.beginPath(); sctx.arc(p.x, p.y, p.r, 0, Math.PI*2); sctx.fill();
+        });
+        requestAnimationFrame(f);
+      }
+      requestAnimationFrame(f);
+    })();
+
+    /************ FLOATERS (bubbles/stars) ************/
+    const floaters = document.getElementById('floaters');
+    function spawnFloaters(){
+      const W = innerWidth, H = innerHeight;
+      floaters.innerHTML = "";
+      const bubbles = 12, stars = 14;
+      for (let i=0;i<bubbles;i++){
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        const size = 12 + Math.random()*26;
+        b.style.width = size+'px'; b.style.height = size+'px';
+        b.style.left = Math.random()*W+'px';
+        b.style.animationDuration = (12 + Math.random()*10) + 's';
+        b.style.animationDelay = (-Math.random()*12) + 's';
+        floaters.appendChild(b);
+      }
+      for (let i=0;i<stars;i++){
+        const s = document.createElement('div');
+        s.className = 'star';
+        const size = 8 + Math.random()*10;
+        s.style.width = size+'px'; s.style.height = size+'px';
+        s.style.left = Math.random()*W+'px'; s.style.top = Math.random()*H+'px';
+        s.style.animationDuration = (8 + Math.random()*10) + 's';
+        floaters.appendChild(s);
+      }
+    }
+    window.addEventListener('resize', spawnFloaters);
+
     /************ EVENTS ************/
     revealBtn.onclick = () => {
       if (!state[todayKey]) state[todayKey] = { planned: null, done: null, signIndex: pickTodayIndex() };
       saveState(state);
       showTodayCard();
     };
-
     skipBtn.onclick = () => {
       if (!state[todayKey]) state[todayKey] = { planned: false, done: null, signIndex: pickTodayIndex() };
       else state[todayKey].planned = false;
@@ -263,7 +427,6 @@
       showToast("All good. Come back anytime today.");
       updateStreakInfo(); updateMascot();
     };
-
     willDoBtn.onclick = () => {
       state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
       state[todayKey].planned = true;
@@ -273,7 +436,6 @@
       showToast("Nice! Come back later and tap “Done for today”.");
       updateStreakInfo(); updateMascot();
     };
-
     doneBtn.onclick = () => {
       state[todayKey] = state[todayKey] || { signIndex: pickTodayIndex() };
       state[todayKey].done = true;
@@ -284,9 +446,10 @@
       updateStreakInfo(); updateMascot();
     };
 
-    // Initialize
-    updateStreakInfo();
-    updateMascot();
+    // Init
+    [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
+    updateStreakInfo(); updateMascot();
+    spawnFloaters();
   </script>
 </body>
 </html>
