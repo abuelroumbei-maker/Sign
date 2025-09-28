@@ -136,7 +136,7 @@
     background:linear-gradient(90deg,#e9ecff,#e5f9ff); color:#254ddf; border:1px solid #dae6ff}
   .today{ font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px }
   .meta{ font-size:13px; color:var(--muted) }
-  .footer{ margin-top:14px; font-size:12px; color:var(--muted) }
+  .footer{ margin top:14px; font-size:12px; color:var(--muted) }
 
   .nudge{
     display:none; background:#fff7d6; border:1px solid #ffe18a; color:#6a5300;
@@ -152,7 +152,7 @@
   }
 
   /* Canvas layers (ordered by depth) */
-  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters + nebulae */
+  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters */
   #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 } /* rainbow mouse trail */
   #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 } /* sparkles above content */
 
@@ -180,6 +180,41 @@
     -webkit-background-clip: text; background-clip: text; color: transparent;
     filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
   }
+
+  /* Level-Up panel */
+  #levelUpPanel{
+    position: fixed; right: 18px; bottom: 18px; z-index: 9999;
+    width: min(380px, 92vw);
+    background: #0f172aee;
+    color: #fff; border: 1px solid rgba(255,255,255,.15);
+    border-radius: 16px; padding: 14px 14px 10px;
+    box-shadow: 0 22px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
+    transform: translateY(20px); opacity:0; pointer-events:none;
+    transition: transform .28s ease, opacity .28s ease;
+    backdrop-filter: blur(8px);
+  }
+  #levelUpPanel.show{ transform: translateY(0); opacity:1; pointer-events:auto; }
+  #levelUpTitle{ font-weight: 900; margin: 0 0 6px; }
+  #levelUpMeta{ font-size: 12px; opacity:.85; margin: 0 0 10px; }
+  .chip{
+    display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
+    background:linear-gradient(90deg,#e9ecff22,#e5f9ff22);
+    border:1px solid rgba(255,255,255,.18); color:#fff; margin-right:8px;
+  }
+  .lp-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .lp-btn{
+    appearance:none; border:0; border-radius:12px; cursor:pointer; font-weight:800;
+    padding:8px 12px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#0a0b0f; box-shadow:0 10px 24px rgba(13,148,255,.25);
+  }
+  .lp-btn.ghost{
+    background:#0f172a; color:#e2e8f0; border:1px solid rgba(255,255,255,.18);
+    box-shadow:none;
+  }
+  #levelUpDetails{ margin-top:10px; font-size:13px; line-height:1.4; display:none; }
+  #levelUpDetails.show{ display:block; }
+  #levelUpClose{ position:absolute; top:8px; right:10px; background:none; border:none; color:#94a3b8; cursor:pointer; }
 
   @media (prefers-reduced-motion: reduce){
     .bg{animation:none} .big::after{display:none} .big::before{animation:none}
@@ -251,6 +286,21 @@
         </div>
       </div>
     </main>
+  </div>
+
+  <!-- Level-Up Panel -->
+  <div id="levelUpPanel" role="dialog" aria-live="polite" aria-modal="false" aria-labelledby="levelUpTitle">
+    <button id="levelUpClose" aria-label="Close">✕</button>
+    <h3 id="levelUpTitle">Level Up!</h3>
+    <p id="levelUpMeta">You became <span id="levelNum" class="chip">Level 1</span></p>
+    <div class="lp-row">
+      <button id="okBtn" class="lp-btn">Okay</button>
+      <button id="soWhatBtn" class="lp-btn ghost">So what?</button>
+    </div>
+    <div id="levelUpDetails">
+      <div>Next level needs <span id="nextXpNeed">—</span> XP.</div>
+      <div>Tip: keep your streak — it’s the easiest way to grow.</div>
+    </div>
   </div>
 
   <!-- Toast -->
@@ -368,6 +418,33 @@ function updateXPUI(){
   xpFill.style.width = pct + "%";
   xpMeta.textContent = metaText;
 }
+
+/* ====== Level-Up panel (replaces nebula effect) ====== */
+const panel = qs('#levelUpPanel');
+const levelNumEl = qs('#levelNum');
+const nextXpNeedEl = qs('#nextXpNeed');
+const okBtn = qs('#okBtn');
+const soWhatBtn = qs('#soWhatBtn');
+const detailsEl = qs('#levelUpDetails');
+const levelUpClose = qs('#levelUpClose');
+
+function showLevelUpPanel(level){
+  levelNumEl.textContent = `Level ${level}`;
+  const need = xpForNext(level);
+  nextXpNeedEl.textContent = (Number.isFinite(need) ? need : '—');
+  detailsEl.classList.remove('show');
+  panel.classList.add('show');
+  // focus for accessibility
+  okBtn.focus();
+}
+function hideLevelUpPanel(){ panel.classList.remove('show'); }
+okBtn.addEventListener('click', hideLevelUpPanel);
+levelUpClose.addEventListener('click', hideLevelUpPanel);
+soWhatBtn.addEventListener('click', ()=>{
+  detailsEl.classList.toggle('show');
+});
+
+/* Earning XP */
 function addXP(amount){
   let gained = amount;
   let leveledUp = 0;
@@ -379,7 +456,8 @@ function addXP(amount){
       xpState.xp = 0;
       leveledUp++;
       triggerShootingStar(true);
-      triggerNebula(xpState.level);
+      // SHOW PANEL on each level up (handles multi-level gains as well)
+      showLevelUpPanel(xpState.level);
       if(xpState.level>=MAX_LEVEL){
         xpState.xp = xpForNext(MAX_LEVEL-1);
         gained = 0;
@@ -521,12 +599,10 @@ function setPageMode(nextMode, tabName){
 
     if(pageMode){
       renderPage(currentPageTab);
-      // hide your two cards, show section
       if(screenIntro) screenIntro.classList.add('hide');
       if(screenToday) screenToday.classList.add('hide');
       sectionEl.classList.remove('hide');
     }else{
-      // show original UI (respect your own show/hide state)
       if(screenIntro) screenIntro.classList.remove('hide');
       if(screenToday) screenToday.classList.toggle('hide', screenToday.style.display === 'none');
       sectionEl.classList.add('hide');
@@ -534,7 +610,7 @@ function setPageMode(nextMode, tabName){
   });
 }
 
-/* ====== STARS BACKGROUND + SHOOTING STARS + NEBULA ====== */
+/* ====== STARS BACKGROUND + SHOOTING STARS (single direction) ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
 function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
 resizeStars(); addEventListener('resize', resizeStars);
@@ -545,14 +621,14 @@ const STARS = Array.from({length: 160}).map(()=>({
   z: Math.random()*1.5 + 0.3
 }));
 
-// Shooting stars
+// Shooting stars: always left -> right so tail is behind head
 const SHOOTERS = [];
 function triggerShootingStar(isLevelUp=false){
-  const dir = Math.random()<0.5 ? 1 : -1;
+  const dir = 1; // fixed direction to the right
   const speed = isLevelUp ? 16 : 11;
   const len = isLevelUp ? 220 : 160;
   const startY = Math.random()*innerHeight*0.5 + (isLevelUp?20:60);
-  const startX = dir===1 ? -80 : innerWidth + 80;
+  const startX = -80; // always from left outside the screen
   SHOOTERS.push({
     x:startX, y:startY,
     vx:dir*speed, vy:-(speed*0.35),
@@ -561,28 +637,6 @@ function triggerShootingStar(isLevelUp=false){
     length:len,
     glow:isLevelUp?1.0:0.7
   });
-}
-
-// Nebula on level-up
-const NEBULAE = [];
-function hexToRgba(hex, a){
-  let h = hex.replace('#',''); if(h.length===3){ h = h.split('').map(c=>c+c).join(''); }
-  const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
-function triggerNebula(levelLabel){
-  const cx = innerWidth * (0.28 + Math.random()*0.44);
-  const cy = innerHeight * (0.30 + Math.random()*0.40);
-  const th = TAB_THEMES[currentTab] || TAB_THEMES.Body;
-  const colors = [ th.accent||'#22c55e', th.accent2||'#a7f3d0', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#c084fc' ];
-  const blobs = Array.from({length:7}).map((_,i)=>({
-    ang: Math.random()*Math.PI*2,
-    baseR: 80 + Math.random()*140,
-    drift: 20 + Math.random()*40,
-    hue: colors[i % colors.length],
-    rot: (Math.random()*0.6 - 0.3)
-  }));
-  NEBULAE.push({ cx, cy, t:0, life:1600, maxLife:1600, blobs, label:`Level ${levelLabel}!` });
 }
 
 let mousePX = 0.5, mousePY = 0.5;
@@ -605,69 +659,38 @@ addEventListener('pointermove', e=>{
     sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
   });
 
-  // nebulae
-  for(let i=NEBULAE.length-1;i>=0;i--){
-    const nb = NEBULAE[i];
-    nb.t += 16;
-    const prog = Math.min(1, nb.t / nb.life);
-    const fade = 1 - prog;
-    const ease = (p)=>1 - Math.pow(1-p, 3);
-
-    sctx.save();
-    sctx.globalCompositeOperation = "lighter";
-    nb.blobs.forEach((b)=>{
-      const r = b.baseR * (0.6 + 0.8*ease(prog));
-      const ox = Math.cos(b.ang + b.rot*prog) * b.drift * ease(prog);
-      const oy = Math.sin(b.ang + b.rot*prog) * b.drift * ease(prog);
-
-      const grad = sctx.createRadialGradient(nb.cx+ox, nb.cy+oy, 0, nb.cx+ox, nb.cy+oy, r);
-      grad.addColorStop(0, `rgba(255,255,255,${0.18*fade})`);
-      grad.addColorStop(0.35, hexToRgba(b.hue, 0.26*fade));
-      grad.addColorStop(1, hexToRgba(b.hue, 0.0));
-      sctx.fillStyle = grad;
-      sctx.beginPath(); sctx.arc(nb.cx+ox, nb.cy+oy, r, 0, Math.PI*2); sctx.fill();
-    });
-
-    if(fade>0.2){
-      sctx.font = "700 22px ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
-      sctx.textAlign = "center";
-      sctx.shadowBlur = 18; sctx.shadowColor = "rgba(255,255,255,0.55)";
-      sctx.fillStyle = `rgba(255,255,255,${0.75*fade})`;
-      sctx.fillText(nb.label, nb.cx, nb.cy);
-    }
-
-    sctx.restore();
-    if(prog>=1){ NEBULAE.splice(i,1); }
-  }
-
   // shooting stars
   for(let i=SHOOTERS.length-1;i>=0;i--){
     const sh = SHOOTERS[i];
     sh.x += sh.vx; sh.y += sh.vy;
-    sh.vy += 0.12;
+    sh.vy += 0.12; // gentle gravity arc
     sh.life -= 16;
     const t = Math.max(0, sh.life / sh.maxLife);
 
     sctx.save();
     sctx.globalCompositeOperation = "lighter";
-    const grad = sctx.createLinearGradient(sh.x - sh.length, sh.y - sh.length*0.2, sh.x, sh.y);
+
+    // Tail is behind head (to the left); gradient fades along the tail
+    const tailX = sh.x - sh.length, tailY = sh.y - sh.length*0.2;
+    const grad = sctx.createLinearGradient(tailX, tailY, sh.x, sh.y);
     grad.addColorStop(0, `rgba(255,255,255,0)`);
     grad.addColorStop(0.7, `rgba(255,255,255,${0.35*sh.glow*t})`);
     grad.addColorStop(1, `rgba(255,255,255,${0.95*sh.glow*t})`);
     sctx.strokeStyle = grad;
     sctx.lineWidth = 2.2;
     sctx.beginPath();
-    sctx.moveTo(sh.x - sh.length, sh.y - sh.length*0.2);
+    sctx.moveTo(tailX, tailY);
     sctx.lineTo(sh.x, sh.y);
     sctx.stroke();
 
+    // head
     sctx.beginPath();
     sctx.arc(sh.x, sh.y, 2.8, 0, Math.PI*2);
     sctx.fillStyle = `rgba(255,255,255,${0.9*t})`;
     sctx.fill();
     sctx.restore();
 
-    if(sh.life<=0 || sh.x < -200 || sh.x > innerWidth+200 || sh.y > innerHeight+200){
+    if(sh.life<=0 || sh.x > innerWidth+200 || sh.y > innerHeight+200){
       SHOOTERS.splice(i,1);
     }
   }
