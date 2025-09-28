@@ -144,7 +144,7 @@
   }
 
   /* Canvas layers (ordered by depth) */
-  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* behind trail */
+  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters + NEBULA */
   #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 } /* rainbow mouse trail */
   #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 } /* sparkles above content */
 
@@ -242,11 +242,10 @@ const MAX_LEVEL = 100;
 // Semi-exponential curve: required XP grows ~12% per level, starting at 200
 function xpForNext(level){
   if(level>=MAX_LEVEL) return Infinity;
-  const base = 200; const growth = 1.12; // gentle curve
+  const base = 200; const growth = 1.12;
   return Math.round(base * Math.pow(growth, level));
 }
 function addXP(amount){
-  const before = {...xpState};
   let gained = amount;
   let leveledUp = 0;
   while(gained>0 && xpState.level < MAX_LEVEL){
@@ -256,9 +255,10 @@ function addXP(amount){
       xpState.level++;
       xpState.xp = 0;
       leveledUp++;
-      triggerShootingStar(true); // bigger star on level-up
+      triggerShootingStar(true);
+      triggerNebula(xpState.level);     // NEBULA: fire big bloom on level-up
       if(xpState.level>=MAX_LEVEL){
-        xpState.xp = xpForNext(MAX_LEVEL-1); // fill bar visually
+        xpState.xp = xpForNext(MAX_LEVEL-1);
         gained = 0;
       }
     }else{
@@ -415,7 +415,7 @@ tabBar.querySelectorAll(".tabBtn").forEach(b=>{
   b.addEventListener("click", ()=> setActiveTab(b.dataset.tab, true));
 });
 
-/* ====== STARS BACKGROUND + SHOOTING STARS ====== */
+/* ====== STARS BACKGROUND + SHOOTING STARS + NEBULAE ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
 function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
 resizeStars(); addEventListener('resize', resizeStars);
@@ -423,10 +423,10 @@ resizeStars(); addEventListener('resize', resizeStars);
 const STARS = Array.from({length: 160}).map(()=>({
   x: Math.random()*innerWidth,
   y: Math.random()*innerHeight,
-  z: Math.random()*1.5 + 0.3 // depth (0.3—1.8)
+  z: Math.random()*1.5 + 0.3
 }));
 
-// active shooting stars
+// Shooting stars
 const SHOOTERS = [];
 function triggerShootingStar(isLevelUp=false){
   const dir = Math.random()<0.5 ? 1 : -1;
@@ -441,6 +441,31 @@ function triggerShootingStar(isLevelUp=false){
     maxLife:isLevelUp?1000:700,
     length:len,
     glow:isLevelUp?1.0:0.7
+  });
+}
+
+// NEBULA: expanding colorful gas clouds on level-up
+const NEBULAE = [];
+function triggerNebula(levelLabel){
+  const cx = innerWidth * (0.28 + Math.random()*0.44);
+  const cy = innerHeight * (0.30 + Math.random()*0.40);
+  // palette blended from tab accent + complementary hues
+  const th = TAB_THEMES[currentTab] || TAB_THEMES.Body;
+  const colors = [
+    th.accent, th.accent2,
+    '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#c084fc'
+  ];
+  const blobs = Array.from({length:7}).map((_,i)=>({
+    ang: Math.random()*Math.PI*2,
+    baseR: 80 + Math.random()*140,
+    drift: 20 + Math.random()*40,
+    hue: colors[i % colors.length],
+    rot: (Math.random()*0.6 - 0.3)
+  }));
+  NEBULAE.push({
+    cx, cy, t:0, life:1600, maxLife:1600,
+    blobs,
+    label:`Level ${levelLabel}!`
   });
 }
 
@@ -464,29 +489,70 @@ addEventListener('pointermove', e=>{
     sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
   });
 
+  // NEBULA render
+  for(let i=NEBULAE.length-1;i>=0;i--){
+    const nb = NEBULAE[i];
+    nb.t += 16;
+    const prog = Math.min(1, nb.t / nb.life);        // 0→1
+    const fade = 1 - prog;                            // fade out
+    const ease = (p)=>1 - Math.pow(1-p, 3);           // cubic ease-out
+
+    sctx.save();
+    sctx.globalCompositeOperation = "lighter";
+
+    // draw blobs
+    nb.blobs.forEach((b, idx)=>{
+      const r = b.baseR * (0.6 + 0.8*ease(prog));
+      const ox = Math.cos(b.ang + b.rot*prog) * b.drift * ease(prog);
+      const oy = Math.sin(b.ang + b.rot*prog) * b.drift * ease(prog);
+
+      const grad = sctx.createRadialGradient(nb.cx+ox, nb.cy+oy, 0, nb.cx+ox, nb.cy+oy, r);
+      grad.addColorStop(0, `rgba(255,255,255,${0.18*fade})`);
+      grad.addColorStop(0.35, hexToRgba(b.hue, 0.26*fade));
+      grad.addColorStop(1, hexToRgba(b.hue, 0.0));
+
+      sctx.fillStyle = grad;
+      sctx.beginPath();
+      sctx.arc(nb.cx+ox, nb.cy+oy, r, 0, Math.PI*2);
+      sctx.fill();
+    });
+
+    // glowing label
+    if(fade>0.2){
+      sctx.font = "700 22px ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
+      sctx.textAlign = "center";
+      sctx.shadowBlur = 18;
+      sctx.shadowColor = "rgba(255,255,255,0.55)";
+      sctx.fillStyle = `rgba(255,255,255,${0.75*fade})`;
+      sctx.fillText(nb.label, nb.cx, nb.cy);
+    }
+
+    sctx.restore();
+
+    if(prog>=1){ NEBULAE.splice(i,1); }
+  }
+
   // shooting stars
   for(let i=SHOOTERS.length-1;i>=0;i--){
     const sh = SHOOTERS[i];
     sh.x += sh.vx; sh.y += sh.vy;
-    sh.vy += 0.12; // slight gravity arc
+    sh.vy += 0.12;
     sh.life -= 16;
     const t = Math.max(0, sh.life / sh.maxLife);
 
-    // trail line
     sctx.save();
     sctx.globalCompositeOperation = "lighter";
     const grad = sctx.createLinearGradient(sh.x - sh.length, sh.y - sh.length*0.2, sh.x, sh.y);
-    grad.addColorStop(0, `rgba(255,255,255,${0.0})`);
+    grad.addColorStop(0, `rgba(255,255,255,0)`);
     grad.addColorStop(0.7, `rgba(255,255,255,${0.35*sh.glow*t})`);
     grad.addColorStop(1, `rgba(255,255,255,${0.95*sh.glow*t})`);
     sctx.strokeStyle = grad;
-    sctx.lineWidth = isFinite(sh.length)?2.2:2.2;
+    sctx.lineWidth = 2.2;
     sctx.beginPath();
     sctx.moveTo(sh.x - sh.length, sh.y - sh.length*0.2);
     sctx.lineTo(sh.x, sh.y);
     sctx.stroke();
 
-    // head
     sctx.beginPath();
     sctx.arc(sh.x, sh.y, 2.8, 0, Math.PI*2);
     sctx.fillStyle = `rgba(255,255,255,${0.9*t})`;
@@ -498,6 +564,17 @@ addEventListener('pointermove', e=>{
     }
   }
 })();
+
+// small helper to convert hex to rgba
+function hexToRgba(hex, a){
+  // supports #rgb or #rrggbb
+  let h = hex.replace('#','');
+  if(h.length===3){ h = h.split('').map(c=>c+c).join(''); }
+  const r = parseInt(h.slice(0,2),16);
+  const g = parseInt(h.slice(2,4),16);
+  const b = parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 
 /* ====== RAINBOW MOUSE TRAIL ====== */
 const trail = qs("#trail"), tctx = trail.getContext("2d");
@@ -593,13 +670,13 @@ function showTodayCard(){
 }
 
 revealBtn.onclick = ()=>{
-  playEthereal(523.25); // C5-ish shimmer
+  playEthereal(523.25);
   if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
   saveState(state);
   showTodayCard();
 };
 skipBtn.onclick = ()=>{
-  playEthereal(349.23); // F4-ish
+  playEthereal(349.23);
   if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()};
   else state[todayKey].planned=false;
   saveState(state);
@@ -607,7 +684,7 @@ skipBtn.onclick = ()=>{
   updateStreakInfo();
 };
 willDoBtn.onclick = ()=>{
-  playEthereal(440); // A4-ish
+  playEthereal(440);
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
   state[todayKey].planned=true; state[todayKey].done=null; saveState(state);
   todayMeta.textContent="You planned this today. Come back later to mark it done.";
@@ -615,7 +692,7 @@ willDoBtn.onclick = ()=>{
   updateStreakInfo();
 };
 doneBtn.onclick = ()=>{
-  playEthereal(659.25); // E5-ish
+  playEthereal(659.25);
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
   if(state[todayKey].done!==true){ // award XP once per day
     addXP(100);
