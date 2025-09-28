@@ -35,7 +35,28 @@
     -webkit-background-clip:text; background-clip:text; color:transparent;
     filter:drop-shadow(0 6px 16px rgba(255,255,255,.1));
   }
-  .subtitle{margin:0 0 14px; color:#cbd5e1; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
+  .subtitle{margin:0 0 10px; color:#cbd5e1; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
+
+  /* XP strip */
+  .xp{
+    display:flex; align-items:center; gap:12px; margin:8px 0 18px;
+  }
+  .xp-badge{
+    background:#ffffffdd; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800;
+    box-shadow:0 8px 18px rgba(0,0,0,.15);
+  }
+  .xp-bar{
+    flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22);
+    overflow:hidden; position:relative;
+    box-shadow:inset 0 2px 6px rgba(0,0,0,.25);
+  }
+  .xp-fill{
+    position:absolute; left:0; top:0; bottom:0; width:0%;
+    background:linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow:0 6px 20px rgba(13,148,255,.35);
+    transition: width .45s ease;
+  }
+  .xp-meta{ font-size:12px; color:#cbd5e1; opacity:.85 }
 
   .card{
     background: var(--card); border-radius:22px; padding:22px 20px;
@@ -48,9 +69,7 @@
   .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
 
   /* Tabs bar */
-  .tabs{
-    display:flex; gap:10px; margin:14px 0 18px; flex-wrap:wrap;
-  }
+  .tabs{ display:flex; gap:10px; margin:14px 0 18px; flex-wrap:wrap; }
   .tabBtn{
     --halo: #a5b4fc;
     position:relative; overflow:hidden; outline:none;
@@ -62,11 +81,7 @@
   }
   .tabBtn:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px rgba(13,148,255,.32) }
   .tabBtn:active{ transform: translateY(1px) scale(.995) }
-  .tabBtn.active{
-    outline:2px solid rgba(255,255,255,.7);
-    box-shadow: 0 16px 42px rgba(255,255,255,.20);
-  }
-  /* Soft pulsing halo for tabs */
+  .tabBtn.active{ outline:2px solid rgba(255,255,255,.7); box-shadow: 0 16px 42px rgba(255,255,255,.20); }
   .tabBtn::before{
     content:""; position:absolute; inset:-18%; border-radius:22px;
     background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
@@ -76,7 +91,7 @@
 
   /* Buttons with halo and ripple */
   .big{
-    --halo: #93c5fd; /* default halo color */
+    --halo: #93c5fd;
     position:relative; overflow:hidden; outline:none;
     flex:1 0 220px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
     border:0; cursor:pointer; color:#0a0b0f;
@@ -87,21 +102,15 @@
   .big:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
   .big:active{ transform: translateY(1px) scale(.995) }
 
-  /* Soft pulsing halo */
   .big::before{
     content:""; position:absolute; inset:-18%; border-radius:24px;
     background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
     opacity:.0; transform:scale(.85); z-index:0;
     animation:halo 2.6s ease-in-out infinite;
   }
-  @keyframes halo{
-    0%,100%{opacity:.0; transform:scale(.85)}
-    50%    {opacity:.22; transform:scale(1)}
-  }
+  @keyframes halo{ 0%,100%{opacity:.0; transform:scale(.85)} 50%{opacity:.22; transform:scale(1)} }
 
-  /* Ripple on click */
-  .big::after,
-  .tabBtn::after{
+  .big::after, .tabBtn::after{
     content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
     width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
     transform:translate(-50%,-50%); opacity:0; pointer-events:none;
@@ -156,7 +165,14 @@
       <h1 class="title">Today Is The Day I…</h1>
       <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
 
-      <!-- NEW: Tabs -->
+      <!-- XP strip -->
+      <div class="xp">
+        <div class="xp-badge" id="xpBadge">Level 0</div>
+        <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+      </div>
+      <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
+
+      <!-- TABS -->
       <div class="tabs" id="tabs">
         <button class="tabBtn active" data-tab="Body"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</button>
         <button class="tabBtn"        data-tab="Heart" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</button>
@@ -218,6 +234,49 @@ function saveState(s){localStorage.setItem("state_v1", JSON.stringify(s))}
 const state=loadState(); const todayKey=ymd();
 const yesterdayKey=(()=>{const d=new Date(); d.setDate(d.getDate()-1); return ymd(d)})();
 
+/* ====== XP STATE ====== */
+function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
+function saveXP(x){ localStorage.setItem("xp_v1", JSON.stringify(x)); }
+
+const MAX_LEVEL = 100;
+// Semi-exponential curve: required XP grows ~12% per level, starting at 200
+function xpForNext(level){
+  if(level>=MAX_LEVEL) return Infinity;
+  const base = 200; const growth = 1.12; // gentle curve
+  return Math.round(base * Math.pow(growth, level));
+}
+function addXP(amount){
+  const before = {...xpState};
+  let gained = amount;
+  let leveledUp = 0;
+  while(gained>0 && xpState.level < MAX_LEVEL){
+    const need = xpForNext(xpState.level) - xpState.xp;
+    if(gained >= need){
+      gained -= need;
+      xpState.level++;
+      xpState.xp = 0;
+      leveledUp++;
+      triggerShootingStar(true); // bigger star on level-up
+      if(xpState.level>=MAX_LEVEL){
+        xpState.xp = xpForNext(MAX_LEVEL-1); // fill bar visually
+        gained = 0;
+      }
+    }else{
+      xpState.xp += gained;
+      gained = 0;
+      triggerShootingStar(false);
+    }
+  }
+  saveXP(xpState);
+  updateXPUI();
+  if(leveledUp>0){
+    showToast(`Level up! Now Level ${xpState.level} ⭐`);
+  }else{
+    showToast(`+${amount} XP`);
+  }
+}
+let xpState = loadXP();
+
 /* ====== UI REFS ====== */
 const screenIntro=qs("#screen-intro"), screenToday=qs("#screen-today");
 const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoBtn"), doneBtn=qs("#doneBtn");
@@ -225,6 +284,7 @@ const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), to
 const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
 const toast=qs("#toast"), toastText=qs("#toastText");
 const tabBar = qs("#tabs");
+const xpBadge = qs("#xpBadge"), xpFill = qs("#xpFill"), xpMeta = qs("#xpMeta");
 
 /* ====== TABS (theme + sound) ====== */
 const TAB_THEMES = {
@@ -245,6 +305,22 @@ function updateStreakInfo(){
   if(nudgeBanner) nudgeBanner.style.display = n ? "block" : "none";
   streakInfo.textContent = `Current streak: ${s} day${s===1?"":"s"}`;
   const m=qs("#mascot"); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px";
+}
+
+/* ====== XP UI ====== */
+function updateXPUI(){
+  const lvl = xpState.level;
+  const need = xpForNext(lvl);
+  let pct = 0, metaText = "";
+  if(lvl>=MAX_LEVEL){
+    pct = 100; metaText = `MAX • Level ${MAX_LEVEL}`;
+  }else{
+    pct = Math.max(0, Math.min(100, Math.round(100 * (xpState.xp / need))));
+    metaText = `${xpState.xp} / ${need} XP`;
+  }
+  xpBadge.textContent = `Level ${lvl}`;
+  xpFill.style.width = pct + "%";
+  xpMeta.textContent = metaText;
 }
 
 /* ====== TOAST ====== */
@@ -280,8 +356,6 @@ function ensureAudio(){
 }
 function playEthereal(root=440){
   ensureAudio();
-
-  // shimmering duo oscillators + gentle highpass + feedback delay for air
   const now = actx.currentTime;
 
   const filt = actx.createBiquadFilter();
@@ -299,20 +373,17 @@ function playEthereal(root=440){
   const out = actx.createGain();
   dry.connect(out); wet.connect(out); out.connect(master);
 
-  // small chord (root + fifth) with gentle detune
   const freqs = [root, root*1.5];
-  const oscs = freqs.map((f,i)=>{
+  freqs.forEach((f,i)=>{
     const o = actx.createOscillator();
     o.type = i===0 ? "sine" : "triangle";
     o.frequency.value = f;
-    o.detune.value = (i?+6:-6); // shimmer
+    o.detune.value = (i?+6:-6);
     o.connect(filt); filt.connect(env);
     o.start(now);
     o.stop(now + 1.6);
-    return o;
   });
 
-  // envelope: soft attack, long airy release
   env.gain.cancelScheduledValues(now);
   env.gain.linearRampToValueAtTime(0.0, now);
   env.gain.linearRampToValueAtTime(1.0, now + 0.08);
@@ -325,12 +396,8 @@ function applyTheme(tab){
   document.documentElement.style.setProperty('--accent', th.accent);
   document.documentElement.style.setProperty('--accent2', th.accent2);
   document.documentElement.style.setProperty('--accent3', th.accent2);
-  // badge subtle recolor
   const badge = qs(".badge");
   if(badge){ badge.style.background = `linear-gradient(90deg, ${th.accent2}22, ${th.accent}22)`; }
-  // mascot hint (keeps streak growth emoji logic; this is just a little topper)
-  const masc = qs("#mascot");
-  if(masc) masc.textContent = (masc.textContent || "🫘") + "";
 }
 
 /* ====== TABS INIT & EVENTS ====== */
@@ -340,18 +407,15 @@ function setActiveTab(tabName, fromClick=false){
   [...tabBar.querySelectorAll(".tabBtn")].forEach(b=>{
     b.classList.toggle("active", b.dataset.tab===tabName);
   });
-  // Play airy sound on tab press
-  if(fromClick) playEthereal(392); // G4-ish
+  if(fromClick) playEthereal(392); // tab chime
   applyTheme(tabName);
 }
 tabBar.querySelectorAll(".tabBtn").forEach(b=>{
   attachRipple(b);
-  b.addEventListener("click", ()=>{
-    setActiveTab(b.dataset.tab, true);
-  });
+  b.addEventListener("click", ()=> setActiveTab(b.dataset.tab, true));
 });
 
-/* ====== STARS BACKGROUND ====== */
+/* ====== STARS BACKGROUND + SHOOTING STARS ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
 function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
 resizeStars(); addEventListener('resize', resizeStars);
@@ -362,7 +426,25 @@ const STARS = Array.from({length: 160}).map(()=>({
   z: Math.random()*1.5 + 0.3 // depth (0.3—1.8)
 }));
 
-let mousePX = 0.5, mousePY = 0.5; // for gentle parallax
+// active shooting stars
+const SHOOTERS = [];
+function triggerShootingStar(isLevelUp=false){
+  const dir = Math.random()<0.5 ? 1 : -1;
+  const speed = isLevelUp ? 16 : 11;
+  const len = isLevelUp ? 220 : 160;
+  const startY = Math.random()*innerHeight*0.5 + (isLevelUp?20:60);
+  const startX = dir===1 ? -80 : innerWidth + 80;
+  SHOOTERS.push({
+    x:startX, y:startY,
+    vx:dir*speed, vy:-(speed*0.35),
+    life:isLevelUp?1000:700,
+    maxLife:isLevelUp?1000:700,
+    length:len,
+    glow:isLevelUp?1.0:0.7
+  });
+}
+
+let mousePX = 0.5, mousePY = 0.5;
 addEventListener('pointermove', e=>{
   mousePX = e.clientX / innerWidth;
   mousePY = e.clientY / innerHeight;
@@ -371,8 +453,9 @@ addEventListener('pointermove', e=>{
 (function drawStars(){
   requestAnimationFrame(drawStars);
   sctx.clearRect(0,0,stars.width,stars.height);
+
+  // static stars
   STARS.forEach(s=>{
-    // gentle drift + parallax
     s.x += (mousePX - 0.5) * s.z * 0.3;
     s.y += (mousePY - 0.5) * s.z * 0.3;
     if (s.x < 0) s.x += stars.width; if (s.x > stars.width) s.x -= stars.width;
@@ -380,6 +463,40 @@ addEventListener('pointermove', e=>{
     sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`;
     sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
   });
+
+  // shooting stars
+  for(let i=SHOOTERS.length-1;i>=0;i--){
+    const sh = SHOOTERS[i];
+    sh.x += sh.vx; sh.y += sh.vy;
+    sh.vy += 0.12; // slight gravity arc
+    sh.life -= 16;
+    const t = Math.max(0, sh.life / sh.maxLife);
+
+    // trail line
+    sctx.save();
+    sctx.globalCompositeOperation = "lighter";
+    const grad = sctx.createLinearGradient(sh.x - sh.length, sh.y - sh.length*0.2, sh.x, sh.y);
+    grad.addColorStop(0, `rgba(255,255,255,${0.0})`);
+    grad.addColorStop(0.7, `rgba(255,255,255,${0.35*sh.glow*t})`);
+    grad.addColorStop(1, `rgba(255,255,255,${0.95*sh.glow*t})`);
+    sctx.strokeStyle = grad;
+    sctx.lineWidth = isFinite(sh.length)?2.2:2.2;
+    sctx.beginPath();
+    sctx.moveTo(sh.x - sh.length, sh.y - sh.length*0.2);
+    sctx.lineTo(sh.x, sh.y);
+    sctx.stroke();
+
+    // head
+    sctx.beginPath();
+    sctx.arc(sh.x, sh.y, 2.8, 0, Math.PI*2);
+    sctx.fillStyle = `rgba(255,255,255,${0.9*t})`;
+    sctx.fill();
+    sctx.restore();
+
+    if(sh.life<=0 || sh.x < -200 || sh.x > innerWidth+200 || sh.y > innerHeight+200){
+      SHOOTERS.splice(i,1);
+    }
+  }
 })();
 
 /* ====== RAINBOW MOUSE TRAIL ====== */
@@ -456,7 +573,7 @@ function paletteForTarget(target){
     if (btn.id === 'willDoBtn') return PALETTES.willdo;
     if (btn.id === 'doneBtn')   return PALETTES.done;
   }
-  return PALETTES.bg; // background default
+  return PALETTES.bg;
 }
 
 /* Global click handler: sparkles anywhere */
@@ -500,18 +617,19 @@ willDoBtn.onclick = ()=>{
 doneBtn.onclick = ()=>{
   playEthereal(659.25); // E5-ish
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
+  if(state[todayKey].done!==true){ // award XP once per day
+    addXP(100);
+  }
   state[todayKey].done=true; saveState(state);
   todayMeta.textContent="Marked done ✅";
-  showToast("Great job! ✅");
   updateStreakInfo();
 };
 
 /* ====== INIT ====== */
 [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
-
-// initialize tabs active state + theme
-setActiveTab(currentTab, false);
+setActiveTab(localStorage.getItem("tab") || "Body", false);
 updateStreakInfo();
+updateXPUI();
 
 // Resume audio on first gesture (mobile autoplay policies)
 window.addEventListener('pointerdown', ()=>ensureAudio(), {once:true});
