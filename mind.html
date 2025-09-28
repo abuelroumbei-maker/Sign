@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
   :root{
-    --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
+    --fg:#e2e8f0; --muted:#94a3b8; --card:#ffffffdd;
     --accent:#3b82f6; --accent2:#bfdbfe; --accent3:#60a5fa;
     --bg1:#0b0d12; --bg2:#0e1320;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -18,6 +18,7 @@
   *{box-sizing:border-box} html,body{height:100%}
   body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:hidden;}
 
+  /* Background + stars (unchanged) */
   .bg{
     position:fixed; inset:0; z-index:-4;
     background:
@@ -28,10 +29,10 @@
     animation:bgDrift 20s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03);
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
-
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
 
-  .wrap{height:100%;display:grid;place-items:center;padding:22px}
+  /* Header + layout */
+  .wrap{height:100%;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:22px}
   .title{margin:0;font-size:clamp(40px,10vw,86px);
     background:linear-gradient(90deg,#fff,color-mix(in srgb,var(--accent2) 35%,#fff));
     -webkit-background-clip:text;background-clip:text;color:transparent;
@@ -46,6 +47,45 @@
   .xp-bar{flex:1;height:10px;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden;position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
   .xp-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(13,148,255,.35);transition:width .45s ease}
   .xp-meta{position:fixed;right:18px;top:52px;font-size:12px;color:#cbd5e1;opacity:.9}
+
+  /* Game area */
+  .game{min-height:0;display:grid;grid-template-rows:auto 1fr;gap:16px;max-width:1100px;margin:0 auto;width:100%}
+  .subtitle{margin:0;text-align:center;color:var(--muted);font-size:14px}
+  .fact-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:14px;align-content:start;overflow:auto;padding-bottom:8px
+  }
+  .fact-card{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:16px;padding:14px 14px 16px;backdrop-filter:blur(6px);
+    transition:transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+    cursor:pointer
+  }
+  .fact-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.25);border-color:rgba(255,255,255,.25)}
+  .fact-title{font-weight:800;margin:2px 0 6px 0;color:#fff}
+  .fact-blurb{margin:0;color:#cbd5e1;font-size:14px;line-height:1.45}
+
+  .panel{
+    background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;padding:18px 18px 20px;backdrop-filter:blur(6px);
+    display:grid;gap:14px;max-width:840px;justify-self:center
+  }
+  .evo-badge{font-size:12px;color:#cbd5e1}
+  .evo-text{font-size:18px;line-height:1.5;margin:0;color:#fff}
+
+  .actions{display:flex;gap:10px;flex-wrap:wrap}
+  .btn{
+    appearance:none;border:none;border-radius:12px;padding:10px 14px;font-weight:900;
+    cursor:pointer;transition:transform .08s ease, box-shadow .1s ease, opacity .2s ease
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent3)); color:#0b0d12; box-shadow:0 10px 24px rgba(59,130,246,.35)}
+  .btn-ghost{background:rgba(255,255,255,.08); color:#e2e8f0; border:1px solid rgba(255,255,255,.16)}
+  .btn-minor{font-size:12px;opacity:.85}
+  .spacer{flex:1 1 auto}
+
+  /* Scroll areas behave nicely within full-height layout */
+  .scrolly{overflow:auto;min-height:0}
 </style>
 </head>
 <body>
@@ -67,9 +107,32 @@
 
   <div class="wrap">
     <h1 class="title">Mind</h1>
+
+    <section class="game">
+      <p class="subtitle">Fact Evolution — click a fact to begin, then unlock deeper layers.</p>
+
+      <!-- LIST VIEW -->
+      <div id="factListView" class="scrolly">
+        <div class="fact-grid" id="factGrid"></div>
+      </div>
+
+      <!-- EVOLUTION VIEW -->
+      <div id="evoView" class="panel" style="display:none">
+        <div class="evo-badge" id="evoMeta">Layer 1 of N • <span id="evoTitle"></span></div>
+        <p class="evo-text" id="evoText"></p>
+
+        <div class="actions">
+          <button class="btn btn-primary" id="btnDeeper">Unlock deeper layers of the fact</button>
+          <span class="spacer"></span>
+          <button class="btn btn-ghost" id="btnExit">I’m no longer interested</button>
+          <button class="btn btn-ghost btn-minor" id="btnRestart" title="Restart this fact from the beginning">Restart this fact</button>
+        </div>
+      </div>
+    </section>
   </div>
 
 <script>
+/* -------------------- Stars (unchanged) -------------------- */
 const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
 function resize(){ stars.width=innerWidth; stars.height=innerHeight; } resize(); addEventListener('resize',resize);
 const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
@@ -78,6 +141,7 @@ const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math
     if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
     sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z); }); })();
 
+/* -------------------- XP UI (unchanged) -------------------- */
 function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
 const MAX_LEVEL=100; function xpForNext(level){ if(level>=MAX_LEVEL)return Infinity; const base=200,growth=1.12; return Math.round(base*Math.pow(growth,level)); }
 function updateXPUI(){ const xp=loadXP(); const need=xpForNext(xp.level);
@@ -86,6 +150,162 @@ function updateXPUI(){ const xp=loadXP(); const need=xpForNext(xp.level);
   document.getElementById('xpMeta').textContent=xp.level>=MAX_LEVEL?`MAX • Level ${MAX_LEVEL}`:`${xp.xp} / ${need} XP`;
 }
 updateXPUI(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateXPUI(); });
+
+/* ============================================================
+   FACT EVOLUTION GAME
+   ------------------------------------------------------------
+   HOW TO ADD YOUR OWN FACTS:
+   - Replace the sample objects in FACTS below.
+   - Each object needs:
+       id: a unique string (no spaces),
+       title: short label shown in the grid,
+       layers: an array of strings from "basic" to "deeper".
+     Example:
+       {
+         id: "my_fact",
+         title: "Your short title",
+         layers: [
+           "Basic fact here.",
+           "Evolution one here.",
+           "Evolution two here.",
+           "Evolution three here."
+         ]
+       }
+   - You can provide any number of layers (2+ recommended).
+   - That’s it. No other files need changes.
+   ============================================================ */
+
+const FACTS = [
+  {
+    id: "sahara",
+    title: "Sahara Desert",
+    layers: [
+      "The Sahara is the largest hot desert on Earth.",
+      "It spans about 9 million km² across North Africa.",
+      "Average rainfall is typically under 100 mm per year.",
+      "Day–night swings can reach from ~50°C to near freezing."
+    ]
+  },
+  {
+    id: "light",
+    title: "Speed of Light",
+    layers: [
+      "Light in vacuum travels at a constant speed.",
+      "That constant is ~299,792 km per second.",
+      "It’s commonly rounded to 3×10⁵ km/s for simplicity.",
+      "This limit shapes causality in modern physics."
+    ]
+  },
+  {
+    id: "honey",
+    title: "Honey & Spoilage",
+    layers: [
+      "Honey can last a very long time.",
+      "Its low water activity inhibits microbial growth.",
+      "Acidity (~pH 3–4.5) and hydrogen peroxide help preservation.",
+      "Archaeologists have found edible honey in ancient tombs."
+    ]
+  }
+];
+
+/* -------------------- State & Elements -------------------- */
+const factGridEl = document.getElementById('factGrid');
+const listViewEl = document.getElementById('factListView');
+const evoViewEl  = document.getElementById('evoView');
+const evoMetaEl  = document.getElementById('evoMeta');
+const evoTitleEl = document.getElementById('evoTitle');
+const evoTextEl  = document.getElementById('evoText');
+const btnDeeper  = document.getElementById('btnDeeper');
+const btnExit    = document.getElementById('btnExit');
+const btnRestart = document.getElementById('btnRestart');
+
+let currentFact = null;
+let layerIndex = 0;
+
+/* -------------------- Renderers -------------------- */
+function renderFactGrid(){
+  factGridEl.innerHTML = '';
+  FACTS.forEach(f=>{
+    const card = document.createElement('button');
+    card.className = 'fact-card';
+    card.setAttribute('data-fact-id', f.id);
+    card.innerHTML = `
+      <div class="fact-title">${escapeHTML(f.title)}</div>
+      <p class="fact-blurb">${escapeHTML(f.layers[0])}</p>
+    `;
+    card.addEventListener('click', ()=> beginEvolution(f.id));
+    factGridEl.appendChild(card);
+  });
+}
+
+function beginEvolution(factId){
+  currentFact = FACTS.find(x=>x.id===factId);
+  layerIndex = 0;
+  updateEvoPanel();
+  toggleMode('evo');
+}
+
+function updateEvoPanel(){
+  if(!currentFact) return;
+  const total = currentFact.layers.length;
+  const humanLayer = Math.min(layerIndex+1, total);
+  evoTitleEl.textContent = currentFact.title;
+  evoTextEl.textContent  = currentFact.layers[layerIndex];
+  evoMetaEl.innerHTML    = `Layer ${humanLayer} of ${total} • <span id="evoTitle"></span>${escapeHTML(currentFact.title)}`;
+
+  // If at last layer, change the CTA wording and subtle style
+  if(layerIndex >= total-1){
+    btnDeeper.textContent = "This is the deepest layer";
+    btnDeeper.disabled = true;
+    btnDeeper.style.opacity = 0.6;
+  }else{
+    btnDeeper.textContent = "Unlock deeper layers of the fact";
+    btnDeeper.disabled = false;
+    btnDeeper.style.opacity = 1;
+  }
+}
+
+function toggleMode(mode){
+  if(mode==='evo'){
+    listViewEl.style.display='none';
+    evoViewEl.style.display='grid';
+  }else{
+    evoViewEl.style.display='none';
+    listViewEl.style.display='block';
+  }
+}
+
+/* -------------------- Events -------------------- */
+btnDeeper.addEventListener('click', ()=>{
+  if(!currentFact) return;
+  if(layerIndex < currentFact.layers.length-1){
+    layerIndex++;
+    updateEvoPanel();
+  }
+});
+
+btnExit.addEventListener('click', ()=>{
+  // Back to list (mind page initial state)
+  currentFact = null;
+  layerIndex = 0;
+  toggleMode('list');
+});
+
+btnRestart.addEventListener('click', ()=>{
+  if(!currentFact) return;
+  layerIndex = 0;
+  updateEvoPanel();
+});
+
+/* -------------------- Utils -------------------- */
+function escapeHTML(str){
+  return String(str).replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+}
+
+/* -------------------- Boot -------------------- */
+renderFactGrid();
+toggleMode('list');
 </script>
 </body>
 </html>
+
