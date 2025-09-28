@@ -3,10 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — Stars + Trail + Pages</title>
+<title>Today Is The Day I… — Home</title>
 <meta name="theme-color" content="#0b0d12" />
 
-<!-- Optional: we’ll lazy-load fonts, but preconnect helps -->
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -15,9 +14,7 @@
     --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
     --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
     --bg1:#0b0d12; --bg2:#0e1320;
-
-    /* page-mode fonts (overridden per theme) */
-    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Robito, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
   *{box-sizing:border-box} html,body{height:100%}
@@ -52,24 +49,14 @@
   .subtitle{margin:0 0 10px; color:#cbd5e1; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
 
   /* XP strip */
-  .xp{
-    display:flex; align-items:center; gap:12px; margin:8px 0 18px;
-  }
-  .xp-badge{
-    background:#ffffffdd; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800;
-    box-shadow:0 8px 18px rgba(0,0,0,.15);
-  }
-  .xp-bar{
-    flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22);
-    overflow:hidden; position:relative;
-    box-shadow:inset 0 2px 6px rgba(0,0,0,.25);
-  }
-  .xp-fill{
-    position:absolute; left:0; top:0; bottom:0; width:0%;
+  .xp{ display:flex; align-items:center; gap:12px; margin:8px 0 18px; }
+  .xp-badge{ background:#ffffffdd; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800;
+    box-shadow:0 8px 18px rgba(0,0,0,.15); }
+  .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22);
+    overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25); }
+  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%;
     background:linear-gradient(90deg, var(--accent), var(--accent2));
-    box-shadow:0 6px 20px rgba(13,148,255,.35);
-    transition: width .45s ease;
-  }
+    box-shadow:0 6px 20px rgba(13,148,255,.35); transition: width .45s ease; }
   .xp-meta{ font-size:12px; color:#cbd5e1; opacity:.85 }
 
   .card{
@@ -82,22 +69,28 @@
 
   .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
 
-  /* Tabs bar */
+  /* Page links (tabs as anchors) */
   .tabs{ display:flex; gap:10px; margin:14px 0 18px; flex-wrap:wrap; }
-  .tabBtn{
+  .tabLink{
     --halo: #a5b4fc;
     position:relative; overflow:hidden; outline:none;
-    border:0; cursor:pointer; color:#0a0b0f; font-weight:900;
-    padding:12px 14px; border-radius:14px; font-size:16px;
+    color:#0a0b0f; font-weight:900; text-decoration:none;
+    padding:12px 14px; border-radius:14px; font-size:16px; display:inline-block;
     background: linear-gradient(135deg, var(--accent), var(--accent2));
     box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 25%, transparent);
     transition: transform .06s ease, filter .2s ease, box-shadow .2s ease, background 280ms ease;
   }
-  .tabBtn:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px color-mix(in srgb, var(--accent) 35%, transparent) }
-  .tabBtn:active{ transform: translateY(1px) scale(.995) }
-  .tabBtn.active{ outline:2px solid rgba(255,255,255,.7); box-shadow: 0 16px 42px rgba(255,255,255,.20); }
+  .tabLink:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px color-mix(in srgb, var(--accent) 35%, transparent) }
+  .tabLink:active{ transform: translateY(1px) scale(.995) }
+  .tabLink::before{
+    content:""; position:absolute; inset:-18%; border-radius:24px;
+    background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
+    opacity:.0; transform:scale(.85); z-index:0; pointer-events:none;
+    animation:halo 2.6s ease-in-out infinite;
+  }
+  @keyframes halo{ 0%,100%{opacity:.0; transform:scale(.85)} 50%{opacity:.22; transform:scale(1)} }
 
-  /* Buttons with halo and ripple */
+  /* Primary buttons with halo and ripple */
   .big{
     --halo: #93c5fd; 
     position:relative; overflow:hidden; outline:none;
@@ -110,21 +103,19 @@
   .big:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
   .big:active{ transform: translateY(1px) scale(.995) }
 
-  .big::before, .tabBtn::before{
+  .big::before{
     content:""; position:absolute; inset:-18%; border-radius:24px;
     background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
     opacity:.0; transform:scale(.85); z-index:0; pointer-events:none;
     animation:halo 2.6s ease-in-out infinite;
   }
-  @keyframes halo{ 0%,100%{opacity:.0; transform:scale(.85)} 50%{opacity:.22; transform:scale(1)} }
-
-  .big::after, .tabBtn::after{
+  .big::after{
     content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
     width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
     transform:translate(-50%,-50%); opacity:0; pointer-events:none;
     transition:width .45s ease, height .45s ease, opacity .6s ease;
   }
-  .big.rippling::after, .tabBtn.rippling::after{ width:220%; height:220%; opacity:1 }
+  .big.rippling::after{ width:220%; height:220%; opacity:1 }
 
   .ghost{
     color:var(--accent); background:#ffffff;
@@ -136,7 +127,7 @@
     background:linear-gradient(90deg,#e9ecff,#e5f9ff); color:#254ddf; border:1px solid #dae6ff}
   .today{ font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px }
   .meta{ font-size:13px; color:var(--muted) }
-  .footer{ margin top:14px; font-size:12px; color:var(--muted) }
+  .footer{ margin-top:14px; font-size:12px; color:var(--muted) }
 
   .nudge{
     display:none; background:#fff7d6; border:1px solid #ffe18a; color:#6a5300;
@@ -152,34 +143,9 @@
   }
 
   /* Canvas layers (ordered by depth) */
-  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters */
-  #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 } /* rainbow mouse trail */
-  #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 } /* sparkles above content */
-
-  /* Page view containers */
-  #home, #section{
-    transition: opacity 280ms ease, filter 280ms ease, transform 280ms ease;
-  }
-  .hide{
-    opacity:0; filter:blur(8px); transform:translateY(8px);
-    pointer-events:none; user-select:none;
-  }
-  .sectionCard{
-    background: color-mix(in srgb, var(--card) 93%, transparent);
-    border-radius:24px; padding:46px 30px;
-    box-shadow: 0 26px 70px rgba(3,7,18,.45);
-    text-align:center;
-  }
-  .sectionTitle{
-    font-family: var(--title-font);
-    font-size: clamp(40px, 10vw, 86px);
-    line-height: 1.05;
-    margin: 0;
-    letter-spacing: 0.5px;
-    background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--accent2) 35%, #fff));
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-    filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
-  }
+  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 }
+  #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 }
+  #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 }
 
   /* Level-Up panel */
   #levelUpPanel{
@@ -218,8 +184,6 @@
 
   @media (prefers-reduced-motion: reduce){
     .bg{animation:none} .big::after{display:none} .big::before{animation:none}
-    .tabBtn::after{display:none} .tabBtn::before{animation:none}
-    #home, #section{transition:none}
   }
 </style>
 </head>
@@ -232,7 +196,7 @@
   <div class="wrap">
     <main class="app">
       <h1 class="title">Today Is The Day I…</h1>
-      <p class="subtitle">Tap to reveal a short, positive prompt. Switch tabs for themed pages.</p>
+      <p class="subtitle">Tap to reveal a short, positive prompt.</p>
 
       <!-- XP strip -->
       <div class="xp">
@@ -241,49 +205,40 @@
       </div>
       <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
 
-      <!-- TABS -->
+      <!-- PAGE LINKS (true pages) -->
       <div class="tabs" id="tabs">
-        <button class="tabBtn active" data-tab="Body"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</button>
-        <button class="tabBtn"        data-tab="Heart" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</button>
-        <button class="tabBtn"        data-tab="Mind"  style="--halo:#93c5fd;background:linear-gradient(135deg,#3b82f6,#bfdbfe)">🧠 Mind</button>
-        <button class="tabBtn"        data-tab="Soul"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</button>
+        <a class="tabLink" href="body.html"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</a>
+        <a class="tabLink" href="heart.html" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</a>
+        <a class="tabLink" href="mind.html"  style="--halo:#93c5fd;background:linear-gradient(135deg,#3b82f6,#bfdbfe)">🧠 Mind</a>
+        <a class="tabLink" href="soul.html"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</a>
       </div>
 
-      <!-- HOME (your original UI) -->
-      <div id="home">
-        <div id="screen-intro" class="card">
-          <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
+      <!-- HOME UI -->
+      <div id="screen-intro" class="card">
+        <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
 
-          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-            <div id="mascot" style="font-size:28px;display:inline-block">🫘</div>
-            <div id="streakInfo" class="meta">Current streak: 0 days</div>
-          </div>
-
-          <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
-          <div class="row">
-            <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
-          </div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+          <div id="mascot" style="font-size:28px;display:inline-block">🫘</div>
+          <div id="streakInfo" class="meta">Current streak: 0 days</div>
         </div>
 
-        <div id="screen-today" class="card" style="display:none">
-          <div class="badge" id="tag">Sign</div>
-          <div class="today" id="messageText"></div>
-          <div class="meta" id="explain"></div>
-
-          <div class="row">
-            <button id="willDoBtn" class="big" style="--halo:#34d399;">Will do ✅</button>
-            <button id="doneBtn"   class="big ghost" style="--halo:#fbbf24;">Done for today</button>
-          </div>
-
-          <div class="footer" id="todayMeta"></div>
+        <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
+        <div class="row">
+          <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
         </div>
       </div>
 
-      <!-- SECTION PAGE (empty except big title) -->
-      <div id="section" class="hide">
-        <div class="sectionCard">
-          <h2 class="sectionTitle" id="sectionTitle">Body</h2>
+      <div id="screen-today" class="card" style="display:none">
+        <div class="badge" id="tag">Sign</div>
+        <div class="today" id="messageText"></div>
+        <div class="meta" id="explain"></div>
+
+        <div class="row">
+          <button id="willDoBtn" class="big" style="--halo:#34d399;">Will do ✅</button>
+          <button id="doneBtn"   class="big ghost" style="--halo:#fbbf24;">Done for today</button>
         </div>
+
+        <div class="footer" id="todayMeta"></div>
       </div>
     </main>
   </div>
@@ -324,7 +279,6 @@ function pickTodayIndex(){const idx=(dayOfYear()+getSeed())%SIGNS.length; return
 function ymd(d=new Date()){return d.toISOString().slice(0,10)}
 function loadState(){try{return JSON.parse(localStorage.getItem("state_v1"))||{}}catch{return{}}}
 function saveState(s){localStorage.setItem("state_v1", JSON.stringify(s))}
-
 const state=loadState(); const todayKey=ymd();
 const yesterdayKey=(()=>{const d=new Date(); d.setDate(d.getDate()-1); return ymd(d)})();
 
@@ -334,52 +288,7 @@ const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoB
 const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
 const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
 const toast=qs("#toast"), toastText=qs("#toastText");
-const tabBar = qs("#tabs");
-
 const xpBadge = qs("#xpBadge"), xpFill = qs("#xpFill"), xpMeta = qs("#xpMeta");
-
-/* ====== TABS THEME (buttons + app theme base) ====== */
-const TAB_THEMES = {
-  Body:  {accent:"#22c55e", accent2:"#a7f3d0", accent3:"#34d399", halo:"#86efac", mascot:"💪"},
-  Heart: {accent:"#ef4444", accent2:"#fecaca", halo:"#fca5a5", mascot:"💖"},
-  Mind:  {accent:"#3b82f6", accent2:"#bfdbfe", halo:"#93c5fd", mascot:"🧠"},
-  Soul:  {accent:"#8b5cf6", accent2:"#ddd6fe", halo:"#c4b5fd", mascot:"✨"}
-};
-let currentTab = localStorage.getItem("tab") || "Body";
-
-/* ====== PAGE THEMES (colors + optional fonts per page) ====== */
-const THEMES = {
-  Body: {
-    accent:"#22c55e", accent2:"#a7f3d0", accent3:"#34d399",
-    bg1:"#0a1110", bg2:"#0b1a14",
-    titleFont: { name: "'Playfair Display'", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" },
-    bodyFont:  { name: "'Inter'",            href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" }
-  },
-  Heart: {
-    accent:"#ef4444", accent2:"#fecaca", accent3:"#f472b6",
-    bg1:"#120b0d", bg2:"#201017",
-    titleFont: { name: "'Pacifico'", href: "https://fonts.googleapis.com/css2?family=Pacifico&display=swap" },
-    bodyFont:  { name: "'Nunito'",  href: "https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" }
-  },
-  Mind: {
-    accent:"#3b82f6", accent2:"#bfdbfe", accent3:"#60a5fa",
-    bg1:"#0b0d12", bg2:"#0e1320",
-    titleFont: { name: "'DM Sans'",   href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" },
-    bodyFont:  { name: "'Source Sans 3'", href: "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;700&display=swap" }
-  },
-  Soul: {
-    accent:"#8b5cf6", accent2:"#ddd6fe", accent3:"#c084fc",
-    bg1:"#0f0b12", bg2:"#160e22",
-    titleFont: { name: "'Marcellus'", href: "https://fonts.googleapis.com/css2?family=Marcellus&display=swap" },
-    bodyFont:  { name: "'Quicksand'", href: "https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" }
-  }
-};
-const loadedFontLinks = new Set();
-function ensureFontLink(href){
-  if(!href || loadedFontLinks.has(href)) return;
-  const link = document.createElement('link'); link.rel='stylesheet'; link.href=href;
-  document.head.appendChild(link); loadedFontLinks.add(href);
-}
 
 /* ====== STREAK/NUDGE ====== */
 function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1);
@@ -393,33 +302,26 @@ function updateStreakInfo(){
   const m=qs("#mascot"); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px";
 }
 
-/* ====== XP STATE ====== */
+/* ====== XP ====== */
 function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
 function saveXP(x){ localStorage.setItem("xp_v1", JSON.stringify(x)); }
 const MAX_LEVEL = 100;
-// Semi-exponential curve: required XP grows ~12% per level, starting at 200
-function xpForNext(level){
-  if(level>=MAX_LEVEL) return Infinity;
-  const base = 200; const growth = 1.12;
-  return Math.round(base * Math.pow(growth, level));
-}
+// Semi-exponential curve
+function xpForNext(level){ if(level>=MAX_LEVEL) return Infinity; const base = 200; const growth = 1.12; return Math.round(base * Math.pow(growth, level)); }
 let xpState = loadXP();
 function updateXPUI(){
-  const lvl = xpState.level;
-  const need = xpForNext(lvl);
-  let pct = 0, metaText = "";
-  if(lvl>=MAX_LEVEL){
-    pct = 100; metaText = `MAX • Level ${MAX_LEVEL}`;
+  const need = xpForNext(xpState.level);
+  xpBadge.textContent = `Level ${xpState.level}`;
+  if(xpState.level>=MAX_LEVEL){
+    xpFill.style.width = "100%";
+    xpMeta.textContent = `MAX • Level ${MAX_LEVEL}`;
   }else{
-    pct = Math.max(0, Math.min(100, Math.round(100 * (xpState.xp / need))));
-    metaText = `${xpState.xp} / ${need} XP`;
+    xpFill.style.width = Math.round(100 * (xpState.xp / need)) + "%";
+    xpMeta.textContent = `${xpState.xp} / ${need} XP`;
   }
-  xpBadge.textContent = `Level ${lvl}`;
-  xpFill.style.width = pct + "%";
-  xpMeta.textContent = metaText;
 }
 
-/* ====== Level-Up panel (replaces nebula effect) ====== */
+/* ====== Level-Up panel ====== */
 const panel = qs('#levelUpPanel');
 const levelNumEl = qs('#levelNum');
 const nextXpNeedEl = qs('#nextXpNeed');
@@ -434,17 +336,14 @@ function showLevelUpPanel(level){
   nextXpNeedEl.textContent = (Number.isFinite(need) ? need : '—');
   detailsEl.classList.remove('show');
   panel.classList.add('show');
-  // focus for accessibility
   okBtn.focus();
 }
 function hideLevelUpPanel(){ panel.classList.remove('show'); }
 okBtn.addEventListener('click', hideLevelUpPanel);
 levelUpClose.addEventListener('click', hideLevelUpPanel);
-soWhatBtn.addEventListener('click', ()=>{
-  detailsEl.classList.toggle('show');
-});
+soWhatBtn.addEventListener('click', ()=>{ detailsEl.classList.toggle('show'); });
 
-/* Earning XP */
+/* Gain XP and trigger star/panel */
 function addXP(amount){
   let gained = amount;
   let leveledUp = 0;
@@ -456,7 +355,6 @@ function addXP(amount){
       xpState.xp = 0;
       leveledUp++;
       triggerShootingStar(true);
-      // SHOW PANEL on each level up (handles multi-level gains as well)
       showLevelUpPanel(xpState.level);
       if(xpState.level>=MAX_LEVEL){
         xpState.xp = xpForNext(MAX_LEVEL-1);
@@ -470,26 +368,18 @@ function addXP(amount){
   }
   saveXP(xpState);
   updateXPUI();
-  if(leveledUp>0){
-    showToast(`Level up! Now Level ${xpState.level} ⭐`);
-  }else{
-    showToast(`+${amount} XP`);
-  }
+  showToast(leveledUp?`Level up! Now Level ${xpState.level} ⭐`:`+${amount} XP`);
 }
 
 /* ====== TOAST ====== */
 function showToast(msg, ms=1800){
   toastText.textContent=msg;
-  toast.style.opacity="1";
-  toast.style.transform="translateX(-50%) translateY(0)";
+  toast.style.opacity="1"; toast.style.transform="translateX(-50%) translateY(0)";
   clearTimeout(showToast._h);
-  showToast._h=setTimeout(()=>{
-    toast.style.opacity="0";
-    toast.style.transform="translateX(-50%) translateY(120%)";
-  }, ms);
+  showToast._h=setTimeout(()=>{ toast.style.opacity="0"; toast.style.transform="translateX(-50%) translateY(120%)"; }, ms);
 }
 
-/* ====== RIPPLE (buttons + tabs) ====== */
+/* ====== RIPPLE ====== */
 function attachRipple(btn){
   btn.addEventListener('pointerdown', e=>{
     const r=btn.getBoundingClientRect();
@@ -500,199 +390,46 @@ function attachRipple(btn){
   });
 }
 
-/* ====== ETHEREAL SOUND (WebAudio) ====== */
+/* ====== AUDIO ====== */
 let actx, master;
-function ensureAudio(){
-  if(!actx){
-    actx = new (window.AudioContext||window.webkitAudioContext)();
-    master = actx.createGain(); master.gain.value = 0.25; master.connect(actx.destination);
-  }
-}
+function ensureAudio(){ if(!actx){ actx = new (window.AudioContext||window.webkitAudioContext)(); master = actx.createGain(); master.gain.value = 0.25; master.connect(actx.destination);} }
 function playEthereal(root=440){
-  ensureAudio();
-  const now = actx.currentTime;
-
-  const filt = actx.createBiquadFilter();
-  filt.type = "highpass"; filt.frequency.value = 200; filt.Q.value = 0.6;
-  const wet = actx.createGain(); wet.gain.value = 0.35;
-  const dry = actx.createGain(); dry.gain.value = 0.8;
-
-  const delay = actx.createDelay(); delay.delayTime.value = 0.22;
-  const fb = actx.createGain(); fb.gain.value = 0.35;
-  delay.connect(fb); fb.connect(delay);
-
-  const env = actx.createGain(); env.gain.value = 0;
-  env.connect(dry); env.connect(delay); delay.connect(wet);
-
-  const out = actx.createGain();
-  dry.connect(out); wet.connect(out); out.connect(master);
-
-  const freqs = [root, root*1.5];
-  freqs.forEach((f,i)=>{
-    const o = actx.createOscillator();
-    o.type = i===0 ? "sine" : "triangle";
-    o.frequency.value = f;
-    o.detune.value = (i?+6:-6);
-    o.connect(filt); filt.connect(env);
-    o.start(now);
-    o.stop(now + 1.6);
-  });
-
-  env.gain.cancelScheduledValues(now);
-  env.gain.linearRampToValueAtTime(0.0, now);
-  env.gain.linearRampToValueAtTime(1.0, now + 0.08);
-  env.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+  ensureAudio(); const now = actx.currentTime;
+  const filt = actx.createBiquadFilter(); filt.type = "highpass"; filt.frequency.value = 200; filt.Q.value = 0.6;
+  const wet = actx.createGain(); wet.gain.value = 0.35; const dry = actx.createGain(); dry.gain.value = 0.8;
+  const delay = actx.createDelay(); delay.delayTime.value = 0.22; const fb = actx.createGain(); fb.gain.value = 0.35; delay.connect(fb); fb.connect(delay);
+  const env = actx.createGain(); env.gain.value = 0; env.connect(dry); env.connect(delay); delay.connect(wet);
+  const out = actx.createGain(); dry.connect(out); wet.connect(out); out.connect(master);
+  [root, root*1.5].forEach((f,i)=>{ const o = actx.createOscillator(); o.type = i? "triangle":"sine"; o.frequency.value = f; o.detune.value = (i?+6:-6); o.connect(filt); filt.connect(env); o.start(now); o.stop(now + 1.6); });
+  env.gain.linearRampToValueAtTime(1.0, now + 0.08); env.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
 }
 
-/* ====== ACTIVE THEME FOR APP BUTTONS ====== */
-function applyTheme(tab){
-  const th = TAB_THEMES[tab] || TAB_THEMES.Body;
-  document.documentElement.style.setProperty('--accent', th.accent || '#22c55e');
-  document.documentElement.style.setProperty('--accent2', th.accent2 || '#a7f3d0');
-  document.documentElement.style.setProperty('--accent3', th.accent2 || '#a7f3d0');
-  const badge = qs(".badge");
-  if(badge){ badge.style.background = `linear-gradient(90deg, ${th.accent2||'#a7f3d0'}22, ${th.accent||'#22c55e'}22)`; }
-}
-
-/* ====== PAGE THEME (colors + fonts) ====== */
-function applyPageTheme(tab){
-  const t = THEMES[tab] || THEMES.Body;
-  const r = document.documentElement.style;
-  r.setProperty('--accent', t.accent);
-  r.setProperty('--accent2', t.accent2);
-  r.setProperty('--accent3', t.accent3);
-  r.setProperty('--bg1', t.bg1);
-  r.setProperty('--bg2', t.bg2);
-  r.setProperty('--title-font', t.titleFont?.name || "ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif");
-  r.setProperty('--body-font',  t.bodyFont?.name  || "ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif");
-  if(t.titleFont?.href) ensureFontLink(t.titleFont.href);
-  if(t.bodyFont?.href)  ensureFontLink(t.bodyFont.href);
-}
-
-/* Smooth transition using View Transitions API when available */
-function smoothSwap(fn){
-  const vt = document.startViewTransition?.bind(document);
-  if(vt){ vt(fn); } else { fn(); }
-}
-
-/* ====== PAGE MODE ====== */
-let pageMode = false; // false: HOME UI, true: SECTION page
-let currentPageTab = localStorage.getItem('page_tab') || 'Body';
-const sectionEl = document.querySelector('#section');
-const sectionTitle = document.querySelector('#sectionTitle');
-
-function renderPage(tab){
-  sectionTitle.textContent = tab;
-  applyPageTheme(tab);
-}
-
-function setPageMode(nextMode, tabName){
-  if(nextMode === pageMode && tabName === currentPageTab) return;
-  pageMode = nextMode;
-  if(tabName) currentPageTab = tabName;
-  localStorage.setItem('page_tab', currentPageTab);
-
-  smoothSwap(()=>{
-    document.querySelectorAll('.tabBtn').forEach(b=>{
-      b.classList.toggle('active', b.dataset.tab === currentPageTab);
-    });
-
-    if(pageMode){
-      renderPage(currentPageTab);
-      if(screenIntro) screenIntro.classList.add('hide');
-      if(screenToday) screenToday.classList.add('hide');
-      sectionEl.classList.remove('hide');
-    }else{
-      if(screenIntro) screenIntro.classList.remove('hide');
-      if(screenToday) screenToday.classList.toggle('hide', screenToday.style.display === 'none');
-      sectionEl.classList.add('hide');
-    }
-  });
-}
-
-/* ====== STARS BACKGROUND + SHOOTING STARS (single direction) ====== */
+/* ====== STARS + SHOOTERS (left->right) ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
 function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
 resizeStars(); addEventListener('resize', resizeStars);
-
-const STARS = Array.from({length: 160}).map(()=>({
-  x: Math.random()*innerWidth,
-  y: Math.random()*innerHeight,
-  z: Math.random()*1.5 + 0.3
-}));
-
-// Shooting stars: always left -> right so tail is behind head
+const STARS = Array.from({length: 160}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.5 + 0.3 }));
 const SHOOTERS = [];
 function triggerShootingStar(isLevelUp=false){
-  const dir = 1; // fixed direction to the right
-  const speed = isLevelUp ? 16 : 11;
-  const len = isLevelUp ? 220 : 160;
-  const startY = Math.random()*innerHeight*0.5 + (isLevelUp?20:60);
-  const startX = -80; // always from left outside the screen
-  SHOOTERS.push({
-    x:startX, y:startY,
-    vx:dir*speed, vy:-(speed*0.35),
-    life:isLevelUp?1000:700,
-    maxLife:isLevelUp?1000:700,
-    length:len,
-    glow:isLevelUp?1.0:0.7
-  });
+  const speed = isLevelUp ? 16 : 11, len = isLevelUp ? 220 : 160;
+  const startY = Math.random()*innerHeight*0.5 + (isLevelUp?20:60), startX = -80;
+  SHOOTERS.push({ x:startX, y:startY, vx:16, vy:-5.6, life:isLevelUp?1000:700, maxLife:isLevelUp?1000:700, length:len, glow:isLevelUp?1.0:0.7 });
 }
-
-let mousePX = 0.5, mousePY = 0.5;
-addEventListener('pointermove', e=>{
-  mousePX = e.clientX / innerWidth;
-  mousePY = e.clientY / innerHeight;
-});
-
+let mousePX=.5, mousePY=.5; addEventListener('pointermove', e=>{ mousePX=e.clientX/innerWidth; mousePY=e.clientY/innerHeight; });
 (function drawStars(){
   requestAnimationFrame(drawStars);
   sctx.clearRect(0,0,stars.width,stars.height);
-
-  // static stars
-  STARS.forEach(s=>{
-    s.x += (mousePX - 0.5) * s.z * 0.3;
-    s.y += (mousePY - 0.5) * s.z * 0.3;
-    if (s.x < 0) s.x += stars.width; if (s.x > stars.width) s.x -= stars.width;
-    if (s.y < 0) s.y += stars.height; if (s.y > stars.height) s.y -= stars.height;
-    sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`;
-    sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
-  });
-
-  // shooting stars
-  for(let i=SHOOTERS.length-1;i>=0;i--){
-    const sh = SHOOTERS[i];
-    sh.x += sh.vx; sh.y += sh.vy;
-    sh.vy += 0.12; // gentle gravity arc
-    sh.life -= 16;
-    const t = Math.max(0, sh.life / sh.maxLife);
-
-    sctx.save();
-    sctx.globalCompositeOperation = "lighter";
-
-    // Tail is behind head (to the left); gradient fades along the tail
-    const tailX = sh.x - sh.length, tailY = sh.y - sh.length*0.2;
-    const grad = sctx.createLinearGradient(tailX, tailY, sh.x, sh.y);
-    grad.addColorStop(0, `rgba(255,255,255,0)`);
-    grad.addColorStop(0.7, `rgba(255,255,255,${0.35*sh.glow*t})`);
-    grad.addColorStop(1, `rgba(255,255,255,${0.95*sh.glow*t})`);
-    sctx.strokeStyle = grad;
-    sctx.lineWidth = 2.2;
-    sctx.beginPath();
-    sctx.moveTo(tailX, tailY);
-    sctx.lineTo(sh.x, sh.y);
-    sctx.stroke();
-
-    // head
-    sctx.beginPath();
-    sctx.arc(sh.x, sh.y, 2.8, 0, Math.PI*2);
-    sctx.fillStyle = `rgba(255,255,255,${0.9*t})`;
-    sctx.fill();
-    sctx.restore();
-
-    if(sh.life<=0 || sh.x > innerWidth+200 || sh.y > innerHeight+200){
-      SHOOTERS.splice(i,1);
-    }
+  STARS.forEach(s=>{ s.x += (mousePX - .5) * s.z * .3; s.y += (mousePY - .5) * s.z * .3;
+    if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
+  for(let i=SHOOTERS.length-1;i>=0;i--){ const sh=SHOOTERS[i]; sh.x+=sh.vx; sh.y+=sh.vy; sh.vy+=.12; sh.life-=16; const t=Math.max(0, sh.life/sh.maxLife);
+    sctx.save(); sctx.globalCompositeOperation="lighter";
+    const tailX=sh.x - sh.length, tailY=sh.y - sh.length*0.2;
+    const g=sctx.createLinearGradient(tailX, tailY, sh.x, sh.y);
+    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(0.7,`rgba(255,255,255,${0.35*sh.glow*t})`); g.addColorStop(1,`rgba(255,255,255,${0.95*sh.glow*t})`);
+    sctx.strokeStyle=g; sctx.lineWidth=2.2; sctx.beginPath(); sctx.moveTo(tailX,tailY); sctx.lineTo(sh.x,sh.y); sctx.stroke();
+    sctx.beginPath(); sctx.arc(sh.x,sh.y,2.8,0,Math.PI*2); sctx.fillStyle=`rgba(255,255,255,${0.9*t})`; sctx.fill(); sctx.restore();
+    if(sh.life<=0 || sh.x>innerWidth+200 || sh.y>innerHeight+200) SHOOTERS.splice(i,1);
   }
 })();
 
@@ -700,67 +437,39 @@ addEventListener('pointermove', e=>{
 const trail = qs("#trail"), tctx = trail.getContext("2d");
 function resizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; }
 resizeTrail(); addEventListener('resize', resizeTrail);
-
-let points=[]; // recent pointer positions
-addEventListener('pointermove', e=>{
-  points.push({x:e.clientX, y:e.clientY, t:Date.now()});
-  if(points.length>140) points.shift();
-});
+let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>140) points.shift(); });
 (function drawTrail(){
   requestAnimationFrame(drawTrail);
-  const now=Date.now();
-  tctx.clearRect(0,0,trail.width,trail.height);
-  if(points.length<2) return;
-  tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
-  for(let i=1;i<points.length;i++){
-    const p0=points[i-1], p1=points[i];
-    const age = now - p1.t; if(age>1600) continue;
-    const life = 1 - age/1600;
-    const w = 2 + life*6;
-    const hue = (p1.t/12) % 360;
-    tctx.strokeStyle = `hsla(${hue}, 85%, 60%, ${0.12 + life*0.28})`;
-    tctx.lineWidth = w;
-    tctx.beginPath(); tctx.moveTo(p0.x, p0.y); tctx.lineTo(p1.x, p1.y); tctx.stroke();
-  }
+  const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height);
+  if(points.length<2) return; tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
+  for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue;
+    const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360;
+    tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
 })();
 
-/* ====== GLOBAL CLICK SPARKLES (anywhere) ====== */
+/* ====== GLOBAL CLICK SPARKLES ====== */
 const clickfx = qs("#clickfx"), cfx = clickfx.getContext("2d");
 function resizeFX(){ clickfx.width=innerWidth; clickfx.height=innerHeight; }
 resizeFX(); addEventListener('resize', resizeFX);
-
 const PALETTES = {
-  bg:    ['#60a5fa','#38bdf8','#34d399','#fbbf24','#a78bfa'],
+  bg:['#60a5fa','#38bdf8','#34d399','#fbbf24','#a78bfa'],
   reveal:['#60a5fa','#38bdf8','#93c5fd','#bae6fd'],
-  skip:  ['#a78bfa','#c4b5fd','#ddd6fe','#e9d5ff'],
+  skip:['#a78bfa','#c4b5fd','#ddd6fe','#e9d5ff'],
   willdo:['#34d399','#2dd4bf','#6ee7b7','#a7f3d0'],
-  done:  ['#f59e0b','#fbbf24','#fde68a','#fcd34d']
+  done:['#f59e0b','#fbbf24','#fde68a','#fcd34d']
 };
-
 function burst(x,y, palette, count=18){
-  const parts=[];
-  for(let i=0;i<count;i++){
-    parts.push({
-      x, y,
-      vx:(Math.random()-.5)*5,
-      vy:(Math.random()-.5)*5-2,
-      life:560,
-      r:2+Math.random()*2,
-      c: palette[i % palette.length]
-    });
+  const parts=[]; for(let i=0;i<count;i++){
+    parts.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:560,r:2+Math.random()*2,c:palette[i%palette.length]});
   }
-  const start=performance.now();
-  (function loop(t){
+  (function loop(){
     cfx.clearRect(0,0,clickfx.width,clickfx.height);
     const alive=[];
-    parts.forEach(p=>{
-      p.x += p.vx; p.y += p.vy; p.vy += .05; p.life -= 16;
-      if(p.life>0){ alive.push(p); cfx.fillStyle=p.c; cfx.beginPath(); cfx.arc(p.x,p.y,p.r,0,Math.PI*2); cfx.fill(); }
-    });
+    parts.forEach(p=>{ p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.life-=16;
+      if(p.life>0){ alive.push(p); cfx.fillStyle=p.c; cfx.beginPath(); cfx.arc(p.x,p.y,p.r,0,Math.PI*2); cfx.fill(); }});
     if(alive.length) requestAnimationFrame(loop);
-  })(start);
+  })();
 }
-
 function paletteForTarget(target){
   const btn = target.closest ? target.closest('button') : null;
   if (btn){
@@ -771,82 +480,25 @@ function paletteForTarget(target){
   }
   return PALETTES.bg;
 }
-document.addEventListener('pointerdown', (e)=>{
+document.addEventListener('pointerdown', e=>{
   burst(e.clientX, e.clientY, paletteForTarget(e.target), 20);
 });
 
 /* ====== TODAY CARD & EVENTS ====== */
 function showTodayCard(){
   const idx=pickTodayIndex(), s=SIGNS[idx];
-  tag.textContent=s.tag||"Sign";
-  messageText.textContent=s.text;
-  explain.textContent=s.explain||"";
-  const rec=state[todayKey]||{};
-  todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
+  tag.textContent=s.tag||"Sign"; messageText.textContent=s.text; explain.textContent=s.explain||"";
+  const rec=state[todayKey]||{}; todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
   screenIntro.style.display="none"; screenToday.style.display="block";
 }
-
-revealBtn.onclick = ()=>{
-  playEthereal(523.25); // C5
-  if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
-  saveState(state);
-  showTodayCard();
-};
-skipBtn.onclick = ()=>{
-  playEthereal(349.23); // F4
-  if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()};
-  else state[todayKey].planned=false;
-  saveState(state);
-  showToast("All good. Come back anytime today.");
-  updateStreakInfo();
-};
-willDoBtn.onclick = ()=>{
-  playEthereal(440); // A4
-  state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
-  state[todayKey].planned=true; state[todayKey].done=null; saveState(state);
-  todayMeta.textContent="You planned this today. Come back later to mark it done.";
-  showToast("Nice! Come back later and tap “Done for today”.");
-  updateStreakInfo();
-};
-doneBtn.onclick = ()=>{
-  playEthereal(659.25); // E5
-  state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
-  if(state[todayKey].done!==true){ addXP(100); } // award once per day
-  state[todayKey].done=true; saveState(state);
-  todayMeta.textContent="Marked done ✅";
-  updateStreakInfo();
-};
-
-/* ====== TAB WIRING (adds page toggle) ====== */
-function setActiveTab(tabName, fromClick=false){
-  currentTab = tabName;
-  localStorage.setItem("tab", tabName);
-  [...tabBar.querySelectorAll(".tabBtn")].forEach(b=>{
-    b.classList.toggle("active", b.dataset.tab===tabName);
-  });
-  if(fromClick) playEthereal(392); // tab chime
-  applyTheme(tabName); // button/halo color base
-}
-tabBar.querySelectorAll(".tabBtn").forEach(b=>{
-  attachRipple(b);
-  b.addEventListener("click", ()=>{
-    const tab = b.dataset.tab;
-    setActiveTab(tab, true);            // keep your color theming
-    // Toggle page mode: clicking the same active tab returns to HOME
-    const isSame = (tab === currentPageTab) && pageMode;
-    setPageMode(!isSame, tab);
-  });
-});
+revealBtn.onclick = ()=>{ playEthereal(523.25); if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()}; saveState(state); showTodayCard(); };
+skipBtn.onclick   = ()=>{ playEthereal(349.23); if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()}; else state[todayKey].planned=false; saveState(state); showToast("All good. Come back anytime today."); updateStreakInfo(); };
+willDoBtn.onclick = ()=>{ playEthereal(440); state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()}; state[todayKey].planned=true; state[todayKey].done=null; saveState(state); todayMeta.textContent="You planned this today. Come back later to mark it done."; showToast("Nice! Come back later and tap “Done for today”."); updateStreakInfo(); };
+doneBtn.onclick   = ()=>{ playEthereal(659.25); state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()}; if(state[todayKey].done!==true){ addXP(100); } state[todayKey].done=true; saveState(state); todayMeta.textContent="Marked done ✅"; updateStreakInfo(); };
 
 /* ====== INIT ====== */
 [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
-applyTheme(currentTab);
-applyPageTheme(currentPageTab);   // preload fonts/colors so tabs/pages are smooth
-setPageMode(false, currentPageTab); // start in HOME mode
-updateStreakInfo();
-updateXPUI();
-
-// Resume audio on first gesture (mobile autoplay policies)
+updateStreakInfo(); updateXPUI();
 window.addEventListener('pointerdown', ()=>ensureAudio(), {once:true});
 </script>
 </body>
