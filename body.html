@@ -1,1 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Body</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  :root{
+    --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
+    --accent:#22c55e; --accent2:#a7f3d0; --accent3:#34d399;
+    --bg1:#0b0d12; --bg2:#0e1320;
+    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:hidden;}
+  .bg{position:fixed;inset:0;z-index:-4; background:
+    radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+    radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+    linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    animation:bgDrift 20s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03);}
+  @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
+  #stars,#trail,#clickfx{position:fixed;inset:0;pointer-events:none} #stars{z-index:-3} #trail{z-index:-2} #clickfx{z-index:998}
+  .wrap{height:100%;display:grid;place-items:center;padding:22px}
+  .title{margin:0;font-size:clamp(40px,10vw,86px);
+    background:linear-gradient(90deg,#fff,color-mix(in srgb,var(--accent2) 35%,#fff));-webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
+    font-weight:900; letter-spacing:.5px; text-align:center}
+  .nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <canvas id="stars"></canvas>
+  <canvas id="trail"></canvas>
+  <canvas id="clickfx"></canvas>
+
+  <div class="nav">
+    <a class="pill" href="index.html">← Home</a>
+    <a class="pill" href="heart.html">Heart</a>
+    <a class="pill" href="mind.html">Mind</a>
+    <a class="pill" href="soul.html">Soul</a>
+  </div>
+
+  <div class="wrap">
+    <h1 class="title">Body</h1>
+  </div>
+
+<script>
+const qs=s=>document.querySelector(s);
+/* stars */
+const stars=qs("#stars"), sctx=stars.getContext("2d"); function rs(){stars.width=innerWidth;stars.height=innerHeight} rs(); addEventListener('resize',rs);
+const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3}));
+let mousePX=.5,mousePY=.5; addEventListener('pointermove',e=>{mousePX=e.clientX/innerWidth;mousePY=e.clientY/innerHeight;});
+(function draw(){requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{s.x+=(mousePX-.5)*s.z*.3; s.y+=(mousePY-.5)*s.z*.3; if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);}); })();
+/* trail */
+const trail=qs("#trail"), tctx=trail.getContext("2d"); function rt(){trail.width=innerWidth;trail.height=innerHeight} rt(); addEventListener('resize',rt);
+let pts=[]; addEventListener('pointermove',e=>{pts.push({x:e.clientX,y:e.clientY,t:Date.now()}); if(pts.length>140)pts.shift();});
+(function drawTrail(){requestAnimationFrame(drawTrail); const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height); if(pts.length<2)return; tctx.lineCap="round";tctx.lineJoin="round";tctx.globalCompositeOperation="lighter";
+  for(let i=1;i<pts.length;i++){const p0=pts[i-1],p1=pts[i];const age=now-p1.t;if(age>1600)continue;const life=1-age/1600,w=2+life*6,hue=(p1.t/12)%360;
+    tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke();}})();
+/* sparkles */
+const clickfx=qs("#clickfx"), cfx=clickfx.getContext("2d"); function rf(){clickfx.width=innerWidth;clickfx.height=innerHeight} rf(); addEventListener('resize',rf);
+const PAL=['#60a5fa','#38bdf8','#34d399','#fbbf24','#a78bfa']; function burst(x,y,count=18){const parts=[];for(let i=0;i<count;i++)parts.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:560,r:2+Math.random()*2,c:PAL[i%PAL.length]});
+ (function loop(){cfx.clearRect(0,0,clickfx.width,clickfx.height);const live=[];parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.life-=16;if(p.life>0){live.push(p);cfx.fillStyle=p.c;cfx.beginPath();cfx.arc(p.x,p.y,p.r,0,Math.PI*2);cfx.fill();}}); if(live.length)requestAnimationFrame(loop);})(); }
+document.addEventListener('pointerdown', e=>burst(e.clientX,e.clientY,20));
+</script>
+</body>
+</html>
 
