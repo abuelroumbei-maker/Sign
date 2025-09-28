@@ -1,4 +1,4 @@
-<!doctype html>
+<!doctype html> 
 <html lang="en">
 <head>
 <meta charset="utf-8" />
@@ -47,6 +47,33 @@
 
   .row{display:flex; gap:12px; flex-wrap:wrap; margin-top:12px}
 
+  /* Tabs bar */
+  .tabs{
+    display:flex; gap:10px; margin:14px 0 18px; flex-wrap:wrap;
+  }
+  .tabBtn{
+    --halo: #a5b4fc;
+    position:relative; overflow:hidden; outline:none;
+    border:0; cursor:pointer; color:#0a0b0f; font-weight:900;
+    padding:12px 14px; border-radius:14px; font-size:16px;
+    background: linear-gradient(135deg, #a78bfa, #60a5fa);
+    box-shadow: 0 10px 24px rgba(13,148,255,.22);
+    transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+  }
+  .tabBtn:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px rgba(13,148,255,.32) }
+  .tabBtn:active{ transform: translateY(1px) scale(.995) }
+  .tabBtn.active{
+    outline:2px solid rgba(255,255,255,.7);
+    box-shadow: 0 16px 42px rgba(255,255,255,.20);
+  }
+  /* Soft pulsing halo for tabs */
+  .tabBtn::before{
+    content:""; position:absolute; inset:-18%; border-radius:22px;
+    background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
+    opacity:.0; transform:scale(.85); z-index:0; pointer-events:none;
+    animation:halo 2.6s ease-in-out infinite;
+  }
+
   /* Buttons with halo and ripple */
   .big{
     --halo: #93c5fd; /* default halo color */
@@ -73,13 +100,14 @@
   }
 
   /* Ripple on click */
-  .big::after{
+  .big::after,
+  .tabBtn::after{
     content:""; position:absolute; left:var(--x,50%); top:var(--y,50%);
     width:0; height:0; border-radius:50%; background:rgba(255,255,255,.35);
     transform:translate(-50%,-50%); opacity:0; pointer-events:none;
     transition:width .45s ease, height .45s ease, opacity .6s ease;
   }
-  .big.rippling::after{ width:220%; height:220%; opacity:1 }
+  .big.rippling::after, .tabBtn.rippling::after{ width:220%; height:220%; opacity:1 }
 
   .ghost{
     color:var(--accent); background:#ffffff;
@@ -113,6 +141,7 @@
 
   @media (prefers-reduced-motion: reduce){
     .bg{animation:none} .big::after{display:none} .big::before{animation:none}
+    .tabBtn::after{display:none} .tabBtn::before{animation:none}
   }
 </style>
 </head>
@@ -126,6 +155,14 @@
     <main class="app">
       <h1 class="title">Today Is The Day I…</h1>
       <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+
+      <!-- NEW: Tabs -->
+      <div class="tabs" id="tabs">
+        <button class="tabBtn active" data-tab="Body"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</button>
+        <button class="tabBtn"        data-tab="Heart" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</button>
+        <button class="tabBtn"        data-tab="Mind"  style="--halo:#93c5fd;background:linear-gradient(135deg,#3b82f6,#bfdbfe)">🧠 Mind</button>
+        <button class="tabBtn"        data-tab="Soul"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</button>
+      </div>
 
       <div id="screen-intro" class="card">
         <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
@@ -187,6 +224,16 @@ const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoB
 const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
 const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
 const toast=qs("#toast"), toastText=qs("#toastText");
+const tabBar = qs("#tabs");
+
+/* ====== TABS (theme + sound) ====== */
+const TAB_THEMES = {
+  Body:  {accent:"#22c55e", accent2:"#a7f3d0", halo:"#86efac", mascot:"💪"},
+  Heart: {accent:"#ef4444", accent2:"#fecaca", halo:"#fca5a5", mascot:"💖"},
+  Mind:  {accent:"#3b82f6", accent2:"#bfdbfe", halo:"#93c5fd", mascot:"🧠"},
+  Soul:  {accent:"#8b5cf6", accent2:"#ddd6fe", halo:"#c4b5fd", mascot:"✨"}
+};
+let currentTab = localStorage.getItem("tab") || "Body";
 
 /* ====== STREAK/NUDGE ====== */
 function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1);
@@ -212,7 +259,7 @@ function showToast(msg, ms=1800){
   }, ms);
 }
 
-/* ====== RIPPLE ON BUTTON ====== */
+/* ====== RIPPLE (buttons + tabs) ====== */
 function attachRipple(btn){
   btn.addEventListener('pointerdown', e=>{
     const r=btn.getBoundingClientRect();
@@ -222,7 +269,87 @@ function attachRipple(btn){
     setTimeout(()=>btn.classList.remove('rippling'), 480);
   });
 }
-[revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
+
+/* ====== ETHEREAL SOUND (WebAudio) ====== */
+let actx, master;
+function ensureAudio(){
+  if(!actx){
+    actx = new (window.AudioContext||window.webkitAudioContext)();
+    master = actx.createGain(); master.gain.value = 0.25; master.connect(actx.destination);
+  }
+}
+function playEthereal(root=440){
+  ensureAudio();
+
+  // shimmering duo oscillators + gentle highpass + feedback delay for air
+  const now = actx.currentTime;
+
+  const filt = actx.createBiquadFilter();
+  filt.type = "highpass"; filt.frequency.value = 200; filt.Q.value = 0.6;
+  const wet = actx.createGain(); wet.gain.value = 0.35;
+  const dry = actx.createGain(); dry.gain.value = 0.8;
+
+  const delay = actx.createDelay(); delay.delayTime.value = 0.22;
+  const fb = actx.createGain(); fb.gain.value = 0.35;
+  delay.connect(fb); fb.connect(delay);
+
+  const env = actx.createGain(); env.gain.value = 0;
+  env.connect(dry); env.connect(delay); delay.connect(wet);
+
+  const out = actx.createGain();
+  dry.connect(out); wet.connect(out); out.connect(master);
+
+  // small chord (root + fifth) with gentle detune
+  const freqs = [root, root*1.5];
+  const oscs = freqs.map((f,i)=>{
+    const o = actx.createOscillator();
+    o.type = i===0 ? "sine" : "triangle";
+    o.frequency.value = f;
+    o.detune.value = (i?+6:-6); // shimmer
+    o.connect(filt); filt.connect(env);
+    o.start(now);
+    o.stop(now + 1.6);
+    return o;
+  });
+
+  // envelope: soft attack, long airy release
+  env.gain.cancelScheduledValues(now);
+  env.gain.linearRampToValueAtTime(0.0, now);
+  env.gain.linearRampToValueAtTime(1.0, now + 0.08);
+  env.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+}
+
+/* ====== THEME APPLY ====== */
+function applyTheme(tab){
+  const th = TAB_THEMES[tab] || TAB_THEMES.Body;
+  document.documentElement.style.setProperty('--accent', th.accent);
+  document.documentElement.style.setProperty('--accent2', th.accent2);
+  document.documentElement.style.setProperty('--accent3', th.accent2);
+  // badge subtle recolor
+  const badge = qs(".badge");
+  if(badge){ badge.style.background = `linear-gradient(90deg, ${th.accent2}22, ${th.accent}22)`; }
+  // mascot hint (keeps streak growth emoji logic; this is just a little topper)
+  const masc = qs("#mascot");
+  if(masc) masc.textContent = (masc.textContent || "🫘") + "";
+}
+
+/* ====== TABS INIT & EVENTS ====== */
+function setActiveTab(tabName, fromClick=false){
+  currentTab = tabName;
+  localStorage.setItem("tab", tabName);
+  [...tabBar.querySelectorAll(".tabBtn")].forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab===tabName);
+  });
+  // Play airy sound on tab press
+  if(fromClick) playEthereal(392); // G4-ish
+  applyTheme(tabName);
+}
+tabBar.querySelectorAll(".tabBtn").forEach(b=>{
+  attachRipple(b);
+  b.addEventListener("click", ()=>{
+    setActiveTab(b.dataset.tab, true);
+  });
+});
 
 /* ====== STARS BACKGROUND ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
@@ -310,9 +437,8 @@ function burst(x,y, palette, count=18){
   }
   const start=performance.now();
   (function loop(t){
-    const elapsed = t - start;
     cfx.clearRect(0,0,clickfx.width,clickfx.height);
-    const alive = [];
+    const alive=[];
     parts.forEach(p=>{
       p.x += p.vx; p.y += p.vy; p.vy += .05; p.life -= 16;
       if(p.life>0){ alive.push(p); cfx.fillStyle=p.c; cfx.beginPath(); cfx.arc(p.x,p.y,p.r,0,Math.PI*2); cfx.fill(); }
@@ -350,11 +476,13 @@ function showTodayCard(){
 }
 
 revealBtn.onclick = ()=>{
+  playEthereal(523.25); // C5-ish shimmer
   if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
   saveState(state);
   showTodayCard();
 };
 skipBtn.onclick = ()=>{
+  playEthereal(349.23); // F4-ish
   if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()};
   else state[todayKey].planned=false;
   saveState(state);
@@ -362,6 +490,7 @@ skipBtn.onclick = ()=>{
   updateStreakInfo();
 };
 willDoBtn.onclick = ()=>{
+  playEthereal(440); // A4-ish
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
   state[todayKey].planned=true; state[todayKey].done=null; saveState(state);
   todayMeta.textContent="You planned this today. Come back later to mark it done.";
@@ -369,6 +498,7 @@ willDoBtn.onclick = ()=>{
   updateStreakInfo();
 };
 doneBtn.onclick = ()=>{
+  playEthereal(659.25); // E5-ish
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
   state[todayKey].done=true; saveState(state);
   todayMeta.textContent="Marked done ✅";
@@ -377,9 +507,17 @@ doneBtn.onclick = ()=>{
 };
 
 /* ====== INIT ====== */
+[revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
+
+// initialize tabs active state + theme
+setActiveTab(currentTab, false);
 updateStreakInfo();
+
+// Resume audio on first gesture (mobile autoplay policies)
+window.addEventListener('pointerdown', ()=>ensureAudio(), {once:true});
 </script>
 </body>
 </html>
+
 
 
