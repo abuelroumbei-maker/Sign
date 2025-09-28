@@ -3,27 +3,39 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — Stars + Trail + Global Sparkles</title>
+<title>Today Is The Day I… — Stars + Trail + Pages</title>
 <meta name="theme-color" content="#0b0d12" />
+
+<!-- Optional: we’ll lazy-load fonts, but preconnect helps -->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
 <style>
   :root{
     --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
     --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
+    --bg1:#0b0d12; --bg2:#0e1320;
+
+    /* page-mode fonts (overridden per theme) */
+    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
   *{box-sizing:border-box} html,body{height:100%}
-  body{ margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-        color:var(--fg); background:#0b0d12; overflow:hidden; }
+  body{ margin:0; font-family: var(--body-font);
+        color:var(--fg); background:#0b0d12; overflow:hidden; 
+        transition: color 280ms ease, background 280ms ease, filter 280ms ease; }
 
   /* Subtle animated gradient background */
   .bg{
     position:fixed; inset:0; z-index:-4;
     background:
-      radial-gradient(1100px 700px at 15% 20%, rgba(109,94,252,.28), transparent 60%),
-      radial-gradient(1000px 700px at 85% 30%, rgba(0,194,255,.28), transparent 60%),
-      radial-gradient(900px 700px at 40% 90%, rgba(45,212,191,.22), transparent 60%),
-      linear-gradient(120deg, #0b0d12, #0e1320 50%, #0b0d12);
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
     filter:saturate(1.1) brightness(1.05);
     animation:bgDrift 20s ease-in-out infinite alternate;
+    transition: background 280ms ease, filter 280ms ease;
   }
   @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
 
@@ -31,9 +43,11 @@
   .app{width:min(860px, 94vw)}
   .title{
     margin:0 0 6px; font-size:clamp(26px,6vw,46px);
+    font-family: var(--title-font);
     background:linear-gradient(90deg,#fff,#dbeafe,#fff);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     filter:drop-shadow(0 6px 16px rgba(255,255,255,.1));
+    transition: filter 280ms ease;
   }
   .subtitle{margin:0 0 10px; color:#cbd5e1; opacity:.9; font-size:clamp(14px,2.4vw,16px)}
 
@@ -75,23 +89,17 @@
     position:relative; overflow:hidden; outline:none;
     border:0; cursor:pointer; color:#0a0b0f; font-weight:900;
     padding:12px 14px; border-radius:14px; font-size:16px;
-    background: linear-gradient(135deg, #a78bfa, #60a5fa);
-    box-shadow: 0 10px 24px rgba(13,148,255,.22);
-    transition: transform .05s ease, filter .2s ease, box-shadow .2s ease;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 10px 24px color-mix(in srgb, var(--accent) 25%, transparent);
+    transition: transform .06s ease, filter .2s ease, box-shadow .2s ease, background 280ms ease;
   }
-  .tabBtn:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px rgba(13,148,255,.32) }
+  .tabBtn:hover{ filter:brightness(1.06); box-shadow: 0 14px 32px color-mix(in srgb, var(--accent) 35%, transparent) }
   .tabBtn:active{ transform: translateY(1px) scale(.995) }
   .tabBtn.active{ outline:2px solid rgba(255,255,255,.7); box-shadow: 0 16px 42px rgba(255,255,255,.20); }
-  .tabBtn::before{
-    content:""; position:absolute; inset:-18%; border-radius:22px;
-    background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
-    opacity:.0; transform:scale(.85); z-index:0; pointer-events:none;
-    animation:halo 2.6s ease-in-out infinite;
-  }
 
   /* Buttons with halo and ripple */
   .big{
-    --halo: #93c5fd;
+    --halo: #93c5fd; 
     position:relative; overflow:hidden; outline:none;
     flex:1 0 220px; padding:16px 18px; border-radius:16px; font-size:18px; font-weight:800;
     border:0; cursor:pointer; color:#0a0b0f;
@@ -102,10 +110,10 @@
   .big:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
   .big:active{ transform: translateY(1px) scale(.995) }
 
-  .big::before{
+  .big::before, .tabBtn::before{
     content:""; position:absolute; inset:-18%; border-radius:24px;
     background: radial-gradient(60% 60% at 50% 50%, var(--halo), transparent 70%);
-    opacity:.0; transform:scale(.85); z-index:0;
+    opacity:.0; transform:scale(.85); z-index:0; pointer-events:none;
     animation:halo 2.6s ease-in-out infinite;
   }
   @keyframes halo{ 0%,100%{opacity:.0; transform:scale(.85)} 50%{opacity:.22; transform:scale(1)} }
@@ -144,13 +152,39 @@
   }
 
   /* Canvas layers (ordered by depth) */
-  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters + NEBULA */
+  #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 } /* stars + shooters + nebulae */
   #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 } /* rainbow mouse trail */
   #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 } /* sparkles above content */
+
+  /* Page view containers */
+  #home, #section{
+    transition: opacity 280ms ease, filter 280ms ease, transform 280ms ease;
+  }
+  .hide{
+    opacity:0; filter:blur(8px); transform:translateY(8px);
+    pointer-events:none; user-select:none;
+  }
+  .sectionCard{
+    background: color-mix(in srgb, var(--card) 93%, transparent);
+    border-radius:24px; padding:46px 30px;
+    box-shadow: 0 26px 70px rgba(3,7,18,.45);
+    text-align:center;
+  }
+  .sectionTitle{
+    font-family: var(--title-font);
+    font-size: clamp(40px, 10vw, 86px);
+    line-height: 1.05;
+    margin: 0;
+    letter-spacing: 0.5px;
+    background: linear-gradient(90deg, #fff, color-mix(in srgb, var(--accent2) 35%, #fff));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
+  }
 
   @media (prefers-reduced-motion: reduce){
     .bg{animation:none} .big::after{display:none} .big::before{animation:none}
     .tabBtn::after{display:none} .tabBtn::before{animation:none}
+    #home, #section{transition:none}
   }
 </style>
 </head>
@@ -163,7 +197,7 @@
   <div class="wrap">
     <main class="app">
       <h1 class="title">Today Is The Day I…</h1>
-      <p class="subtitle">Tap to reveal a short, positive prompt. One per day. No accounts, no tracking.</p>
+      <p class="subtitle">Tap to reveal a short, positive prompt. Switch tabs for themed pages.</p>
 
       <!-- XP strip -->
       <div class="xp">
@@ -180,31 +214,41 @@
         <button class="tabBtn"        data-tab="Soul"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</button>
       </div>
 
-      <div id="screen-intro" class="card">
-        <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
+      <!-- HOME (your original UI) -->
+      <div id="home">
+        <div id="screen-intro" class="card">
+          <div id="nudgeBanner" class="nudge">Did you do yesterday’s sign?</div>
 
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-          <div id="mascot" style="font-size:28px;display:inline-block">🫘</div>
-          <div id="streakInfo" class="meta">Current streak: 0 days</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+            <div id="mascot" style="font-size:28px;display:inline-block">🫘</div>
+            <div id="streakInfo" class="meta">Current streak: 0 days</div>
+          </div>
+
+          <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
+          <div class="row">
+            <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
+          </div>
         </div>
 
-        <button id="revealBtn" class="big" style="--halo:#60a5fa;">Reveal today’s message ✨</button>
-        <div class="row">
-          <button id="skipBtn" class="big ghost" style="--halo:#a78bfa;">Nah, maybe later</button>
+        <div id="screen-today" class="card" style="display:none">
+          <div class="badge" id="tag">Sign</div>
+          <div class="today" id="messageText"></div>
+          <div class="meta" id="explain"></div>
+
+          <div class="row">
+            <button id="willDoBtn" class="big" style="--halo:#34d399;">Will do ✅</button>
+            <button id="doneBtn"   class="big ghost" style="--halo:#fbbf24;">Done for today</button>
+          </div>
+
+          <div class="footer" id="todayMeta"></div>
         </div>
       </div>
 
-      <div id="screen-today" class="card" style="display:none">
-        <div class="badge" id="tag">Sign</div>
-        <div class="today" id="messageText"></div>
-        <div class="meta" id="explain"></div>
-
-        <div class="row">
-          <button id="willDoBtn" class="big" style="--halo:#34d399;">Will do ✅</button>
-          <button id="doneBtn"   class="big ghost" style="--halo:#fbbf24;">Done for today</button>
+      <!-- SECTION PAGE (empty except big title) -->
+      <div id="section" class="hide">
+        <div class="sectionCard">
+          <h2 class="sectionTitle" id="sectionTitle">Body</h2>
         </div>
-
-        <div class="footer" id="todayMeta"></div>
       </div>
     </main>
   </div>
@@ -234,16 +278,95 @@ function saveState(s){localStorage.setItem("state_v1", JSON.stringify(s))}
 const state=loadState(); const todayKey=ymd();
 const yesterdayKey=(()=>{const d=new Date(); d.setDate(d.getDate()-1); return ymd(d)})();
 
+/* ====== UI REFS ====== */
+const screenIntro=qs("#screen-intro"), screenToday=qs("#screen-today");
+const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoBtn"), doneBtn=qs("#doneBtn");
+const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
+const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
+const toast=qs("#toast"), toastText=qs("#toastText");
+const tabBar = qs("#tabs");
+
+const xpBadge = qs("#xpBadge"), xpFill = qs("#xpFill"), xpMeta = qs("#xpMeta");
+
+/* ====== TABS THEME (buttons + app theme base) ====== */
+const TAB_THEMES = {
+  Body:  {accent:"#22c55e", accent2:"#a7f3d0", accent3:"#34d399", halo:"#86efac", mascot:"💪"},
+  Heart: {accent:"#ef4444", accent2:"#fecaca", halo:"#fca5a5", mascot:"💖"},
+  Mind:  {accent:"#3b82f6", accent2:"#bfdbfe", halo:"#93c5fd", mascot:"🧠"},
+  Soul:  {accent:"#8b5cf6", accent2:"#ddd6fe", halo:"#c4b5fd", mascot:"✨"}
+};
+let currentTab = localStorage.getItem("tab") || "Body";
+
+/* ====== PAGE THEMES (colors + optional fonts per page) ====== */
+const THEMES = {
+  Body: {
+    accent:"#22c55e", accent2:"#a7f3d0", accent3:"#34d399",
+    bg1:"#0a1110", bg2:"#0b1a14",
+    titleFont: { name: "'Playfair Display'", href: "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" },
+    bodyFont:  { name: "'Inter'",            href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" }
+  },
+  Heart: {
+    accent:"#ef4444", accent2:"#fecaca", accent3:"#f472b6",
+    bg1:"#120b0d", bg2:"#201017",
+    titleFont: { name: "'Pacifico'", href: "https://fonts.googleapis.com/css2?family=Pacifico&display=swap" },
+    bodyFont:  { name: "'Nunito'",  href: "https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" }
+  },
+  Mind: {
+    accent:"#3b82f6", accent2:"#bfdbfe", accent3:"#60a5fa",
+    bg1:"#0b0d12", bg2:"#0e1320",
+    titleFont: { name: "'DM Sans'",   href: "https://fonts.googleapis.com/css2?family=DM+Sans:wght@700&display=swap" },
+    bodyFont:  { name: "'Source Sans 3'", href: "https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;700&display=swap" }
+  },
+  Soul: {
+    accent:"#8b5cf6", accent2:"#ddd6fe", accent3:"#c084fc",
+    bg1:"#0f0b12", bg2:"#160e22",
+    titleFont: { name: "'Marcellus'", href: "https://fonts.googleapis.com/css2?family=Marcellus&display=swap" },
+    bodyFont:  { name: "'Quicksand'", href: "https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap" }
+  }
+};
+const loadedFontLinks = new Set();
+function ensureFontLink(href){
+  if(!href || loadedFontLinks.has(href)) return;
+  const link = document.createElement('link'); link.rel='stylesheet'; link.href=href;
+  document.head.appendChild(link); loadedFontLinks.add(href);
+}
+
+/* ====== STREAK/NUDGE ====== */
+function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1);
+  for(;;){const k=d.toISOString().slice(0,10); if(state[k]?.done===true){s++; d.setDate(d.getDate()-1)}else break;} return s}
+function mascotFor(streak){if(streak>=10)return"🌳"; if(streak>=5)return"🌿"; if(streak>=2)return"🌱"; return"🫘"}
+function getYesterdayNudge(){const y=state[yesterdayKey]; if(y&&y.planned===true&&y.done==null)return"Did you do yesterday’s sign?"; return null}
+function updateStreakInfo(){
+  const n=getYesterdayNudge(); const s=computeStreak();
+  if(nudgeBanner) nudgeBanner.style.display = n ? "block" : "none";
+  streakInfo.textContent = `Current streak: ${s} day${s===1?"":"s"}`;
+  const m=qs("#mascot"); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px";
+}
+
 /* ====== XP STATE ====== */
 function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
 function saveXP(x){ localStorage.setItem("xp_v1", JSON.stringify(x)); }
-
 const MAX_LEVEL = 100;
 // Semi-exponential curve: required XP grows ~12% per level, starting at 200
 function xpForNext(level){
   if(level>=MAX_LEVEL) return Infinity;
   const base = 200; const growth = 1.12;
   return Math.round(base * Math.pow(growth, level));
+}
+let xpState = loadXP();
+function updateXPUI(){
+  const lvl = xpState.level;
+  const need = xpForNext(lvl);
+  let pct = 0, metaText = "";
+  if(lvl>=MAX_LEVEL){
+    pct = 100; metaText = `MAX • Level ${MAX_LEVEL}`;
+  }else{
+    pct = Math.max(0, Math.min(100, Math.round(100 * (xpState.xp / need))));
+    metaText = `${xpState.xp} / ${need} XP`;
+  }
+  xpBadge.textContent = `Level ${lvl}`;
+  xpFill.style.width = pct + "%";
+  xpMeta.textContent = metaText;
 }
 function addXP(amount){
   let gained = amount;
@@ -256,7 +379,7 @@ function addXP(amount){
       xpState.xp = 0;
       leveledUp++;
       triggerShootingStar(true);
-      triggerNebula(xpState.level);     // NEBULA: fire big bloom on level-up
+      triggerNebula(xpState.level);
       if(xpState.level>=MAX_LEVEL){
         xpState.xp = xpForNext(MAX_LEVEL-1);
         gained = 0;
@@ -274,53 +397,6 @@ function addXP(amount){
   }else{
     showToast(`+${amount} XP`);
   }
-}
-let xpState = loadXP();
-
-/* ====== UI REFS ====== */
-const screenIntro=qs("#screen-intro"), screenToday=qs("#screen-today");
-const revealBtn=qs("#revealBtn"), skipBtn=qs("#skipBtn"), willDoBtn=qs("#willDoBtn"), doneBtn=qs("#doneBtn");
-const messageText=qs("#messageText"), explain=qs("#explain"), tag=qs("#tag"), todayMeta=qs("#todayMeta");
-const streakInfo=qs("#streakInfo"), nudgeBanner=qs("#nudgeBanner");
-const toast=qs("#toast"), toastText=qs("#toastText");
-const tabBar = qs("#tabs");
-const xpBadge = qs("#xpBadge"), xpFill = qs("#xpFill"), xpMeta = qs("#xpMeta");
-
-/* ====== TABS (theme + sound) ====== */
-const TAB_THEMES = {
-  Body:  {accent:"#22c55e", accent2:"#a7f3d0", halo:"#86efac", mascot:"💪"},
-  Heart: {accent:"#ef4444", accent2:"#fecaca", halo:"#fca5a5", mascot:"💖"},
-  Mind:  {accent:"#3b82f6", accent2:"#bfdbfe", halo:"#93c5fd", mascot:"🧠"},
-  Soul:  {accent:"#8b5cf6", accent2:"#ddd6fe", halo:"#c4b5fd", mascot:"✨"}
-};
-let currentTab = localStorage.getItem("tab") || "Body";
-
-/* ====== STREAK/NUDGE ====== */
-function computeStreak(){let s=0; const d=new Date(); d.setDate(d.getDate()-1);
-  for(;;){const k=d.toISOString().slice(0,10); if(state[k]?.done===true){s++; d.setDate(d.getDate()-1)}else break;} return s}
-function mascotFor(streak){if(streak>=10)return"🌳"; if(streak>=5)return"🌿"; if(streak>=2)return"🌱"; return"🫘"}
-function getYesterdayNudge(){const y=state[yesterdayKey]; if(y&&y.planned===true&&y.done==null)return"Did you do yesterday’s sign?"; return null}
-function updateStreakInfo(){
-  const n=getYesterdayNudge(); const s=computeStreak();
-  if(nudgeBanner) nudgeBanner.style.display = n ? "block" : "none";
-  streakInfo.textContent = `Current streak: ${s} day${s===1?"":"s"}`;
-  const m=qs("#mascot"); m.textContent=mascotFor(s); m.style.fontSize=(28+Math.min(s*2,22))+"px";
-}
-
-/* ====== XP UI ====== */
-function updateXPUI(){
-  const lvl = xpState.level;
-  const need = xpForNext(lvl);
-  let pct = 0, metaText = "";
-  if(lvl>=MAX_LEVEL){
-    pct = 100; metaText = `MAX • Level ${MAX_LEVEL}`;
-  }else{
-    pct = Math.max(0, Math.min(100, Math.round(100 * (xpState.xp / need))));
-    metaText = `${xpState.xp} / ${need} XP`;
-  }
-  xpBadge.textContent = `Level ${lvl}`;
-  xpFill.style.width = pct + "%";
-  xpMeta.textContent = metaText;
 }
 
 /* ====== TOAST ====== */
@@ -390,32 +466,75 @@ function playEthereal(root=440){
   env.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
 }
 
-/* ====== THEME APPLY ====== */
+/* ====== ACTIVE THEME FOR APP BUTTONS ====== */
 function applyTheme(tab){
   const th = TAB_THEMES[tab] || TAB_THEMES.Body;
-  document.documentElement.style.setProperty('--accent', th.accent);
-  document.documentElement.style.setProperty('--accent2', th.accent2);
-  document.documentElement.style.setProperty('--accent3', th.accent2);
+  document.documentElement.style.setProperty('--accent', th.accent || '#22c55e');
+  document.documentElement.style.setProperty('--accent2', th.accent2 || '#a7f3d0');
+  document.documentElement.style.setProperty('--accent3', th.accent2 || '#a7f3d0');
   const badge = qs(".badge");
-  if(badge){ badge.style.background = `linear-gradient(90deg, ${th.accent2}22, ${th.accent}22)`; }
+  if(badge){ badge.style.background = `linear-gradient(90deg, ${th.accent2||'#a7f3d0'}22, ${th.accent||'#22c55e'}22)`; }
 }
 
-/* ====== TABS INIT & EVENTS ====== */
-function setActiveTab(tabName, fromClick=false){
-  currentTab = tabName;
-  localStorage.setItem("tab", tabName);
-  [...tabBar.querySelectorAll(".tabBtn")].forEach(b=>{
-    b.classList.toggle("active", b.dataset.tab===tabName);
+/* ====== PAGE THEME (colors + fonts) ====== */
+function applyPageTheme(tab){
+  const t = THEMES[tab] || THEMES.Body;
+  const r = document.documentElement.style;
+  r.setProperty('--accent', t.accent);
+  r.setProperty('--accent2', t.accent2);
+  r.setProperty('--accent3', t.accent3);
+  r.setProperty('--bg1', t.bg1);
+  r.setProperty('--bg2', t.bg2);
+  r.setProperty('--title-font', t.titleFont?.name || "ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif");
+  r.setProperty('--body-font',  t.bodyFont?.name  || "ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif");
+  if(t.titleFont?.href) ensureFontLink(t.titleFont.href);
+  if(t.bodyFont?.href)  ensureFontLink(t.bodyFont.href);
+}
+
+/* Smooth transition using View Transitions API when available */
+function smoothSwap(fn){
+  const vt = document.startViewTransition?.bind(document);
+  if(vt){ vt(fn); } else { fn(); }
+}
+
+/* ====== PAGE MODE ====== */
+let pageMode = false; // false: HOME UI, true: SECTION page
+let currentPageTab = localStorage.getItem('page_tab') || 'Body';
+const sectionEl = document.querySelector('#section');
+const sectionTitle = document.querySelector('#sectionTitle');
+
+function renderPage(tab){
+  sectionTitle.textContent = tab;
+  applyPageTheme(tab);
+}
+
+function setPageMode(nextMode, tabName){
+  if(nextMode === pageMode && tabName === currentPageTab) return;
+  pageMode = nextMode;
+  if(tabName) currentPageTab = tabName;
+  localStorage.setItem('page_tab', currentPageTab);
+
+  smoothSwap(()=>{
+    document.querySelectorAll('.tabBtn').forEach(b=>{
+      b.classList.toggle('active', b.dataset.tab === currentPageTab);
+    });
+
+    if(pageMode){
+      renderPage(currentPageTab);
+      // hide your two cards, show section
+      if(screenIntro) screenIntro.classList.add('hide');
+      if(screenToday) screenToday.classList.add('hide');
+      sectionEl.classList.remove('hide');
+    }else{
+      // show original UI (respect your own show/hide state)
+      if(screenIntro) screenIntro.classList.remove('hide');
+      if(screenToday) screenToday.classList.toggle('hide', screenToday.style.display === 'none');
+      sectionEl.classList.add('hide');
+    }
   });
-  if(fromClick) playEthereal(392); // tab chime
-  applyTheme(tabName);
 }
-tabBar.querySelectorAll(".tabBtn").forEach(b=>{
-  attachRipple(b);
-  b.addEventListener("click", ()=> setActiveTab(b.dataset.tab, true));
-});
 
-/* ====== STARS BACKGROUND + SHOOTING STARS + NEBULAE ====== */
+/* ====== STARS BACKGROUND + SHOOTING STARS + NEBULA ====== */
 const stars = qs("#stars"), sctx = stars.getContext("2d");
 function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
 resizeStars(); addEventListener('resize', resizeStars);
@@ -444,17 +563,18 @@ function triggerShootingStar(isLevelUp=false){
   });
 }
 
-// NEBULA: expanding colorful gas clouds on level-up
+// Nebula on level-up
 const NEBULAE = [];
+function hexToRgba(hex, a){
+  let h = hex.replace('#',''); if(h.length===3){ h = h.split('').map(c=>c+c).join(''); }
+  const r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
 function triggerNebula(levelLabel){
   const cx = innerWidth * (0.28 + Math.random()*0.44);
   const cy = innerHeight * (0.30 + Math.random()*0.40);
-  // palette blended from tab accent + complementary hues
   const th = TAB_THEMES[currentTab] || TAB_THEMES.Body;
-  const colors = [
-    th.accent, th.accent2,
-    '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#c084fc'
-  ];
+  const colors = [ th.accent||'#22c55e', th.accent2||'#a7f3d0', '#f472b6', '#60a5fa', '#34d399', '#fbbf24', '#c084fc' ];
   const blobs = Array.from({length:7}).map((_,i)=>({
     ang: Math.random()*Math.PI*2,
     baseR: 80 + Math.random()*140,
@@ -462,11 +582,7 @@ function triggerNebula(levelLabel){
     hue: colors[i % colors.length],
     rot: (Math.random()*0.6 - 0.3)
   }));
-  NEBULAE.push({
-    cx, cy, t:0, life:1600, maxLife:1600,
-    blobs,
-    label:`Level ${levelLabel}!`
-  });
+  NEBULAE.push({ cx, cy, t:0, life:1600, maxLife:1600, blobs, label:`Level ${levelLabel}!` });
 }
 
 let mousePX = 0.5, mousePY = 0.5;
@@ -489,19 +605,17 @@ addEventListener('pointermove', e=>{
     sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
   });
 
-  // NEBULA render
+  // nebulae
   for(let i=NEBULAE.length-1;i>=0;i--){
     const nb = NEBULAE[i];
     nb.t += 16;
-    const prog = Math.min(1, nb.t / nb.life);        // 0→1
-    const fade = 1 - prog;                            // fade out
-    const ease = (p)=>1 - Math.pow(1-p, 3);           // cubic ease-out
+    const prog = Math.min(1, nb.t / nb.life);
+    const fade = 1 - prog;
+    const ease = (p)=>1 - Math.pow(1-p, 3);
 
     sctx.save();
     sctx.globalCompositeOperation = "lighter";
-
-    // draw blobs
-    nb.blobs.forEach((b, idx)=>{
+    nb.blobs.forEach((b)=>{
       const r = b.baseR * (0.6 + 0.8*ease(prog));
       const ox = Math.cos(b.ang + b.rot*prog) * b.drift * ease(prog);
       const oy = Math.sin(b.ang + b.rot*prog) * b.drift * ease(prog);
@@ -510,25 +624,19 @@ addEventListener('pointermove', e=>{
       grad.addColorStop(0, `rgba(255,255,255,${0.18*fade})`);
       grad.addColorStop(0.35, hexToRgba(b.hue, 0.26*fade));
       grad.addColorStop(1, hexToRgba(b.hue, 0.0));
-
       sctx.fillStyle = grad;
-      sctx.beginPath();
-      sctx.arc(nb.cx+ox, nb.cy+oy, r, 0, Math.PI*2);
-      sctx.fill();
+      sctx.beginPath(); sctx.arc(nb.cx+ox, nb.cy+oy, r, 0, Math.PI*2); sctx.fill();
     });
 
-    // glowing label
     if(fade>0.2){
       sctx.font = "700 22px ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif";
       sctx.textAlign = "center";
-      sctx.shadowBlur = 18;
-      sctx.shadowColor = "rgba(255,255,255,0.55)";
+      sctx.shadowBlur = 18; sctx.shadowColor = "rgba(255,255,255,0.55)";
       sctx.fillStyle = `rgba(255,255,255,${0.75*fade})`;
       sctx.fillText(nb.label, nb.cx, nb.cy);
     }
 
     sctx.restore();
-
     if(prog>=1){ NEBULAE.splice(i,1); }
   }
 
@@ -564,17 +672,6 @@ addEventListener('pointermove', e=>{
     }
   }
 })();
-
-// small helper to convert hex to rgba
-function hexToRgba(hex, a){
-  // supports #rgb or #rrggbb
-  let h = hex.replace('#','');
-  if(h.length===3){ h = h.split('').map(c=>c+c).join(''); }
-  const r = parseInt(h.slice(0,2),16);
-  const g = parseInt(h.slice(2,4),16);
-  const b = parseInt(h.slice(4,6),16);
-  return `rgba(${r},${g},${b},${a})`;
-}
 
 /* ====== RAINBOW MOUSE TRAIL ====== */
 const trail = qs("#trail"), tctx = trail.getContext("2d");
@@ -641,7 +738,6 @@ function burst(x,y, palette, count=18){
   })(start);
 }
 
-/* Choose palette by where you clicked */
 function paletteForTarget(target){
   const btn = target.closest ? target.closest('button') : null;
   if (btn){
@@ -652,8 +748,6 @@ function paletteForTarget(target){
   }
   return PALETTES.bg;
 }
-
-/* Global click handler: sparkles anywhere */
 document.addEventListener('pointerdown', (e)=>{
   burst(e.clientX, e.clientY, paletteForTarget(e.target), 20);
 });
@@ -670,13 +764,13 @@ function showTodayCard(){
 }
 
 revealBtn.onclick = ()=>{
-  playEthereal(523.25);
+  playEthereal(523.25); // C5
   if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
   saveState(state);
   showTodayCard();
 };
 skipBtn.onclick = ()=>{
-  playEthereal(349.23);
+  playEthereal(349.23); // F4
   if(!state[todayKey]) state[todayKey]={planned:false,done:null,signIndex:pickTodayIndex()};
   else state[todayKey].planned=false;
   saveState(state);
@@ -684,7 +778,7 @@ skipBtn.onclick = ()=>{
   updateStreakInfo();
 };
 willDoBtn.onclick = ()=>{
-  playEthereal(440);
+  playEthereal(440); // A4
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
   state[todayKey].planned=true; state[todayKey].done=null; saveState(state);
   todayMeta.textContent="You planned this today. Come back later to mark it done.";
@@ -692,19 +786,40 @@ willDoBtn.onclick = ()=>{
   updateStreakInfo();
 };
 doneBtn.onclick = ()=>{
-  playEthereal(659.25);
+  playEthereal(659.25); // E5
   state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
-  if(state[todayKey].done!==true){ // award XP once per day
-    addXP(100);
-  }
+  if(state[todayKey].done!==true){ addXP(100); } // award once per day
   state[todayKey].done=true; saveState(state);
   todayMeta.textContent="Marked done ✅";
   updateStreakInfo();
 };
 
+/* ====== TAB WIRING (adds page toggle) ====== */
+function setActiveTab(tabName, fromClick=false){
+  currentTab = tabName;
+  localStorage.setItem("tab", tabName);
+  [...tabBar.querySelectorAll(".tabBtn")].forEach(b=>{
+    b.classList.toggle("active", b.dataset.tab===tabName);
+  });
+  if(fromClick) playEthereal(392); // tab chime
+  applyTheme(tabName); // button/halo color base
+}
+tabBar.querySelectorAll(".tabBtn").forEach(b=>{
+  attachRipple(b);
+  b.addEventListener("click", ()=>{
+    const tab = b.dataset.tab;
+    setActiveTab(tab, true);            // keep your color theming
+    // Toggle page mode: clicking the same active tab returns to HOME
+    const isSame = (tab === currentPageTab) && pageMode;
+    setPageMode(!isSame, tab);
+  });
+});
+
 /* ====== INIT ====== */
 [revealBtn, skipBtn, willDoBtn, doneBtn].forEach(attachRipple);
-setActiveTab(localStorage.getItem("tab") || "Body", false);
+applyTheme(currentTab);
+applyPageTheme(currentPageTab);   // preload fonts/colors so tabs/pages are smooth
+setPageMode(false, currentPageTab); // start in HOME mode
 updateStreakInfo();
 updateXPUI();
 
