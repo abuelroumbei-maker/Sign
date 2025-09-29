@@ -9,14 +9,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
   :root{
-    --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
+    --fg:#e5e7eb; --muted:#9aa4b2; --card:#ffffffdd;
     --accent:#22c55e; --accent2:#a7f3d0; --accent3:#34d399;
     --bg1:#0b0d12; --bg2:#0e1320;
+    --ink:#0a0b0f;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
-  *{box-sizing:border-box} html,body{height:100%}
-  body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:hidden;}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:hidden}
 
   /* Background */
   .bg{
@@ -30,31 +32,98 @@
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
 
-  /* Only stars canvas (no mouse trail / no confetti) */
+  /* Stars canvas (gentle drift) */
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
 
   .wrap{height:100%;display:grid;place-items:center;padding:22px}
-  .title{margin:0;font-size:clamp(40px,10vw,86px);
+  .title{
+    margin:0;font-size:clamp(40px,10vw,86px);
     background:linear-gradient(90deg,#fff,color-mix(in srgb,var(--accent2) 35%,#fff));
     -webkit-background-clip:text;background-clip:text;color:transparent;
     filter:drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
-    font-weight:900; letter-spacing:.5px; text-align:center}
+    font-weight:900; letter-spacing:.5px; text-align:center
+  }
 
-  .nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
   .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
 
   /* XP strip (read-only) */
-  .xpWrap{position:fixed; right:18px; top:18px; left:auto; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw);}
-  .xp-badge{
-    background:#ffffffdd; color:#0a0b0f; border-radius:12px; padding:6px 10px;
-    font-size:13px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.15);
+  .xpWrap{position:fixed; right:18px; top:18px; left:auto; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw); z-index:5}
+  .xp-badge{background:#ffffffdd; color:#0a0b0f; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.15)}
+  .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
+  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--accent), var(--accent2)); box-shadow:0 6px 20px rgba(13,148,255,.35); transition:width .45s ease}
+  .xp-meta{ position:fixed; right:18px; top:52px; font-size:12px; color:#cbd5e1; opacity:.9; z-index:5 }
+
+  /* Exercises CTA */
+  .cta{
+    position:fixed; left:50%; transform:translateX(-50%);
+    bottom:28px; z-index:4;
+    background:linear-gradient(90deg, #22c55e, #34d399);
+    color:var(--ink); border:none; padding:14px 22px; font-weight:900;
+    border-radius:16px; box-shadow:0 12px 28px rgba(0,0,0,.35);
+    cursor:pointer; letter-spacing:.4px;
   }
-  .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22);
-    overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25);}
-  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%;
-    background:linear-gradient(90deg, var(--accent), var(--accent2));
-    box-shadow:0 6px 20px rgba(13,148,255,.35); transition:width .45s ease;}
-  .xp-meta{ position:fixed; right:18px; top:52px; font-size:12px; color:#cbd5e1; opacity:.9 }
+  .cta:active{transform:translateX(-50%) translateY(1px);}
+
+  /* Drawer */
+  .scrim{position:fixed; inset:0; background:rgba(3,6,16,.6); opacity:0; pointer-events:none; transition:opacity .25s ease; z-index:6}
+  .scrim.show{opacity:1; pointer-events:auto}
+  .drawer{
+    position:fixed; inset:auto 0 0 0; height:min(86vh, 900px);
+    background:rgba(255,255,255,.08); backdrop-filter: blur(10px) saturate(1.2);
+    border-top:1px solid rgba(255,255,255,.25); transform:translateY(100%);
+    transition:transform .35s cubic-bezier(.2,.8,.2,1); z-index:7;
+    box-shadow: 0 -30px 60px rgba(0,0,0,.45);
+  }
+  .drawer.show{transform:translateY(0)}
+  .drawer-head{
+    display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.18)
+  }
+  .drag{width:52px;height:6px;background:rgba(255,255,255,.35);border-radius:999px;margin:0 auto}
+  .drawer-title{font-weight:900; letter-spacing:.3px}
+  .drawer-body{padding:14px 16px 20px; overflow:auto; height:calc(100% - 64px)}
+
+  /* Library header */
+  .lib-top{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px}
+  .seg{
+    display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;
+  }
+  .seg button{
+    border:none; background:transparent; color:#e2e8f0; padding:8px 12px; border-radius:10px; font-weight:800; cursor:pointer;
+  }
+  .seg button.active{background:#ffffff; color:#0a0b0f}
+  .search{flex:1; min-width:220px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.14); border-radius:12px; padding:8px 12px}
+  .search input{flex:1; background:transparent; border:none; color:#fff; outline:none; font-weight:700}
+
+  /* Cards */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
+  .card{
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.18);
+    border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;
+  }
+  .card h3{margin:0; font-size:18px; letter-spacing:.2px}
+  .meta{font-size:12px; color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
+  .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:11px}
+  .illustration{background:#0b1220; border-radius:12px; aspect-ratio:16/9; display:grid; place-items:center; overflow:hidden; border:1px solid rgba(255,255,255,.12)}
+  .controls{display:flex; gap:8px; flex-wrap:wrap}
+  .btn{
+    border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer
+  }
+  .btn.ghost{background:transparent; color:#e2e8f0; border:1px solid rgba(255,255,255,.28)}
+  details{border-top:1px dashed rgba(255,255,255,.2); padding-top:8px}
+  details > summary{cursor:pointer; font-weight:800; list-style:none}
+  details > summary::-webkit-details-marker{display:none}
+  ul{margin:.4em 0 .2em 1.1em}
+  li{margin:.2em 0}
+
+  /* Video */
+  .vid, .iframe-wrap{width:100%; height:100%}
+  .iframe-wrap{position:relative}
+  .iframe-wrap iframe{position:absolute; inset:0; width:100%; height:100%; border:0; border-radius:10px}
+
+  /* Hide page scroll while drawer open on small screens */
+  body.lock{overflow:hidden}
 </style>
 </head>
 <body>
@@ -79,13 +148,35 @@
     <h1 class="title">Body</h1>
   </div>
 
+  <!-- Exercises CTA -->
+  <button class="cta" id="openExercises">Exercises</button>
+
+  <!-- Drawer + scrim -->
+  <div class="scrim" id="scrim" aria-hidden="true"></div>
+  <section class="drawer" id="drawer" aria-label="Exercises Library" aria-hidden="true">
+    <header class="drawer-head">
+      <div class="drag"></div>
+    </header>
+    <div class="drawer-body">
+      <div class="lib-top">
+        <div class="seg" role="tablist" aria-label="Libraries">
+          <button class="active" id="tabHome" role="tab" aria-selected="true">At Home</button>
+          <button id="tabGym" role="tab" aria-selected="false">At the Gym</button>
+        </div>
+        <label class="search" aria-label="Search exercises">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/></svg>
+          <input id="q" placeholder="Search movement, muscle, equipment…" />
+        </label>
+      </div>
+      <div class="grid" id="cards" aria-live="polite"></div>
+    </div>
+  </section>
+
 <script>
 /* ===== Stars (gentle time-based drift; NO mouse tracking) ===== */
-const stars = document.getElementById('stars');
-const sctx = stars.getContext('2d');
+const stars = document.getElementById('stars'); const sctx = stars.getContext('2d');
 function resize() { stars.width = innerWidth; stars.height = innerHeight; }
 resize(); addEventListener('resize', resize);
-
 const STARS = Array.from({length:160}).map(()=>({
   x: Math.random()*innerWidth,
   y: Math.random()*innerHeight,
@@ -93,7 +184,6 @@ const STARS = Array.from({length:160}).map(()=>({
   dx: (Math.random()-0.5)*0.15,
   dy: (Math.random()-0.5)*0.15
 }));
-
 (function draw(){
   requestAnimationFrame(draw);
   sctx.clearRect(0,0,stars.width,stars.height);
@@ -120,11 +210,416 @@ function updateXPUI(){
     xpState.level>=MAX_LEVEL ? `MAX • Level ${MAX_LEVEL}` : `${xpState.xp} / ${need} XP`;
 }
 updateXPUI();
-// If you navigate back here after earning XP on index, a reload updates the bar.
-// Optional: listen for visibility changes to refresh.
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
+
+/* ===== Exercises Library Data =====
+   Add/change videos: set `video` to a YouTube/Vimeo/MP4 URL (e.g., "https://www.youtube.com/embed/VIDEO_ID").
+   If `video` is provided, the card shows the video instead of the SVG illustration.
+*/
+const LIBRARIES = {
+  home: [
+    {
+      id:"pushup",
+      name:"Push-Up",
+      muscles:["Chest","Triceps","Anterior delts","Core"],
+      level:"Beginner+",
+      equipment:"Bodyweight",
+      setsReps:"3–4 × 6–12",
+      steps:[
+        "Hands under shoulders, body in a straight line, glutes/abs tight.",
+        "Lower with elbows ~45° from torso until chest is close to floor.",
+        "Press through palms, keeping ribs tucked and neck neutral."
+      ],
+      cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"],
+      mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"],
+      // video:"https://www.youtube.com/embed/5aP3kqM2wWc",
+      illustration:"pushup"
+    },
+    {
+      id:"squat-bw",
+      name:"Bodyweight Squat",
+      muscles:["Quads","Glutes","Adductors","Core"],
+      level:"Beginner",
+      equipment:"Bodyweight",
+      setsReps:"3–4 × 10–15",
+      steps:[
+        "Feet shoulder-width, toes slightly out.",
+        "Sit hips back/down, knees track over toes, chest tall.",
+        "Descend to comfortable depth; drive mid-foot to stand."
+      ],
+      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"],
+      mistakes:["Heels lifting","Knees caving in","Butt wink from lack of brace"],
+      illustration:"squat"
+    },
+    {
+      id:"glute-bridge",
+      name:"Glute Bridge",
+      muscles:["Glutes","Hamstrings","Core"],
+      level:"Beginner",
+      equipment:"Bodyweight",
+      setsReps:"3 × 12–15 (1–2s squeeze top)",
+      steps:[
+        "Heels close to glutes, ribs down, pelvis neutral.",
+        "Drive through heels to lift hips; squeeze glutes at top.",
+        "Lower under control; avoid over-arching lower back."
+      ],
+      cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"],
+      mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"],
+      illustration:"bridge"
+    },
+    {
+      id:"plank",
+      name:"Forearm Plank",
+      muscles:["Core","Glutes","Shoulders"],
+      level:"Beginner",
+      equipment:"Bodyweight",
+      setsReps:"3 × 20–40s",
+      steps:[
+        "Elbows under shoulders, forearms parallel.",
+        "Squeeze glutes, slightly tuck pelvis, keep ribs down.",
+        "Hold a straight line from ears to ankles; breathe."
+      ],
+      cues:["Crush the floor","Long spine","Soft inhale through nose"],
+      mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"],
+      illustration:"plank"
+    }
+  ],
+  gym: [
+    {
+      id:"bb-squat",
+      name:"Barbell Back Squat",
+      muscles:["Quads","Glutes","Adductors","Core"],
+      level:"Intermediate",
+      equipment:"Barbell/Rack",
+      setsReps:"3–5 × 3–8",
+      steps:[
+        "Set bar just below traps; hands even, elbows under bar.",
+        "Unrack, step back, feet shoulder-width, brace hard.",
+        "Sit back/down keeping knees tracking; drive up through mid-foot."
+      ],
+      cues:["Big breath/brace","Knees out","Chest over mid-foot"],
+      mistakes:["Soft brace","Heels popping","Knees collapsing in"],
+      illustration:"squatBar"
+    },
+    {
+      id:"bench",
+      name:"Barbell Bench Press",
+      muscles:["Chest","Triceps","Anterior delts"],
+      level:"Intermediate",
+      equipment:"Barbell/Bench",
+      setsReps:"3–5 × 4–8",
+      steps:[
+        "Eyes under bar; set upper-back arch; feet planted.",
+        "Unrack; lower to lower-sternum with forearms vertical.",
+        "Press back/up to start; keep shoulder blades retracted."
+      ],
+      cues:["Row it down","Press the floor","Meet bar with chest (don’t bounce)"],
+      mistakes:["Elbow flare","Loose upper back","Bouncing off chest"],
+      illustration:"bench"
+    },
+    {
+      id:"latpd",
+      name:"Lat Pulldown",
+      muscles:["Lats","Biceps","Mid-back"],
+      level:"Beginner+",
+      equipment:"Pulldown machine",
+      setsReps:"3–4 × 8–12",
+      steps:[
+        "Set thigh pad; grasp bar slightly wider than shoulders.",
+        "Pull elbows to ribs/chest up; pause near collarbone.",
+        "Control the return to full stretch without shrugging."
+      ],
+      cues:["Elbows in pockets","Chest proud","Drive with lats first"],
+      mistakes:["Leaning way back","Half reps","Shrugging the neck"],
+      illustration:"pulldown"
+    },
+    {
+      id:"cable-row",
+      name:"Seated Cable Row",
+      muscles:["Lats","Rhomboids","Rear delts","Biceps"],
+      level:"Beginner",
+      equipment:"Cable/Row",
+      setsReps:"3–4 × 8–12",
+      steps:[
+        "Neutral spine, chest tall, shoulders down/back.",
+        "Pull handle to lower ribs; pause; return with control.",
+        "Keep wrists neutral; don’t over-lean."
+      ],
+      cues:["Pull with elbows","Crack walnut between blades","Stay tall"],
+      mistakes:["Shrugging","Rounding lower back","Using momentum"],
+      illustration:"row"
+    }
+  ]
+};
+
+/* ===== Drawer controls ===== */
+const drawer = document.getElementById('drawer');
+const scrim = document.getElementById('scrim');
+const openBtn = document.getElementById('openExercises');
+const q = document.getElementById('q');
+const tabHome = document.getElementById('tabHome');
+const tabGym = document.getElementById('tabGym');
+const cards = document.getElementById('cards');
+
+let currentLib = 'home';
+let searchTerm = '';
+
+function openDrawer(){
+  drawer.classList.add('show'); scrim.classList.add('show');
+  drawer.setAttribute('aria-hidden','false'); scrim.setAttribute('aria-hidden','false');
+  document.body.classList.add('lock');
+}
+function closeDrawer(){
+  drawer.classList.remove('show'); scrim.classList.remove('show');
+  drawer.setAttribute('aria-hidden','true'); scrim.setAttribute('aria-hidden','true');
+  document.body.classList.remove('lock');
+}
+openBtn.addEventListener('click', openDrawer);
+scrim.addEventListener('click', closeDrawer);
+addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('show')) closeDrawer(); });
+
+tabHome.addEventListener('click', ()=>{ currentLib='home'; tabHome.classList.add('active'); tabGym.classList.remove('active'); tabHome.setAttribute('aria-selected','true'); tabGym.setAttribute('aria-selected','false'); render(); });
+tabGym.addEventListener('click', ()=>{ currentLib='gym'; tabGym.classList.add('active'); tabHome.classList.remove('active'); tabGym.setAttribute('aria-selected','true'); tabHome.setAttribute('aria-selected','false'); render(); });
+
+q.addEventListener('input', ()=>{ searchTerm = q.value.toLowerCase(); render(); });
+
+/* ===== Rendering ===== */
+function render(){
+  const data = LIBRARIES[currentLib].filter(item=>{
+    if(!searchTerm) return true;
+    const hay = (item.name+' '+item.muscles.join(' ')+' '+item.equipment+' '+item.level).toLowerCase();
+    return hay.includes(searchTerm);
+  });
+  cards.innerHTML = data.map(renderCard).join('');
+  attachCardHandlers();
+}
+
+function renderCard(ex){
+  const muscles = ex.muscles.map(m=>`<span class="badge">${m}</span>`).join(' ');
+  const vid = ex.video ? `
+    <div class="iframe-wrap">
+      ${
+        ex.video.includes('youtube.com')||ex.video.includes('vimeo.com')
+        ? `<iframe src="${ex.video}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen title="${ex.name} video"></iframe>`
+        : `<video class="vid" src="${ex.video}" controls playsinline></video>`
+      }
+    </div>` : renderSVG(ex.illustration, ex.id);
+
+  return `
+    <article class="card" data-id="${ex.id}">
+      <h3>${ex.name}</h3>
+      <div class="meta">
+        <span class="badge">${ex.level}</span>
+        <span class="badge">${ex.equipment}</span>
+        <span class="badge">${ex.setsReps}</span>
+      </div>
+      <div class="illustration" id="illu-${ex.id}">
+        ${vid}
+      </div>
+      ${
+        ex.video ? '' : `
+        <div class="controls">
+          <button class="btn play" data-target="${ex.id}">Play demo</button>
+          <button class="btn ghost reset" data-target="${ex.id}">Reset</button>
+        </div>`
+      }
+      <details>
+        <summary>Technique steps</summary>
+        <ul>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ul>
+      </details>
+      <details>
+        <summary>Coaching cues</summary>
+        <ul>${ex.cues.map(c=>`<li>${c}</li>`).join('')}</ul>
+      </details>
+      <details>
+        <summary>Common mistakes</summary>
+        <ul>${ex.mistakes.map(m=>`<li>${m}</li>`).join('')}</ul>
+      </details>
+    </article>
+  `;
+}
+
+/* ===== Simple SVG “illustrations” with CSS animations =====
+   Not anatomically perfect—meant to communicate the motion pattern.
+   Each returns a small DOM with keyframe style scoped via the element id.
+*/
+function renderSVG(kind, id){
+  switch(kind){
+    case 'pushup': return svgPushup(id);
+    case 'squat': return svgSquat(id);
+    case 'bridge': return svgBridge(id);
+    case 'plank': return svgPlank(id);
+    case 'squatBar': return svgSquatBar(id);
+    case 'bench': return svgBench(id);
+    case 'pulldown': return svgPulldown(id);
+    case 'row': return svgRow(id);
+    default: return `<div style="color:#cbd5e1;font-weight:800">Demo</div>`;
+  }
+}
+
+function svgPushup(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      #${id}-bar{ transform-origin:120px 90px }
+      .${id}-arm{ transform-origin: 150px 85px }
+      .running #${id}-bar { animation: ${id}-push 1.8s ease-in-out infinite }
+      .running .${id}-arm { animation: ${id}-elbow 1.8s ease-in-out infinite }
+      @keyframes ${id}-push { 0%,100%{ translate:0 0 } 50%{ translate:0 14px } }
+      @keyframes ${id}-elbow{ 0%,100%{ rotate:0deg } 50%{ rotate:12deg } }
+    </style>
+    <rect x="0" y="0" width="240" height="135" fill="#0b1220"/>
+    <!-- ground -->
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <!-- body -->
+    <g id="${id}-bar">
+      <rect x="70" y="80" width="100" height="10" rx="5" fill="#34d399"/>
+      <circle cx="65" cy="85" r="7" fill="#a7f3d0"/>
+      <circle cx="175" cy="85" r="7" fill="#a7f3d0"/>
+      <!-- arms -->
+      <rect class="${id}-arm" x="150" y="85" width="30" height="6" rx="3" fill="#22c55e"/>
+      <rect x="180" y="88" width="10" height="6" rx="3" fill="#22c55e"/>
+    </g>
+  </svg>`;
+}
+function svgSquat(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-hips { animation:${id}-hip 1.9s ease-in-out infinite }
+      .running #${id}-knees { animation:${id}-knee 1.9s ease-in-out infinite }
+      @keyframes ${id}-hip { 0%,100%{ translate:0 0 } 50%{ translate:0 18px } }
+      @keyframes ${id}-knee{ 0%,100%{ rotate:0deg } 50%{ rotate:12deg } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect id="${id}-hips" x="110" y="65" width="20" height="30" rx="6" fill="#34d399"/>
+    <g id="${id}-knees" transform="translate(120,95)">
+      <rect x="-36" y="0" width="30" height="8" rx="4" fill="#a7f3d0"/>
+      <rect x="6" y="0" width="30" height="8" rx="4" fill="#a7f3d0"/>
+    </g>
+    <rect x="95" y="40" width="50" height="20" rx="8" fill="#22c55e"/>
+  </svg>`;
+}
+function svgBridge(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-pelvis{ animation:${id}-lift 2s ease-in-out infinite }
+      @keyframes ${id}-lift { 0%,100%{ translate:0 18px } 50%{ translate:0 0 } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect x="40" y="100" width="50" height="8" rx="4" fill="#a7f3d0"/>
+    <rect x="150" y="100" width="50" height="8" rx="4" fill="#a7f3d0"/>
+    <rect id="${id}-pelvis" x="95" y="70" width="50" height="16" rx="8" fill="#34d399"/>
+  </svg>`;
+}
+function svgPlank(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-line{ animation:${id}-breath 3.2s ease-in-out infinite }
+      @keyframes ${id}-breath { 0%,100%{ translate:0 0 } 50%{ translate:0 -3px } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect id="${id}-line" x="40" y="85" width="160" height="8" rx="4" fill="#34d399"/>
+    <circle cx="35" cy="89" r="6" fill="#a7f3d0"/>
+    <circle cx="205" cy="89" r="6" fill="#a7f3d0"/>
+  </svg>`;
+}
+function svgSquatBar(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-body{ animation:${id}-downup 2s ease-in-out infinite }
+      @keyframes ${id}-downup { 0%,100%{ translate:0 0 } 50%{ translate:0 20px } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <g id="${id}-body">
+      <rect x="80" y="40" width="80" height="14" rx="7" fill="#a7f3d0"/> <!-- bar -->
+      <rect x="110" y="54" width="20" height="36" rx="6" fill="#34d399"/> <!-- torso -->
+      <rect x="100" y="90" width="16" height="8" rx="4" fill="#22c55e"/> <!-- left thigh -->
+      <rect x="124" y="90" width="16" height="8" rx="4" fill="#22c55e"/> <!-- right thigh -->
+    </g>
+  </svg>`;
+}
+function svgBench(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-bar{ animation:${id}-press 1.8s ease-in-out infinite }
+      @keyframes ${id}-press { 0%,100%{ translate:0 -8px } 50%{ translate:0 10px } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect x="60" y="90" width="120" height="8" rx="4" fill="#1f2937"/> <!-- bench -->
+    <rect id="${id}-bar" x="70" y="50" width="100" height="10" rx="5" fill="#a7f3d0"/>
+    <rect x="100" y="76" width="40" height="10" rx="5" fill="#34d399"/>
+  </svg>`;
+}
+function svgPulldown(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-handle{ animation:${id}-pull 2s ease-in-out infinite }
+      @keyframes ${id}-pull { 0%,100%{ translate:0 -18px } 50%{ translate:0 6px } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect x="118" y="0" width="4" height="80" fill="#a7f3d0"/>
+    <rect id="${id}-handle" x="90" y="65" width="60" height="8" rx="4" fill="#34d399"/>
+    <rect x="110" y="80" width="20" height="20" rx="6" fill="#22c55e"/>
+  </svg>`;
+}
+function svgRow(id){
+  return `
+  <svg viewBox="0 0 240 135" width="100%" height="100%" data-anim="off">
+    <style>
+      .running #${id}-handle{ animation:${id}-row 1.8s ease-in-out infinite }
+      @keyframes ${id}-row { 0%,100%{ translate:0 0 } 50%{ translate:16px 0 } }
+    </style>
+    <rect width="240" height="135" fill="#0b1220"/>
+    <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
+    <rect x="40" y="90" width="50" height="10" rx="5" fill="#22c55e"/> <!-- torso -->
+    <rect id="${id}-handle" x="95" y="95" width="35" height="6" rx="3" fill="#34d399"/> <!-- handle -->
+  </svg>`;
+}
+
+/* ===== Play/Reset handlers ===== */
+function attachCardHandlers(){
+  document.querySelectorAll('.btn.play').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.target;
+      const box = document.getElementById('illu-'+id);
+      box.classList.toggle('running');
+      btn.textContent = box.classList.contains('running') ? 'Pause demo' : 'Play demo';
+    });
+  });
+  document.querySelectorAll('.btn.reset').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      const id = btn.dataset.target;
+      const box = document.getElementById('illu-'+id);
+      box.classList.remove('running');
+      const svg = box.querySelector('svg');
+      if(svg){
+        // Reset animation by cloning
+        const clone = svg.cloneNode(true);
+        svg.replaceWith(clone);
+      }
+      const play = btn.parentElement.querySelector('.btn.play');
+      if(play) play.textContent = 'Play demo';
+    });
+  });
+}
+
+/* Initial render */
+render();
 </script>
 </body>
 </html>
+
 
 
