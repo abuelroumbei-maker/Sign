@@ -10,19 +10,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Muscle-inspired palette */
     --fg:#e5e7eb; --muted:#9aa4b2; --card:#ffffffdd;
-    --bg1:#0b0d12; --bg2:#0e1320;
-    --ink:#0a0b0f;
-
-    --muscle1:#8b1d2c;  /* deep red */
-    --muscle2:#c53030;  /* red */
-    --muscle3:#e07a7a;  /* warm salmon */
-    --muscleHi:#f9c2c2; /* highlight */
-
+    --bg1:#0b0d12; --bg2:#0e1320; --ink:#0a0b0f;
+    --muscle1:#8b1d2c; --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
     --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
     --safe-bottom: env(safe-area-inset-bottom, 16px);
     --safe-top: env(safe-area-inset-top, 16px);
   }
@@ -51,39 +43,34 @@
   .wrap{
     min-height:100dvh;
     display:grid; place-items:center;
-    padding:calc(60px + var(--safe-top)) 18px calc(120px + var(--safe-bottom));
+    padding:calc(60px + var(--safe-top)) 18px calc(140px + var(--safe-bottom));
   }
   .title{
-    margin:0;
-    font-family:var(--title-font);
-    font-size:clamp(48px, 12vw, 112px);
-    line-height:0.95;
-    text-align:center;
-    letter-spacing:1px;
+    margin:0; font-family:var(--title-font);
+    font-size:clamp(48px, 12vw, 112px); line-height:0.95; text-align:center; letter-spacing:1px;
     background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     border-bottom: 6px solid color-mix(in oklab, var(--muscle2) 60%, transparent);
-    padding-bottom:10px;
-    text-shadow:
-      0 2px 0 rgba(0,0,0,.35),
-      0 8px 24px rgba(139,29,44,.45);
+    padding-bottom:10px; text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
   }
-  .subtitle{
-    margin:14px 0 0; text-align:center; max-width:900px; color:#e2e8f0; font-weight:600;
-  }
+  .subtitle{ margin:14px 0 0; text-align:center; max-width:900px; color:#e2e8f0; font-weight:600; }
 
-  /* Exercises CTA */
-  .cta{
+  /* Bottom actions (two buttons) */
+  .ctaRow{
     position:fixed; left:50%; transform:translateX(-50%);
     bottom:calc(18px + var(--safe-bottom)); z-index:4;
+    display:grid; grid-template-columns:1fr 1fr; gap:10px;
+    width:min(680px, 94vw);
+  }
+  @media (max-width:520px){ .ctaRow{grid-template-columns:1fr} }
+  .cta{
     background:linear-gradient(90deg, var(--muscle2), var(--muscle3));
-    color:var(--ink); border:none; padding:14px 22px; font-weight:900;
+    color:var(--ink); border:none; padding:14px 18px; font-weight:900;
     border-radius:16px; box-shadow:0 12px 28px rgba(0,0,0,.35);
     cursor:pointer; letter-spacing:.4px;
-    width:min(560px, 92vw);
   }
 
-  /* Drawer */
+  /* Drawer base */
   .scrim{position:fixed; inset:0; background:rgba(3,6,16,.6); opacity:0; pointer-events:none; z-index:6}
   .scrim.show{opacity:1; pointer-events:auto}
   .drawer{
@@ -93,18 +80,13 @@
     display:none; z-index:7; box-shadow: 0 -30px 60px rgba(0,0,0,.45);
   }
   .drawer.show{display:block}
-  .drawer-head{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.18)
-  }
+  .drawer-head{ display:flex; align-items:center; justify-content:space-between; gap:12px;
+    padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.18) }
   .drawer-title{font-weight:900; letter-spacing:.3px}
-  .closeX{
-    background:#ffffff; color:#0a0b0f; border:none; border-radius:10px; font-weight:900; cursor:pointer;
-    padding:6px 10px; line-height:1;
-  }
+  .closeX{ background:#ffffff; color:#0a0b0f; border:none; border-radius:10px; font-weight:900; cursor:pointer; padding:6px 10px; line-height:1; }
   .drawer-body{padding:14px 16px 20px; overflow:auto; height:calc(100% - 56px)}
 
-  /* Tabs + search */
+  /* Tabs + search (Exercises) */
   .lib-top{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px}
   .seg{display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;}
   .seg button{border:none; background:transparent; color:#e2e8f0; padding:10px 14px; border-radius:10px; font-weight:900; cursor:pointer}
@@ -126,19 +108,29 @@
   li{margin:.2em 0}
 
   /* Games */
-  .gamesPane{display:none; gap:14px}
+  .gamesHub{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  @media (max-width:700px){ .gamesHub{grid-template-columns:1fr} }
+  .gamePick{background:#ffffff; color:#0a0b0f; border:none; border-radius:16px; padding:16px; font-weight:900; cursor:pointer}
+  .gamePane{display:none}
+  .gamePane.active{display:block}
   .gameCard{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;}
-  .gameCard h3{margin:0; font-size:18px}
   .controlsRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
   .btn{border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer}
   .stat{font-weight:800; color:#e2e8f0; margin-left:auto}
-  .arena{position:relative; width:100%; height:360px; background:#0b1220; border:1px solid rgba(255,255,255,.2); border-radius:12px; touch-action:none; user-select:none}
-  @media (min-width:900px){ .gamesPane{display:grid; grid-template-columns:1fr 1fr} .arena{height:420px} }
+  .arena{position:relative; width:100%; height:420px; background:#0b1220; border:1px solid rgba(255,255,255,.2); border-radius:12px; touch-action:none; user-select:none}
   .target{position:absolute; width:54px; height:54px; border-radius:999px; background:linear-gradient(180deg, var(--muscle3), var(--muscle2)); border:2px solid #fff; display:grid; place-items:center; font-weight:900; color:#0a0b0f}
   .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
   .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
   .swipeNote{font-size:12px; color:#cbd5e1}
-  .flashBad{background:#4a0a14 !important;} /* quick error flash (we toggle it briefly) */
+  .flashBad{background:#4a0a14 !important;}
+
+  /* Know Yourself content */
+  .ky-section{display:grid; gap:12px}
+  .ky-note{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:12px}
+  .ky-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px}
+  .ky-card{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:12px}
+  .ky-card h3{margin:0 0 6px 0}
+  .ky-card ul{margin:.4em 0 .2em 1.1em}
 </style>
 </head>
 <body>
@@ -165,15 +157,21 @@
     </header>
   </main>
 
-  <!-- Exercises CTA -->
-  <button class="cta" id="openExercises" aria-haspopup="dialog" aria-controls="drawer">Exercises</button>
+  <!-- Bottom action buttons -->
+  <div class="ctaRow">
+    <button class="cta" id="openExercises" aria-haspopup="dialog" aria-controls="drawerExercises">Exercises</button>
+    <button class="cta" id="openKnow" aria-haspopup="dialog" aria-controls="drawerKnow">Know Yourself</button>
+  </div>
 
-  <!-- Drawer + scrim -->
-  <div class="scrim" id="scrim" aria-hidden="true"></div>
-  <section class="drawer" id="drawer" role="dialog" aria-label="Exercises Library" aria-modal="true" aria-hidden="true">
+  <!-- SCRIMS -->
+  <div class="scrim" id="scrimExercises" aria-hidden="true"></div>
+  <div class="scrim" id="scrimKnow" aria-hidden="true"></div>
+
+  <!-- Drawer: Exercises -->
+  <section class="drawer" id="drawerExercises" role="dialog" aria-label="Exercises Library" aria-modal="true" aria-hidden="true">
     <header class="drawer-head">
       <div class="drawer-title">Exercises</div>
-      <button class="closeX" id="closeDrawer" aria-label="Close exercises">×</button>
+      <button class="closeX" id="closeExercises" aria-label="Close exercises">×</button>
     </header>
     <div class="drawer-body">
       <div class="lib-top">
@@ -189,15 +187,20 @@
         </label>
       </div>
 
-      <!-- Library cards -->
+      <!-- Exercise lists -->
       <div class="grid" id="cards" aria-live="polite"></div>
 
-      <!-- Games -->
-      <div class="gamesPane" id="gamesPane" aria-live="polite">
-        <!-- Tap Sprint -->
+      <!-- Games: Hub & Single-game panes -->
+      <div id="gamesHub" class="gamesHub" style="display:none" aria-live="polite">
+        <button class="gamePick" id="pickTap">▶ Tap Sprint</button>
+        <button class="gamePick" id="pickReflex">▶ Reflex Sprint</button>
+      </div>
+
+      <!-- Tap game (single pane) -->
+      <div id="tapPane" class="gamePane">
         <section class="gameCard">
-          <h3>Tap Sprint</h3>
           <div class="controlsRow">
+            <button class="btn" id="tapBack">← Back to Games</button>
             <button class="btn" id="tapStart">Start</button>
             <button class="btn" id="tapStop">Stop</button>
             <button class="btn" id="tapReset">Reset</button>
@@ -206,11 +209,13 @@
           <div class="arena" id="tapArena" aria-label="Tap arena"></div>
           <p class="swipeNote">Tap all circles. New circles only appear after you clear the current wave. Max 5 per wave.</p>
         </section>
+      </div>
 
-        <!-- Reflex Sprint (swipe/tap) -->
+      <!-- Reflex game (single pane) -->
+      <div id="reflexPane" class="gamePane">
         <section class="gameCard">
-          <h3>Reflex Sprint</h3>
           <div class="controlsRow">
+            <button class="btn" id="reflexBack">← Back to Games</button>
             <button class="btn" id="reflexStart">Start</button>
             <button class="btn" id="reflexStop">Stop</button>
             <button class="btn" id="reflexReset">Reset</button>
@@ -226,60 +231,122 @@
     </div>
   </section>
 
+  <!-- Drawer: Know Yourself -->
+  <section class="drawer" id="drawerKnow" role="dialog" aria-label="Know Yourself" aria-modal="true" aria-hidden="true">
+    <header class="drawer-head">
+      <div class="drawer-title">Know Yourself</div>
+      <button class="closeX" id="closeKnow" aria-label="Close know yourself">×</button>
+    </header>
+    <div class="drawer-body">
+      <div class="ky-section">
+        <div class="ky-note">
+          <strong>Diagram coming soon:</strong> a realistic, age-appropriate human figure showing external parts and internal systems (skeleton, muscles, heart & blood, lungs, brain & nerves, digestion). No animations; clear labels; friendly colors for kids.
+        </div>
+        <div class="ky-grid">
+          <div class="ky-card">
+            <h3>Skin (Your Super Suit)</h3>
+            <ul>
+              <li>Largest organ in your body—covers everything!</li>
+              <li>Helps keep germs out and water in.</li>
+              <li>Has tiny “doors” (pores) for sweat to cool you.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Skeleton (The Frame)</h3>
+            <ul>
+              <li>Adults have 206 bones; babies start with more that fuse.</li>
+              <li>Protects organs (ribs guard your heart & lungs).</li>
+              <li>Bone marrow makes new blood cells.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Muscles (Your Movers)</h3>
+            <ul>
+              <li>Over 600 muscles help you smile, jump, and blink.</li>
+              <li>They pull on bones like strong rubber bands.</li>
+              <li>Your heart is a special muscle that never rests.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Heart & Blood (The Delivery Team)</h3>
+            <ul>
+              <li>Your heart beats ~100,000 times a day.</li>
+              <li>Blood carries oxygen & food to every cell.</li>
+              <li>Arteries go away from the heart; veins return.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Lungs (Air Filters)</h3>
+            <ul>
+              <li>You have two lungs like spongy balloons.</li>
+              <li>They trade oxygen in and carbon dioxide out.</li>
+              <li>Hairs and mucus trap dust to keep airways clean.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Brain & Nerves (The Control Room)</h3>
+            <ul>
+              <li>Your brain uses tiny signals to talk to your body.</li>
+              <li>Nerves are “wires” carrying messages super fast.</li>
+              <li>Sleep helps your brain sort memories and learn.</li>
+            </ul>
+          </div>
+          <div class="ky-card">
+            <h3>Digestion (Fuel Station)</h3>
+            <ul>
+              <li>Your stomach squeezes food like a washing machine.</li>
+              <li>The small intestine is a super long noodle (6+ meters!).</li>
+              <li>Good bacteria help you get vitamins from food.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 <script>
-/* ===== XP (read from localStorage; no earning here) ===== */
+/* ===== XP (read from localStorage) ===== */
 function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
 const MAX_LEVEL = 100;
 function xpForNext(level){ if(level>=MAX_LEVEL) return Infinity; const base=200, growth=1.12; return Math.round(base * Math.pow(growth, level)); }
 function updateXPUI(){
-  const xpState = loadXP();
-  const need = xpForNext(xpState.level);
+  const xpState = loadXP(); const need = xpForNext(xpState.level);
   document.getElementById('xpBadge').textContent = `Level ${xpState.level}`;
-  document.getElementById('xpFill').style.width =
-    (xpState.level>=MAX_LEVEL ? 100 : Math.round(100 * (xpState.xp / need))) + "%";
-  document.getElementById('xpMeta').textContent =
-    xpState.level>=MAX_LEVEL ? `MAX • Level ${MAX_LEVEL}` : `${xpState.xp} / ${need} XP`;
+  document.getElementById('xpFill').style.width = (xpState.level>=MAX_LEVEL ? 100 : Math.round(100 * (xpState.xp / need))) + "%";
+  document.getElementById('xpMeta').textContent = xpState.level>=MAX_LEVEL ? `MAX • Level ${MAX_LEVEL}` : `${xpState.xp} / ${need} XP`;
 }
 updateXPUI();
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
 
-/* ===== Library Data (no graphics) ===== */
+/* ===== Data ===== */
 const LIBRARIES = {
   home: [
     { id:"pushup", name:"Push-Up", muscles:["Chest","Triceps","Anterior delts","Core"], level:"Beginner+", equipment:"Bodyweight", setsReps:"3–4 × 6–12",
       steps:["Hands under shoulders, body in a straight line, glutes/abs tight.","Lower with elbows ~45° from torso until chest is close to floor.","Press through palms, keeping ribs tucked and neck neutral."],
-      cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"],
-      mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"] },
+      cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"], mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"] },
     { id:"squat-bw", name:"Bodyweight Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3–4 × 10–15",
       steps:["Feet shoulder-width, toes slightly out.","Sit hips back/down, knees track over toes, chest tall.","Descend to comfortable depth; drive mid-foot to stand."],
-      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"],
-      mistakes:["Heels lifting","Knees caving in","Losing brace at bottom"] },
+      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"], mistakes:["Heels lifting","Knees caving in","Losing brace at bottom"] },
     { id:"glute-bridge", name:"Glute Bridge", muscles:["Glutes","Hamstrings","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 12–15 (1–2s squeeze top)",
       steps:["Heels close to glutes, ribs down, pelvis neutral.","Drive through heels to lift hips; squeeze glutes at top.","Lower under control; avoid over-arching lower back."],
-      cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"],
-      mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"] },
+      cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"], mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"] },
     { id:"plank", name:"Forearm Plank", muscles:["Core","Glutes","Shoulders"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 20–40s",
       steps:["Elbows under shoulders, forearms parallel.","Squeeze glutes, slight pelvic tuck, ribs down.","Hold straight line from ears to ankles; breathe."],
-      cues:["Crush the floor","Long spine","Soft nasal inhale"],
-      mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"] }
+      cues:["Crush the floor","Long spine","Soft nasal inhale"], mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"] }
   ],
   gym: [
     { id:"bb-squat", name:"Barbell Back Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Intermediate", equipment:"Barbell/Rack", setsReps:"3–5 × 3–8",
       steps:["Bar set just below traps; hands even, elbows under bar.","Unrack, step back, feet shoulder-width, brace hard.","Sit back/down keeping knees tracking; stand through mid-foot."],
-      cues:["Big breath/brace","Knees out","Chest over mid-foot"],
-      mistakes:["Soft brace","Heels popping","Knees collapsing in"] },
+      cues:["Big breath/brace","Knees out","Chest over mid-foot"], mistakes:["Soft brace","Heels popping","Knees collapsing in"] },
     { id:"bench", name:"Barbell Bench Press", muscles:["Chest","Triceps","Anterior delts"], level:"Intermediate", equipment:"Barbell/Bench", setsReps:"3–5 × 4–8",
       steps:["Eyes under bar; upper-back set; feet planted.","Lower to lower-sternum with forearms vertical.","Press back/up; keep shoulder blades retracted."],
-      cues:["Row it down","Press the floor","No bounce"],
-      mistakes:["Elbow flare","Loose upper back","Bouncing off chest"] },
+      cues:["Row it down","Press the floor","No bounce"], mistakes:["Elbow flare","Loose upper back","Bouncing off chest"] },
     { id:"latpd", name:"Lat Pulldown", muscles:["Lats","Biceps","Mid-back"], level:"Beginner+", equipment:"Pulldown machine", setsReps:"3–4 × 8–12",
       steps:["Set thigh pad; grasp bar slightly wider than shoulders.","Pull elbows to ribs/chest up; pause near collarbone.","Control the return to full stretch without shrugging."],
-      cues:["Elbows in pockets","Chest tall","Lead with lats"],
-      mistakes:["Leaning way back","Half reps","Shrugging neck"] },
+      cues:["Elbows in pockets","Chest tall","Lead with lats"], mistakes:["Leaning way back","Half reps","Shrugging neck"] },
     { id:"cable-row", name:"Seated Cable Row", muscles:["Lats","Rhomboids","Rear delts","Biceps"], level:"Beginner", equipment:"Cable/Row", setsReps:"3–4 × 8–12",
       steps:["Neutral spine, chest tall, shoulders down/back.","Pull handle to lower ribs; pause; return with control.","Keep wrists neutral; avoid excessive lean."],
-      cues:["Pull with elbows","Squeeze shoulder blades","Stay tall"],
-      mistakes:["Shrugging","Rounding lower back","Using momentum"] }
+      cues:["Pull with elbows","Squeeze shoulder blades","Stay tall"], mistakes:["Shrugging","Rounding lower back","Using momentum"] }
   ],
   lazy: [
     { id:"toe-curls", name:"Toe Curls (Seated/Standing)", muscles:["Intrinsic foot","Calves"], level:"Super easy", equipment:"None / Towel", setsReps:"2–3 × 10–20 each foot",
@@ -300,53 +367,51 @@ const LIBRARIES = {
   ]
 };
 
-/* ===== Drawer controls ===== */
-const drawer = document.getElementById('drawer');
-const scrim = document.getElementById('scrim');
-const openBtn = document.getElementById('openExercises');
-const closeBtn = document.getElementById('closeDrawer');
+/* ===== EXERCISES Drawer Controls ===== */
+const drawerExercises = document.getElementById('drawerExercises');
+const scrimExercises = document.getElementById('scrimExercises');
+const openExercises = document.getElementById('openExercises');
+const closeExercises = document.getElementById('closeExercises');
+
+function openDrawer(el,scrim){ el.classList.add('show'); scrim.classList.add('show'); el.setAttribute('aria-hidden','false'); scrim.setAttribute('aria-hidden','false'); }
+function closeDrawer(el,scrim){ el.classList.remove('show'); scrim.classList.remove('show'); el.setAttribute('aria-hidden','true'); scrim.setAttribute('aria-hidden','true'); }
+
+openExercises.addEventListener('click', ()=>{ openDrawer(drawerExercises, scrimExercises); closeExercises.focus(); });
+closeExercises.addEventListener('click', ()=>{ closeDrawer(drawerExercises, scrimExercises); });
+scrimExercises.addEventListener('click', ()=>{ closeDrawer(drawerExercises, scrimExercises); });
+
+/* Tabs & Search */
 const q = document.getElementById('q');
 const tabHome = document.getElementById('tabHome');
 const tabGym = document.getElementById('tabGym');
 const tabLazy = document.getElementById('tabLazy');
 const tabGames = document.getElementById('tabGames');
 const cards = document.getElementById('cards');
-const gamesPane = document.getElementById('gamesPane');
+const gamesHub = document.getElementById('gamesHub');
+const tapPane = document.getElementById('tapPane');
+const reflexPane = document.getElementById('reflexPane');
 
-let currentTab = 'home'; // 'home' | 'gym' | 'lazy' | 'games'
+let currentTab = 'home';
 let searchTerm = '';
-
-function openDrawer(){
-  drawer.classList.add('show'); scrim.classList.add('show');
-  drawer.setAttribute('aria-hidden','false'); scrim.setAttribute('aria-hidden','false');
-  closeBtn.focus();
-}
-function closeDrawer(){
-  drawer.classList.remove('show'); scrim.classList.remove('show');
-  drawer.setAttribute('aria-hidden','true'); scrim.setAttribute('aria-hidden','true');
-  openBtn.focus();
-}
-openBtn.addEventListener('click', openDrawer);
-closeBtn.addEventListener('click', closeDrawer);
-scrim.addEventListener('click', closeDrawer);
-addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('show')) closeDrawer(); });
 
 function setTab(tab){
   currentTab = tab;
-  tabHome.classList.toggle('active', tab==='home');
-  tabGym.classList.toggle('active', tab==='gym');
-  tabLazy.classList.toggle('active', tab==='lazy');
-  tabGames.classList.toggle('active', tab==='games');
+  [tabHome,tabGym,tabLazy,tabGames].forEach(b=>b.classList.toggle('active', b===(
+    tab==='home'?tabHome:tab==='gym'?tabGym:tab==='lazy'?tabLazy:tabGames
+  )));
   tabHome.setAttribute('aria-selected', tab==='home');
   tabGym.setAttribute('aria-selected', tab==='gym');
   tabLazy.setAttribute('aria-selected', tab==='lazy');
   tabGames.setAttribute('aria-selected', tab==='games');
 
+  // Reset game panes when switching tabs
+  showGamesHub();
+
   if(tab==='games'){
     cards.style.display='none';
-    gamesPane.style.display='grid';
+    gamesHub.style.display='grid';
   } else {
-    gamesPane.style.display='none';
+    gamesHub.style.display='none';
     cards.style.display='grid';
     const list = tab==='home' ? LIBRARIES.home : tab==='gym' ? LIBRARIES.gym : LIBRARIES.lazy;
     renderList(list);
@@ -371,7 +436,6 @@ function renderList(list){
   });
   cards.innerHTML = data.map(renderCard).join('');
 }
-
 function renderCard(ex){
   return `
     <article class="card" data-id="${ex.id}">
@@ -392,10 +456,38 @@ function renderCard(ex){
   `;
 }
 
+/* ===== Games: Hub control ===== */
+const pickTap = document.getElementById('pickTap');
+const pickReflex = document.getElementById('pickReflex');
+const tapBack = document.getElementById('tapBack');
+const reflexBack = document.getElementById('reflexBack');
+
+function showGamesHub(){
+  gamesHub.style.display='grid';
+  tapPane.classList.remove('active'); tapPane.style.display='none';
+  reflexPane.classList.remove('active'); reflexPane.style.display='none';
+  // stop games when leaving pane
+  tapStopGame(); reflexStopGame();
+}
+function showTapGame(){
+  gamesHub.style.display='none';
+  tapPane.style.display='block'; tapPane.classList.add('active');
+  reflexPane.style.display='none'; reflexPane.classList.remove('active');
+}
+function showReflexGame(){
+  gamesHub.style.display='none';
+  reflexPane.style.display='block'; reflexPane.classList.add('active');
+  tapPane.style.display='none'; tapPane.classList.remove('active');
+}
+pickTap.addEventListener('click', showTapGame);
+pickReflex.addEventListener('click', showReflexGame);
+tapBack.addEventListener('click', showGamesHub);
+reflexBack.addEventListener('click', showGamesHub);
+
 /* ========= Tap Sprint (wave-based, “Score” only) ========= */
 const tapArena = document.getElementById('tapArena');
 const tapStart = document.getElementById('tapStart');
-const tapStop  = document.getElementById('tapStop');
+const tapStopBtn  = document.getElementById('tapStop');
 const tapReset = document.getElementById('tapReset');
 const tapStat  = document.getElementById('tapStat');
 
@@ -405,77 +497,46 @@ let tapTargets = new Map(); // id -> element
 let tapNextId = 1;
 
 function tapUpdateStat(){ tapStat.textContent = `Score: ${tapScore}`; }
-
-function tapWaveSize(){
-  // increase with score; caps at 5
-  return Math.min(5, Math.floor(tapScore / 8) + 1);
-}
-
+function tapWaveSize(){ return Math.min(5, Math.floor(tapScore / 8) + 1); }
 function tapSpawnWave(){
   if(!tapRunning) return;
-  if(tapTargets.size > 0) return; // only after all cleared
+  if(tapTargets.size > 0) return;
   const n = tapWaveSize();
   for(let i=0;i<n;i++) tapSpawnOne();
 }
-
 function tapSpawnOne(){
   const id = tapNextId++;
   const el = document.createElement('button');
-  el.type='button';
-  el.className='target';
-  el.textContent='•';
-  el.setAttribute('aria-label','tap target');
-
-  // random position within arena
-  const pad = 60;
-  const rect = tapArena.getBoundingClientRect();
+  el.type='button'; el.className='target'; el.textContent='•'; el.setAttribute('aria-label','tap target');
+  const pad = 60, rect = tapArena.getBoundingClientRect();
   const x = Math.floor(Math.random() * Math.max(1, rect.width  - pad));
   const y = Math.floor(Math.random() * Math.max(1, rect.height - pad));
   el.style.left = `${x}px`; el.style.top = `${y}px`;
   el.dataset.id = String(id);
-
   const hit = (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); e.stopPropagation();
     if(!tapTargets.has(id)) return;
-    tapScore += 1;
-    tapUpdateStat();
-    const node = tapTargets.get(id);
-    tapTargets.delete(id);
-    node?.remove();
-    // when all cleared, spawn the next wave (fast)
-    if(tapRunning && tapTargets.size === 0){
-      setTimeout(tapSpawnWave, 0);
-    }
+    tapScore += 1; tapUpdateStat();
+    const node = tapTargets.get(id); tapTargets.delete(id); node?.remove();
+    if(tapRunning && tapTargets.size === 0){ setTimeout(tapSpawnWave, 0); }
   };
-  // multi-input friendly
   el.addEventListener('pointerdown', hit, {passive:false});
   el.addEventListener('click', hit, {passive:false});
-
-  tapArena.appendChild(el);
-  tapTargets.set(id, el);
+  tapArena.appendChild(el); tapTargets.set(id, el);
 }
-
-function tapStartGame(){
-  if(tapRunning) return;
-  tapRunning = true;
-  tapSpawnWave();
-}
+function tapStartGame(){ if(tapRunning) return; tapRunning = true; tapSpawnWave(); }
 function tapStopGame(){ tapRunning = false; }
-function tapResetGame(){
-  tapStopGame();
-  tapScore = 0; tapUpdateStat();
-  tapTargets.forEach(n=>n.remove()); tapTargets.clear();
-}
+function tapResetGame(){ tapStopGame(); tapScore = 0; tapUpdateStat(); tapTargets.forEach(n=>n.remove()); tapTargets.clear(); }
+
 tapStart.addEventListener('click', tapStartGame);
-tapStop .addEventListener('click', tapStopGame);
+tapStopBtn.addEventListener('click', tapStopGame);
 tapReset.addEventListener('click', tapResetGame);
 tapUpdateStat();
 
 /* ========= Reflex Sprint (tap or swipe; wrong => reset) ========= */
 const reflexArena = document.getElementById('reflexArena');
 const reflexStart = document.getElementById('reflexStart');
-const reflexStop  = document.getElementById('reflexStop');
+const reflexStopBtn  = document.getElementById('reflexStop');
 const reflexReset = document.getElementById('reflexReset');
 const reflexStat  = document.getElementById('reflexStat');
 const reflexActionEl = document.getElementById('reflexAction');
@@ -485,116 +546,79 @@ let reflexCount = 0;
 let currentAction = null; // 'tap','left','right','up','down'
 
 function setActionText(a){
-  reflexActionEl.textContent = a === 'tap' ? 'TAP' :
-    a === 'left' ? '←' :
-    a === 'right' ? '→' :
-    a === 'up' ? '↑' : '↓';
+  reflexActionEl.textContent = a === 'tap' ? 'TAP' : a === 'left' ? '←' : a === 'right' ? '→' : a === 'up' ? '↑' : '↓';
 }
-
 function nextAction(){
   const actions = ['tap','left','right','up','down'];
   currentAction = actions[Math.floor(Math.random()*actions.length)];
   setActionText(currentAction);
 }
-
 function reflexUpdate(){ reflexStat.textContent = `Count: ${reflexCount}`; }
+function flashBad(){ reflexArena.classList.add('flashBad'); setTimeout(()=>reflexArena.classList.remove('flashBad'), 150); }
+function failReset(){ reflexCount = 0; reflexUpdate(); flashBad(); nextAction(); }
+function success(){ reflexCount += 1; reflexUpdate(); nextAction(); }
 
-function flashBad(){
-  const old = reflexArena.style.backgroundColor;
-  reflexArena.classList.add('flashBad');
-  setTimeout(()=>{ reflexArena.classList.remove('flashBad'); }, 150);
-}
-
-function failReset(){
-  reflexCount = 0;
-  reflexUpdate();
-  flashBad();
-  nextAction();
-}
-
-function success(){
-  reflexCount += 1;
-  reflexUpdate();
-  nextAction();
-}
-
-function reflexStartGame(){
-  if(reflexRunning) return;
-  reflexRunning = true;
-  reflexCount = 0; reflexUpdate();
-  nextAction();
-}
+function reflexStartGame(){ if(reflexRunning) return; reflexRunning = true; reflexCount = 0; reflexUpdate(); nextAction(); }
 function reflexStopGame(){ reflexRunning = false; }
-function reflexResetGame(){
-  reflexStopGame();
-  reflexCount = 0; reflexUpdate();
-  currentAction = null; reflexActionEl.textContent = '—';
-}
+function reflexResetGame(){ reflexStopGame(); reflexCount = 0; reflexUpdate(); currentAction = null; reflexActionEl.textContent = '—'; }
+
 reflexStart.addEventListener('click', reflexStartGame);
-reflexStop .addEventListener('click', reflexStopGame);
+reflexStopBtn.addEventListener('click', reflexStopGame);
 reflexReset.addEventListener('click', reflexResetGame);
 
-/* Gesture detection for Reflex Sprint */
+/* Gesture detection */
 let sx=0, sy=0, st=0, tracking=false;
-const MAX_TIME = 600;  // fast
-const MIN_DIST = 40;   // px threshold for swipe
-const TAP_MAX_DIST = 12; // px for tap
-const TAP_MAX_TIME = 300; // ms for tap
+const MAX_TIME = 600, MIN_DIST = 40, TAP_MAX_DIST = 12, TAP_MAX_TIME = 300;
 
 function onReflexDown(e){
   if(!reflexRunning) return;
-  tracking = true;
-  sx = e.clientX; sy = e.clientY; st = performance.now();
+  tracking = true; sx = e.clientX; sy = e.clientY; st = performance.now();
 }
 function onReflexUp(e){
   if(!reflexRunning || !tracking) return;
   tracking = false;
-  const dx = e.clientX - sx;
-  const dy = e.clientY - sy;
-  const dt = performance.now() - st;
-
-  // Determine input
+  const dx = e.clientX - sx, dy = e.clientY - sy, dt = performance.now() - st;
   let input = null;
-  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){
-    input = 'tap';
-  } else if(dt <= MAX_TIME){
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){
-      input = dx > 0 ? 'right' : 'left';
-    } else if(Math.abs(dy) >= MIN_DIST){
-      input = dy > 0 ? 'down' : 'up';
-    }
+  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){ input='tap'; }
+  else if(dt <= MAX_TIME){
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){ input = dx > 0 ? 'right' : 'left'; }
+    else if(Math.abs(dy) >= MIN_DIST){ input = dy > 0 ? 'down' : 'up'; }
   }
-
-  if(!input){
-    // too slow or too short: consider it a fail to keep it intense
-    failReset();
-    return;
-    }
-
+  if(!input){ failReset(); return; }
   if(input === currentAction) success(); else failReset();
 }
-
 ['pointerdown','mousedown','touchstart'].forEach(type=>{
-  reflexArena.addEventListener(type, e=>{
-    // ignore synthetic mousedown if pointerdown exists
-    if(e.pointerType && type==='mousedown') return;
-    onReflexDown(e);
-  }, {passive:true});
+  reflexArena.addEventListener(type, e=>{ if(e.pointerType && type==='mousedown') return; onReflexDown(e); }, {passive:true});
 });
 ['pointerup','mouseup','touchend','pointercancel'].forEach(type=>{
-  reflexArena.addEventListener(type, e=>{
-    onReflexUp(e);
-  }, {passive:true});
+  reflexArena.addEventListener(type, e=>{ onReflexUp(e); }, {passive:true});
 });
 
+/* ===== KNOW YOURSELF Drawer Controls ===== */
+const drawerKnow = document.getElementById('drawerKnow');
+const scrimKnow = document.getElementById('scrimKnow');
+const openKnow = document.getElementById('openKnow');
+const closeKnow = document.getElementById('closeKnow');
+
+openKnow.addEventListener('click', ()=>{ openDrawer(drawerKnow, scrimKnow); closeKnow.focus(); });
+closeKnow.addEventListener('click', ()=>{ closeDrawer(drawerKnow, scrimKnow); });
+scrimKnow.addEventListener('click', ()=>{ closeDrawer(drawerKnow, scrimKnow); });
+
 /* ===== Init ===== */
-function initialRender(){
-  setTab('home');
-}
+function initialRender(){ setTab('home'); }
 initialRender();
+
+/* ESC closes whichever drawer is open */
+addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if(drawerExercises.classList.contains('show')) closeDrawer(drawerExercises, scrimExercises);
+    if(drawerKnow.classList.contains('show')) closeDrawer(drawerKnow, scrimKnow);
+  }
+});
 </script>
 </body>
 </html>
+
 
 
 
