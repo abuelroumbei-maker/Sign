@@ -10,11 +10,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <style>
   :root{
-    --fg:#e5e7eb; --muted:#9aa4b2; --card:#ffffffdd;
-    --bg1:#0b0d12; --bg2:#0e1320; --ink:#0a0b0f;
+    /* Refreshed, kid-friendly palette (still professional) */
+    --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
+    --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
+    --ink:#0a0b0f;
+    /* Muscle accents kept, add playful helpers */
     --muscle1:#8b1d2c; --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
+    --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
+
     --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
     --safe-bottom: env(safe-area-inset-bottom, 16px);
     --safe-top: env(safe-area-inset-top, 16px);
   }
@@ -22,11 +28,13 @@
   html,body{height:100%}
   body{
     margin:0; font-family:var(--body-font); color:#fff;
+    /* more colorful but calm background (no animation) */
     background:
-      radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--muscle2) 28%, transparent), transparent 60%),
-      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--muscle3) 28%, transparent), transparent 60%),
-      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
-    overflow:auto; /* no animations */
+      radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--play2) 35%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--play1) 28%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--play4) 22%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+    overflow:auto;
   }
 
   .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
@@ -43,7 +51,7 @@
   .wrap{
     min-height:100dvh;
     display:grid; place-items:center;
-    padding:calc(60px + var(--safe-top)) 18px calc(140px + var(--safe-bottom));
+    padding:calc(60px + var(--safe-top)) 18px calc(160px + var(--safe-bottom));
   }
   .title{
     margin:0; font-family:var(--title-font);
@@ -60,13 +68,15 @@
     position:fixed; left:50%; transform:translateX(-50%);
     bottom:calc(18px + var(--safe-bottom)); z-index:4;
     display:grid; grid-template-columns:1fr 1fr; gap:10px;
-    width:min(680px, 94vw);
+    width:min(720px, 94vw);
   }
-  @media (max-width:520px){ .ctaRow{grid-template-columns:1fr} }
+  @media (max-width:560px){ .ctaRow{grid-template-columns:1fr} }
   .cta{
-    background:linear-gradient(90deg, var(--muscle2), var(--muscle3));
-    color:var(--ink); border:none; padding:14px 18px; font-weight:900;
-    border-radius:16px; box-shadow:0 12px 28px rgba(0,0,0,.35);
+    background:
+      linear-gradient(90deg, var(--play2), var(--play1)),
+      linear-gradient(90deg, var(--muscle2), var(--muscle3));
+    color:var(--ink); border:none; padding:16px 18px; font-weight:900;
+    border-radius:18px; box-shadow:0 12px 28px rgba(0,0,0,.35);
     cursor:pointer; letter-spacing:.4px;
   }
 
@@ -76,7 +86,7 @@
   .drawer{
     position:fixed; inset:auto 0 0 0; height:min(90dvh, 900px);
     background:rgba(15,18,28,.9); backdrop-filter: blur(8px) saturate(1.2);
-    border-top:1px solid rgba(255,255,255,.25);
+    border-top:2px solid rgba(255,255,255,.25);
     display:none; z-index:7; box-shadow: 0 -30px 60px rgba(0,0,0,.45);
   }
   .drawer.show{display:block}
@@ -97,7 +107,7 @@
   /* Cards grid */
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
   @media (max-width:380px){ .grid{grid-template-columns:1fr} }
-  .card{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;}
+  .card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px;}
   .card h3{margin:0; font-size:18px; letter-spacing:.2px}
   .meta{font-size:12px; color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
   .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:11px}
@@ -110,14 +120,14 @@
   /* Games */
   .gamesHub{display:grid; grid-template-columns:1fr 1fr; gap:12px}
   @media (max-width:700px){ .gamesHub{grid-template-columns:1fr} }
-  .gamePick{background:#ffffff; color:#0a0b0f; border:none; border-radius:16px; padding:16px; font-weight:900; cursor:pointer}
+  .gamePick{background:linear-gradient(90deg, var(--play3), var(--play4)); color:#0a0b0f; border:none; border-radius:18px; padding:16px; font-weight:900; cursor:pointer}
   .gamePane{display:none}
   .gamePane.active{display:block}
-  .gameCard{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;}
+  .gameCard{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px;}
   .controlsRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
   .btn{border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer}
   .stat{font-weight:800; color:#e2e8f0; margin-left:auto}
-  .arena{position:relative; width:100%; height:420px; background:#0b1220; border:1px solid rgba(255,255,255,.2); border-radius:12px; touch-action:none; user-select:none}
+  .arena{position:relative; width:100%; height:420px; background:#0b1220; border:2px solid rgba(255,255,255,.25); border-radius:14px; touch-action:none; user-select:none}
   .target{position:absolute; width:54px; height:54px; border-radius:999px; background:linear-gradient(180deg, var(--muscle3), var(--muscle2)); border:2px solid #fff; display:grid; place-items:center; font-weight:900; color:#0a0b0f}
   .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
   .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
@@ -125,12 +135,15 @@
   .flashBad{background:#4a0a14 !important;}
 
   /* Know Yourself content */
-  .ky-section{display:grid; gap:12px}
-  .ky-note{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:12px}
-  .ky-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:12px}
-  .ky-card{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:12px; padding:12px}
+  .ky-section{display:grid; gap:14px}
+  .ky-note{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px}
+  .ky-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px}
+  .ky-card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px}
   .ky-card h3{margin:0 0 6px 0}
-  .ky-card ul{margin:.4em 0 .2em 1.1em}
+  .ky-card figure{margin:0}
+  .ky-card img{width:100%; height:auto; border-radius:10px; display:block; background:#0a0f1d}
+  .ky-cap{font-size:12px; color:#d1d5db}
+  .ky-cap a{color:#e5e7eb}
 </style>
 </head>
 <body>
@@ -240,65 +253,81 @@
     <div class="drawer-body">
       <div class="ky-section">
         <div class="ky-note">
-          <strong>Diagram coming soon:</strong> a realistic, age-appropriate human figure showing external parts and internal systems (skeleton, muscles, heart & blood, lungs, brain & nerves, digestion). No animations; clear labels; friendly colors for kids.
+          <strong>Realistic, kid-friendly diagrams</strong>—clear labels, bright but calm colors, no animations. <em>More views coming soon.</em>
         </div>
+
         <div class="ky-grid">
-          <div class="ky-card">
-            <h3>Skin (Your Super Suit)</h3>
+          <!-- Circulatory System -->
+          <article class="ky-card">
+            <h3>Heart & Blood (Circulatory System)</h3>
+            <figure>
+              <img
+                src="https://commons.wikimedia.org/wiki/Special:FilePath/Circulatory_System_en_rendersvg.png"
+                alt="Front view diagram of major arteries and veins across the body"
+                loading="lazy" decoding="async">
+            </figure>
+            <div class="ky-cap">Image: Wikimedia Commons, “Circulatory System” (PNG render). CC-compatible; vector version available. Attribution via page history.</div>
             <ul>
-              <li>Largest organ in your body—covers everything!</li>
-              <li>Helps keep germs out and water in.</li>
-              <li>Has tiny “doors” (pores) for sweat to cool you.</li>
+              <li>Your heart is a tireless muscle that pushes blood everywhere.</li>
+              <li>Arteries carry blood away from the heart; veins bring it back.</li>
+              <li>Capillaries are tiny bridges where oxygen & nutrients swap.</li>
             </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Skeleton (The Frame)</h3>
+          </article>
+
+          <!-- Digestive System -->
+          <article class="ky-card">
+            <h3>Food to Fuel (Digestive System)</h3>
+            <figure>
+              <img
+                src="https://commons.wikimedia.org/wiki/Special:FilePath/Adult_Digestive_System.png"
+                alt="Digestive system illustration showing stomach, liver, intestines"
+                loading="lazy" decoding="async">
+            </figure>
+            <div class="ky-cap">Image: BruceBlaus, “Adult Digestive System”. CC BY-SA 4.0 (Wikimedia Commons).</div>
             <ul>
-              <li>Adults have 206 bones; babies start with more that fuse.</li>
-              <li>Protects organs (ribs guard your heart & lungs).</li>
-              <li>Bone marrow makes new blood cells.</li>
+              <li>Your stomach squeezes; your intestines absorb nutrients.</li>
+              <li>The small intestine is over 6 meters long—coiled like a hose!</li>
+              <li>Friendly gut bacteria help make vitamins.</li>
             </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Muscles (Your Movers)</h3>
+          </article>
+
+          <!-- Internal Organs (overview) -->
+          <article class="ky-card">
+            <h3>Where Are My Organs?</h3>
+            <figure>
+              <img
+                src="https://commons.wikimedia.org/wiki/Special:FilePath/Surface_projections_of_the_organs_of_the_trunk.png"
+                alt="Surface projections of major trunk organs relative to ribs and spine"
+                loading="lazy" decoding="async">
+            </figure>
+            <div class="ky-cap">Image: “Surface projections of the organs of the trunk”. Wikimedia Commons. Public domain/CC per file page.</div>
             <ul>
-              <li>Over 600 muscles help you smile, jump, and blink.</li>
-              <li>They pull on bones like strong rubber bands.</li>
-              <li>Your heart is a special muscle that never rests.</li>
+              <li>Doctors use landmarks (ribs, belly button) to find organs.</li>
+              <li>Right side: liver sits high; left side: stomach and spleen.</li>
+              <li>The appendix lives low on the right (McBurney’s point).</li>
             </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Heart & Blood (The Delivery Team)</h3>
+          </article>
+
+          <!-- Body outline with organs (NIH) -->
+          <article class="ky-card">
+            <h3>Body Map (Brain & Kidneys)</h3>
+            <figure>
+              <img
+                src="https://niddk.nih.gov/-/media/Images/News/Media-Library/18227/18227.jpg"
+                alt="Human body outline showing brain and kidneys highlights"
+                loading="lazy" decoding="async">
+            </figure>
+            <div class="ky-cap">Image: NIDDK/NIH media asset. Credit: National Institute of Diabetes and Digestive and Kidney Diseases (NIH).</div>
             <ul>
-              <li>Your heart beats ~100,000 times a day.</li>
-              <li>Blood carries oxygen & food to every cell.</li>
-              <li>Arteries go away from the heart; veins return.</li>
+              <li>Your brain is the control room; kidneys filter your blood.</li>
+              <li>Kidneys balance water, minerals, and remove wastes.</li>
+              <li>Drink water and move often—your organs love it.</li>
             </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Lungs (Air Filters)</h3>
-            <ul>
-              <li>You have two lungs like spongy balloons.</li>
-              <li>They trade oxygen in and carbon dioxide out.</li>
-              <li>Hairs and mucus trap dust to keep airways clean.</li>
-            </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Brain & Nerves (The Control Room)</h3>
-            <ul>
-              <li>Your brain uses tiny signals to talk to your body.</li>
-              <li>Nerves are “wires” carrying messages super fast.</li>
-              <li>Sleep helps your brain sort memories and learn.</li>
-            </ul>
-          </div>
-          <div class="ky-card">
-            <h3>Digestion (Fuel Station)</h3>
-            <ul>
-              <li>Your stomach squeezes food like a washing machine.</li>
-              <li>The small intestine is a super long noodle (6+ meters!).</li>
-              <li>Good bacteria help you get vitamins from food.</li>
-            </ul>
-          </div>
+          </article>
+        </div>
+
+        <div class="ky-note">
+          Want front/back full-body views (with modesty/age-appropriate styling) or a labeled skeleton/muscle set? Say the word and I’ll add them next.
         </div>
       </div>
     </div>
