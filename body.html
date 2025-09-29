@@ -23,20 +23,18 @@
     --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-    /* Layout helpers */
     --safe-bottom: env(safe-area-inset-bottom, 16px);
     --safe-top: env(safe-area-inset-top, 16px);
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0; font-family:var(--body-font); color:#fff; background:var(--bg1);
-    /* Allow page scroll; no animation anywhere */
-    overflow:auto;
+    margin:0; font-family:var(--body-font); color:#fff;
     background:
       radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--muscle2) 28%, transparent), transparent 60%),
       radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--muscle3) 28%, transparent), transparent 60%),
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    overflow:auto; /* no animations */
   }
 
   .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
@@ -46,10 +44,10 @@
   .xpWrap{position:fixed; right:16px; top:16px; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw); z-index:5}
   .xp-badge{background:#ffffffdd; color:#0a0b0f; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.15)}
   .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
-  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--muscle2), var(--muscle3)); /* no transitions */ }
+  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--muscle2), var(--muscle3)); }
   .xp-meta{ position:fixed; right:16px; top:50px; font-size:12px; color:#cbd5e1; opacity:.9; z-index:5 }
 
-  /* Page content */
+  /* Page */
   .wrap{
     min-height:100dvh;
     display:grid; place-items:center;
@@ -61,16 +59,14 @@
     font-size:clamp(48px, 12vw, 112px);
     line-height:0.95;
     text-align:center;
-    color:#fff;
     letter-spacing:1px;
-    text-shadow:
-      0 2px 0 rgba(0,0,0,.35),
-      0 8px 24px rgba(139,29,44,.45);
-    /* Muscle gradient fill (no animation) */
     background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     border-bottom: 6px solid color-mix(in oklab, var(--muscle2) 60%, transparent);
     padding-bottom:10px;
+    text-shadow:
+      0 2px 0 rgba(0,0,0,.35),
+      0 8px 24px rgba(139,29,44,.45);
   }
   .subtitle{
     margin:14px 0 0; text-align:center; max-width:900px; color:#e2e8f0; font-weight:600;
@@ -94,11 +90,7 @@
     position:fixed; inset:auto 0 0 0; height:min(90dvh, 900px);
     background:rgba(15,18,28,.9); backdrop-filter: blur(8px) saturate(1.2);
     border-top:1px solid rgba(255,255,255,.25);
-    /* No slide animation; it just appears */
-    transform:translateY(0);
-    display:none;
-    z-index:7;
-    box-shadow: 0 -30px 60px rgba(0,0,0,.45);
+    display:none; z-index:7; box-shadow: 0 -30px 60px rgba(0,0,0,.45);
   }
   .drawer.show{display:block}
   .drawer-head{
@@ -112,49 +104,40 @@
   }
   .drawer-body{padding:14px 16px 20px; overflow:auto; height:calc(100% - 56px)}
 
-  /* Library header */
+  /* Tabs + search */
   .lib-top{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px}
-  .seg{
-    display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;
-  }
-  .seg button{
-    border:none; background:transparent; color:#e2e8f0; padding:10px 14px; border-radius:10px; font-weight:900; cursor:pointer
-  }
+  .seg{display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;}
+  .seg button{border:none; background:transparent; color:#e2e8f0; padding:10px 14px; border-radius:10px; font-weight:900; cursor:pointer}
   .seg button.active{background:#ffffff; color:#0a0b0f}
   .search{flex:1; min-width:220px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.14); border-radius:12px; padding:8px 12px}
   .search input{flex:1; background:transparent; border:none; color:#fff; outline:none; font-weight:700; font-size:14px}
 
-  /* Lazy Gains button (under Gym) */
-  .lazy-bar{
-    display:none; /* only visible for Gym tab */
-    margin:4px 0 12px; display:flex; gap:10px; flex-wrap:wrap;
-  }
-  .lazy-btn{
-    border:none; background:linear-gradient(90deg, var(--muscle2), var(--muscle3));
-    color:#0a0b0f; padding:10px 14px; border-radius:12px; font-weight:900; cursor:pointer;
-  }
-  .lazy-hint{color:#cbd5e1; font-size:12px}
-
-  /* Cards */
+  /* Cards grid */
   .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
   @media (max-width:380px){ .grid{grid-template-columns:1fr} }
-
-  .card{
-    background:rgba(255,255,255,.10);
-    border:1px solid rgba(255,255,255,.18);
-    border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;
-  }
+  .card{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;}
   .card h3{margin:0; font-size:18px; letter-spacing:.2px}
   .meta{font-size:12px; color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
   .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:11px}
-  .illustration{background:#0b1220; border-radius:12px; aspect-ratio:16/9; display:grid; place-items:center; overflow:hidden; border:1px solid rgba(255,255,255,.12)}
-  .controls{display:none} /* no play/reset now */
-
   details{border-top:1px dashed rgba(255,255,255,.2); padding-top:8px}
   details > summary{cursor:pointer; font-weight:800; list-style:none}
   details > summary::-webkit-details-marker{display:none}
   ul{margin:.4em 0 .2em 1.1em}
   li{margin:.2em 0}
+
+  /* Games */
+  .gamesPane{display:none; gap:14px}
+  .gameCard{background:rgba(255,255,255,.10); border:1px solid rgba(255,255,255,.18); border-radius:16px; padding:12px; display:flex; flex-direction:column; gap:10px;}
+  .gameCard h3{margin:0; font-size:18px}
+  .controlsRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
+  .btn{border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer}
+  .stat{font-weight:800; color:#e2e8f0; margin-left:auto}
+  .arena{position:relative; width:100%; height:360px; background:#0b1220; border:1px solid rgba(255,255,255,.2); border-radius:12px; touch-action:none; user-select:none}
+  @media (min-width:900px){ .gamesPane{display:grid; grid-template-columns:1fr 1fr} .arena{height:420px} }
+  .target{position:absolute; width:54px; height:54px; border-radius:999px; background:linear-gradient(180deg, var(--muscle3), var(--muscle2)); border:2px solid #fff; display:grid; place-items:center; font-weight:900; color:#0a0b0f}
+  .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
+  .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
+  .swipeNote{font-size:12px; color:#cbd5e1}
 </style>
 </head>
 <body>
@@ -177,7 +160,7 @@
   <main class="wrap">
     <header style="text-align:center">
       <h1 class="title">BODY</h1>
-      <p class="subtitle">Organized training choices—clear technique, real-world sets & reps, and a new <strong>Lazy Gains</strong> mode for ultra-simple movement you can do anywhere.</p>
+      <p class="subtitle">Organized training choices—clear technique, real-world sets & reps. Tabs: <strong>At Home</strong>, <strong>At the Gym</strong>, <strong>Lazy Gains</strong>, and <strong>Games</strong>.</p>
     </header>
   </main>
 
@@ -188,14 +171,16 @@
   <div class="scrim" id="scrim" aria-hidden="true"></div>
   <section class="drawer" id="drawer" role="dialog" aria-label="Exercises Library" aria-modal="true" aria-hidden="true">
     <header class="drawer-head">
-      <div class="drawer-title">Exercises Library</div>
+      <div class="drawer-title">Exercises</div>
       <button class="closeX" id="closeDrawer" aria-label="Close exercises">×</button>
     </header>
     <div class="drawer-body">
       <div class="lib-top">
-        <div class="seg" role="tablist" aria-label="Libraries">
+        <div class="seg" role="tablist" aria-label="Sections">
           <button class="active" id="tabHome" role="tab" aria-selected="true">At Home</button>
           <button id="tabGym" role="tab" aria-selected="false">At the Gym</button>
+          <button id="tabLazy" role="tab" aria-selected="false">Lazy Gains</button>
+          <button id="tabGames" role="tab" aria-selected="false">Games</button>
         </div>
         <label class="search" aria-label="Search exercises">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/></svg>
@@ -203,13 +188,40 @@
         </label>
       </div>
 
-      <!-- Lazy Gains bar: only visible when Gym tab is active -->
-      <div class="lazy-bar" id="lazyBar">
-        <button class="lazy-btn" id="lazyBtn">Lazy Gains</button>
-        <span class="lazy-hint">Ultra-simple techniques: toe curls, neck rolls, shoulder shrugs, deep breathing, eye movements.</span>
-      </div>
-
+      <!-- Library cards -->
       <div class="grid" id="cards" aria-live="polite"></div>
+
+      <!-- Games -->
+      <div class="gamesPane" id="gamesPane" aria-live="polite">
+        <!-- Tap Sprint -->
+        <section class="gameCard">
+          <h3>Tap Sprint</h3>
+          <div class="controlsRow">
+            <button class="btn" id="tapStart">Start</button>
+            <button class="btn" id="tapStop">Stop</button>
+            <button class="btn" id="tapReset">Reset</button>
+            <span class="stat" id="tapStat">Score: 0 • Level: 1</span>
+          </div>
+          <div class="arena" id="tapArena" aria-label="Tap arena"></div>
+          <p class="swipeNote">Tap the circles as fast as you can. Multi-touch supported. Level increases target count up to 5.</p>
+        </section>
+
+        <!-- Swipe Sprint -->
+        <section class="gameCard">
+          <h3>Swipe Sprint</h3>
+          <div class="controlsRow">
+            <button class="btn" id="swipeStart">Start</button>
+            <button class="btn" id="swipeStop">Stop</button>
+            <button class="btn" id="swipeReset">Reset</button>
+            <span class="stat" id="swipeStat">Correct: 0 • Attempts: 0</span>
+          </div>
+          <div class="controlsRow">
+            <span class="dirHint">Swipe direction: <span class="arrow" id="swipeDir">—</span></span>
+          </div>
+          <div class="arena" id="swipeArena" aria-label="Swipe arena"></div>
+          <p class="swipeNote">Make a quick swipe matching the shown arrow (↑ ↓ ← →). Touch or mouse drag.</p>
+        </section>
+      </div>
     </div>
   </section>
 
@@ -230,221 +242,60 @@ function updateXPUI(){
 updateXPUI();
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
 
-/* ===== Library Data (no animations, static SVGs) ===== */
+/* ===== Library Data (no SVG/illustrations) ===== */
 const LIBRARIES = {
   home: [
-    {
-      id:"pushup",
-      name:"Push-Up",
-      muscles:["Chest","Triceps","Anterior delts","Core"],
-      level:"Beginner+",
-      equipment:"Bodyweight",
-      setsReps:"3–4 × 6–12",
-      steps:[
-        "Hands under shoulders, body in a straight line, glutes/abs tight.",
-        "Lower with elbows ~45° from torso until chest is close to floor.",
-        "Press through palms, keeping ribs tucked and neck neutral."
-      ],
+    { id:"pushup", name:"Push-Up", muscles:["Chest","Triceps","Anterior delts","Core"], level:"Beginner+", equipment:"Bodyweight", setsReps:"3–4 × 6–12",
+      steps:["Hands under shoulders, body in a straight line, glutes/abs tight.","Lower with elbows ~45° from torso until chest is close to floor.","Press through palms, keeping ribs tucked and neck neutral."],
       cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"],
-      mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"],
-      illustration:"pushup"
-    },
-    {
-      id:"squat-bw",
-      name:"Bodyweight Squat",
-      muscles:["Quads","Glutes","Adductors","Core"],
-      level:"Beginner",
-      equipment:"Bodyweight",
-      setsReps:"3–4 × 10–15",
-      steps:[
-        "Feet shoulder-width, toes slightly out.",
-        "Sit hips back/down, knees track over toes, chest tall.",
-        "Descend to comfortable depth; drive mid-foot to stand."
-      ],
+      mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"] },
+    { id:"squat-bw", name:"Bodyweight Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3–4 × 10–15",
+      steps:["Feet shoulder-width, toes slightly out.","Sit hips back/down, knees track over toes, chest tall.","Descend to comfortable depth; drive mid-foot to stand."],
       cues:["Knees track with toes","Weight mid-foot","Brace before each rep"],
-      mistakes:["Heels lifting","Knees caving in","Losing brace at bottom"],
-      illustration:"squat"
-    },
-    {
-      id:"glute-bridge",
-      name:"Glute Bridge",
-      muscles:["Glutes","Hamstrings","Core"],
-      level:"Beginner",
-      equipment:"Bodyweight",
-      setsReps:"3 × 12–15 (1–2s squeeze top)",
-      steps:[
-        "Heels close to glutes, ribs down, pelvis neutral.",
-        "Drive through heels to lift hips; squeeze glutes at top.",
-        "Lower under control; avoid over-arching lower back."
-      ],
+      mistakes:["Heels lifting","Knees caving in","Losing brace at bottom"] },
+    { id:"glute-bridge", name:"Glute Bridge", muscles:["Glutes","Hamstrings","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 12–15 (1–2s squeeze top)",
+      steps:["Heels close to glutes, ribs down, pelvis neutral.","Drive through heels to lift hips; squeeze glutes at top.","Lower under control; avoid over-arching lower back."],
       cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"],
-      mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"],
-      illustration:"bridge"
-    },
-    {
-      id:"plank",
-      name:"Forearm Plank",
-      muscles:["Core","Glutes","Shoulders"],
-      level:"Beginner",
-      equipment:"Bodyweight",
-      setsReps:"3 × 20–40s",
-      steps:[
-        "Elbows under shoulders, forearms parallel.",
-        "Squeeze glutes, slight pelvic tuck, ribs down.",
-        "Hold straight line from ears to ankles; breathe."
-      ],
+      mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"] },
+    { id:"plank", name:"Forearm Plank", muscles:["Core","Glutes","Shoulders"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 20–40s",
+      steps:["Elbows under shoulders, forearms parallel.","Squeeze glutes, slight pelvic tuck, ribs down.","Hold straight line from ears to ankles; breathe."],
       cues:["Crush the floor","Long spine","Soft nasal inhale"],
-      mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"],
-      illustration:"plank"
-    }
+      mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"] }
   ],
   gym: [
-    {
-      id:"bb-squat",
-      name:"Barbell Back Squat",
-      muscles:["Quads","Glutes","Adductors","Core"],
-      level:"Intermediate",
-      equipment:"Barbell/Rack",
-      setsReps:"3–5 × 3–8",
-      steps:[
-        "Bar set just below traps; hands even, elbows under bar.",
-        "Unrack, step back, feet shoulder-width, brace hard.",
-        "Sit back/down keeping knees tracking; stand through mid-foot."
-      ],
+    { id:"bb-squat", name:"Barbell Back Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Intermediate", equipment:"Barbell/Rack", setsReps:"3–5 × 3–8",
+      steps:["Bar set just below traps; hands even, elbows under bar.","Unrack, step back, feet shoulder-width, brace hard.","Sit back/down keeping knees tracking; stand through mid-foot."],
       cues:["Big breath/brace","Knees out","Chest over mid-foot"],
-      mistakes:["Soft brace","Heels popping","Knees collapsing in"],
-      illustration:"squatBar"
-    },
-    {
-      id:"bench",
-      name:"Barbell Bench Press",
-      muscles:["Chest","Triceps","Anterior delts"],
-      level:"Intermediate",
-      equipment:"Barbell/Bench",
-      setsReps:"3–5 × 4–8",
-      steps:[
-        "Eyes under bar; upper-back set; feet planted.",
-        "Lower to lower-sternum with forearms vertical.",
-        "Press back/up; keep shoulder blades retracted."
-      ],
+      mistakes:["Soft brace","Heels popping","Knees collapsing in"] },
+    { id:"bench", name:"Barbell Bench Press", muscles:["Chest","Triceps","Anterior delts"], level:"Intermediate", equipment:"Barbell/Bench", setsReps:"3–5 × 4–8",
+      steps:["Eyes under bar; upper-back set; feet planted.","Lower to lower-sternum with forearms vertical.","Press back/up; keep shoulder blades retracted."],
       cues:["Row it down","Press the floor","No bounce"],
-      mistakes:["Elbow flare","Loose upper back","Bouncing off chest"],
-      illustration:"bench"
-    },
-    {
-      id:"latpd",
-      name:"Lat Pulldown",
-      muscles:["Lats","Biceps","Mid-back"],
-      level:"Beginner+",
-      equipment:"Pulldown machine",
-      setsReps:"3–4 × 8–12",
-      steps:[
-        "Set thigh pad; grasp bar slightly wider than shoulders.",
-        "Pull elbows to ribs/chest up; pause near collarbone.",
-        "Control the return to full stretch without shrugging."
-      ],
+      mistakes:["Elbow flare","Loose upper back","Bouncing off chest"] },
+    { id:"latpd", name:"Lat Pulldown", muscles:["Lats","Biceps","Mid-back"], level:"Beginner+", equipment:"Pulldown machine", setsReps:"3–4 × 8–12",
+      steps:["Set thigh pad; grasp bar slightly wider than shoulders.","Pull elbows to ribs/chest up; pause near collarbone.","Control the return to full stretch without shrugging."],
       cues:["Elbows in pockets","Chest tall","Lead with lats"],
-      mistakes:["Leaning way back","Half reps","Shrugging neck"],
-      illustration:"pulldown"
-    },
-    {
-      id:"cable-row",
-      name:"Seated Cable Row",
-      muscles:["Lats","Rhomboids","Rear delts","Biceps"],
-      level:"Beginner",
-      equipment:"Cable/Row",
-      setsReps:"3–4 × 8–12",
-      steps:[
-        "Neutral spine, chest tall, shoulders down/back.",
-        "Pull handle to lower ribs; pause; return with control.",
-        "Keep wrists neutral; avoid excessive lean."
-      ],
+      mistakes:["Leaning way back","Half reps","Shrugging neck"] },
+    { id:"cable-row", name:"Seated Cable Row", muscles:["Lats","Rhomboids","Rear delts","Biceps"], level:"Beginner", equipment:"Cable/Row", setsReps:"3–4 × 8–12",
+      steps:["Neutral spine, chest tall, shoulders down/back.","Pull handle to lower ribs; pause; return with control.","Keep wrists neutral; avoid excessive lean."],
       cues:["Pull with elbows","Squeeze shoulder blades","Stay tall"],
-      mistakes:["Shrugging","Rounding lower back","Using momentum"],
-      illustration:"row"
-    }
+      mistakes:["Shrugging","Rounding lower back","Using momentum"] }
   ],
   lazy: [
-    {
-      id:"toe-curls",
-      name:"Toe Curls (Seated/Standing)",
-      muscles:["Intrinsic foot","Calves"],
-      level:"Super easy",
-      equipment:"None / Towel",
-      setsReps:"2–3 × 10–20 each foot",
-      steps:[
-        "Barefoot if possible. Spread toes, then curl to scrunch a towel or the floor.",
-        "Hold 1s, then release and actively spread toes again.",
-        "Keep ankle neutral; avoid cramping by easing range."
-      ],
-      cues:["Slow squeeze","Full release","Breathe easy"],
-      mistakes:["Cramping from rushing","Ankle rolling in/out"],
-      illustration:"toe"
-    },
-    {
-      id:"neck-rolls",
-      name:"Neck Rolls (Gentle)",
-      muscles:["Neck flexors/extensors"],
-      level:"Super easy",
-      equipment:"None",
-      setsReps:"1–2 × 3 slow circles each way",
-      steps:[
-        "Sit/stand tall. Draw small comfortable circles with nose.",
-        "Go slow, pain-free range only.",
-        "Switch directions; keep shoulders relaxed."
-      ],
-      cues:["Tiny circles","Relax jaw","Easy breath"],
-      mistakes:["Forcing end-range","Shrugging shoulders"],
-      illustration:"neck"
-    },
-    {
-      id:"shrugs",
-      name:"Shoulder Shrugs",
-      muscles:["Upper traps"],
-      level:"Super easy",
-      equipment:"None",
-      setsReps:"2–3 × 10–15",
-      steps:[
-        "Stand tall. Lift shoulders toward ears without craning neck.",
-        "Pause 1s at top; lower under control.",
-        "Option: add light objects for load."
-      ],
-      cues:["Long neck","Even lift","Smooth lower"],
-      mistakes:["Chin jutting","Rolling shoulders excessively"],
-      illustration:"shrug"
-    },
-    {
-      id:"breathing",
-      name:"Deep Breathing (Box/4-7-8)",
-      muscles:["Diaphragm","Parasympathetic"],
-      level:"Super easy",
-      equipment:"None",
-      setsReps:"3–5 cycles",
-      steps:[
-        "Nasal inhale 4s → hold 4s → exhale 4s → hold 4s (box).",
-        "Or 4-7-8: inhale 4s → hold 7s → exhale 8s (mouth or nose).",
-        "Keep ribs down, shoulders relaxed, slow & quiet."
-      ],
-      cues:["Belly expands 360°","Soft jaw","Long exhale"],
-      mistakes:["Chest-only breathing","Rushing counts"],
-      illustration:"breath"
-    },
-    {
-      id:"eye-moves",
-      name:"Eye Movement Drills",
-      muscles:["Extraocular muscles"],
-      level:"Super easy",
-      equipment:"None",
-      setsReps:"2–3 × 20–30s",
-      steps:[
-        "Keep head still; move eyes: left↔right, up↕down, diagonals.",
-        "Finish with smooth circles both ways.",
-        "Blink normally; stop if dizzy."
-      ],
-      cues:["Slow tracks","Relax face","Blink and breathe"],
-      mistakes:["Straining at extremes","Holding breath"],
-      illustration:"eyes"
-    }
+    { id:"toe-curls", name:"Toe Curls (Seated/Standing)", muscles:["Intrinsic foot","Calves"], level:"Super easy", equipment:"None / Towel", setsReps:"2–3 × 10–20 each foot",
+      steps:["Barefoot if possible. Spread toes, then curl to scrunch a towel or the floor.","Hold 1s, then release and actively spread toes again.","Keep ankle neutral; avoid cramping by easing range."],
+      cues:["Slow squeeze","Full release","Breathe easy"], mistakes:["Cramping from rushing","Ankle rolling in/out"] },
+    { id:"neck-rolls", name:"Neck Rolls (Gentle)", muscles:["Neck flexors/extensors"], level:"Super easy", equipment:"None", setsReps:"1–2 × 3 slow circles each way",
+      steps:["Sit/stand tall. Draw small comfortable circles with nose.","Go slow, pain-free range only.","Switch directions; keep shoulders relaxed."],
+      cues:["Tiny circles","Relax jaw","Easy breath"], mistakes:["Forcing end-range","Shrugging shoulders"] },
+    { id:"shrugs", name:"Shoulder Shrugs", muscles:["Upper traps"], level:"Super easy", equipment:"None", setsReps:"2–3 × 10–15",
+      steps:["Stand tall. Lift shoulders toward ears without craning neck.","Pause 1s at top; lower under control.","Option: add light objects for load."],
+      cues:["Long neck","Even lift","Smooth lower"], mistakes:["Chin jutting","Rolling shoulders excessively"] },
+    { id:"breathing", name:"Deep Breathing (Box/4-7-8)", muscles:["Diaphragm","Parasympathetic"], level:"Super easy", equipment:"None", setsReps:"3–5 cycles",
+      steps:["Nasal inhale 4s → hold 4s → exhale 4s → hold 4s (box).","Or 4-7-8: inhale 4s → hold 7s → exhale 8s.","Keep ribs down, shoulders relaxed, slow & quiet."],
+      cues:["Belly expands 360°","Soft jaw","Long exhale"], mistakes:["Chest-only breathing","Rushing counts"] },
+    { id:"eye-moves", name:"Eye Movement Drills", muscles:["Extraocular muscles"], level:"Super easy", equipment:"None", setsReps:"2–3 × 20–30s",
+      steps:["Keep head still; move eyes: left↔right, up↕down, diagonals.","Finish with smooth circles both ways.","Blink normally; stop if dizzy."],
+      cues:["Slow tracks","Relax face","Blink and breathe"], mistakes:["Straining at extremes","Holding breath"] }
   ]
 };
 
@@ -456,18 +307,17 @@ const closeBtn = document.getElementById('closeDrawer');
 const q = document.getElementById('q');
 const tabHome = document.getElementById('tabHome');
 const tabGym = document.getElementById('tabGym');
-const lazyBar = document.getElementById('lazyBar');
-const lazyBtn = document.getElementById('lazyBtn');
+const tabLazy = document.getElementById('tabLazy');
+const tabGames = document.getElementById('tabGames');
 const cards = document.getElementById('cards');
+const gamesPane = document.getElementById('gamesPane');
 
-let currentLib = 'home';
+let currentTab = 'home'; // 'home' | 'gym' | 'lazy' | 'games'
 let searchTerm = '';
-let showingLazy = false;
 
 function openDrawer(){
   drawer.classList.add('show'); scrim.classList.add('show');
   drawer.setAttribute('aria-hidden','false'); scrim.setAttribute('aria-hidden','false');
-  // focus the close button for accessibility
   closeBtn.focus();
 }
 function closeDrawer(){
@@ -480,47 +330,48 @@ closeBtn.addEventListener('click', closeDrawer);
 scrim.addEventListener('click', closeDrawer);
 addEventListener('keydown', e=>{ if(e.key==='Escape' && drawer.classList.contains('show')) closeDrawer(); });
 
-tabHome.addEventListener('click', ()=>{
-  currentLib='home'; showingLazy=false;
-  tabHome.classList.add('active'); tabGym.classList.remove('active');
-  tabHome.setAttribute('aria-selected','true'); tabGym.setAttribute('aria-selected','false');
-  lazyBar.style.display='none';
-  render();
+function setTab(tab){
+  currentTab = tab;
+  tabHome.classList.toggle('active', tab==='home');
+  tabGym.classList.toggle('active', tab==='gym');
+  tabLazy.classList.toggle('active', tab==='lazy');
+  tabGames.classList.toggle('active', tab==='games');
+  tabHome.setAttribute('aria-selected', tab==='home');
+  tabGym.setAttribute('aria-selected', tab==='gym');
+  tabLazy.setAttribute('aria-selected', tab==='lazy');
+  tabGames.setAttribute('aria-selected', tab==='games');
+
+  if(tab==='games'){
+    cards.style.display='none';
+    gamesPane.style.display='grid';
+  } else {
+    gamesPane.style.display='none';
+    cards.style.display='grid';
+    const list = tab==='home' ? LIBRARIES.home : tab==='gym' ? LIBRARIES.gym : LIBRARIES.lazy;
+    renderList(list);
+  }
+}
+tabHome.addEventListener('click', ()=>setTab('home'));
+tabGym.addEventListener('click', ()=>setTab('gym'));
+tabLazy.addEventListener('click', ()=>setTab('lazy'));
+tabGames.addEventListener('click', ()=>setTab('games'));
+
+q.addEventListener('input', ()=>{
+  searchTerm = q.value.toLowerCase();
+  if(currentTab==='games') return;
+  const list = currentTab==='home' ? LIBRARIES.home : currentTab==='gym' ? LIBRARIES.gym : LIBRARIES.lazy;
+  renderList(list);
 });
-tabGym.addEventListener('click', ()=>{
-  currentLib='gym'; showingLazy=false;
-  tabGym.classList.add('active'); tabHome.classList.remove('active');
-  tabGym.setAttribute('aria-selected','true'); tabHome.setAttribute('aria-selected','false');
-  lazyBar.style.display='flex';
-  render();
-});
 
-q.addEventListener('input', ()=>{ searchTerm = q.value.toLowerCase(); render(); });
-
-lazyBtn.addEventListener('click', ()=>{
-  // Toggle Lazy Gains view under Gym
-  showingLazy = true;
-  render();
-});
-
-/* ===== Rendering ===== */
-function render(){
-  let base = [];
-  if(currentLib==='home'){ base = LIBRARIES.home; }
-  if(currentLib==='gym' && !showingLazy){ base = LIBRARIES.gym; }
-  if(currentLib==='gym' && showingLazy){ base = LIBRARIES.lazy; }
-
-  const data = base.filter(item=>{
-    if(!searchTerm) return true;
+function renderList(list){
+  const data = !searchTerm ? list : list.filter(item=>{
     const hay = (item.name+' '+item.muscles.join(' ')+' '+(item.equipment||'')+' '+(item.level||'')).toLowerCase();
     return hay.includes(searchTerm);
   });
-
   cards.innerHTML = data.map(renderCard).join('');
 }
 
 function renderCard(ex){
-  const muscles = ex.muscles.map(m=>`<span class="badge">${m}</span>`).join(' ');
   return `
     <article class="card" data-id="${ex.id}">
       <h3>${ex.name}</h3>
@@ -528,9 +379,7 @@ function renderCard(ex){
         ${ex.level?`<span class="badge">${ex.level}</span>`:''}
         ${ex.equipment?`<span class="badge">${ex.equipment}</span>`:''}
         ${ex.setsReps?`<span class="badge">${ex.setsReps}</span>`:''}
-      </div>
-      <div class="illustration" id="illu-${ex.id}">
-        ${staticSVG(ex.illustration)}
+        ${ex.muscles?.length? ex.muscles.slice(0,3).map(m=>`<span class="badge">${m}</span>`).join('') : ''}
       </div>
       <details>
         <summary>Technique steps</summary>
@@ -542,81 +391,175 @@ function renderCard(ex){
   `;
 }
 
-/* ===== Static SVGs (no motion) ===== */
-function staticSVG(kind){
-  const base = (body)=>`
-    <svg viewBox="0 0 240 135" width="100%" height="100%" aria-hidden="true">
-      <rect width="240" height="135" fill="#0b1220"/>
-      ${body}
-    </svg>`;
-  switch(kind){
-    case 'pushup': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="70" y="80" width="100" height="10" rx="5" fill="#e07a7a"/>
-      <circle cx="65" cy="85" r="7" fill="#f9c2c2"/>
-      <circle cx="175" cy="85" r="7" fill="#f9c2c2"/>`);
-    case 'squat': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="110" y="65" width="20" height="30" rx="6" fill="#e07a7a"/>
-      <rect x="95" y="40" width="50" height="20" rx="8" fill="#c53030"/>
-      <rect x="84" y="95" width="30" height="8" rx="4" fill="#f9c2c2"/>
-      <rect x="126" y="95" width="30" height="8" rx="4" fill="#f9c2c2"/>`);
-    case 'bridge': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="40" y="100" width="50" height="8" rx="4" fill="#f9c2c2"/>
-      <rect x="150" y="100" width="50" height="8" rx="4" fill="#f9c2c2"/>
-      <rect x="95" y="70" width="50" height="16" rx="8" fill="#e07a7a"/>`);
-    case 'plank': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="40" y="85" width="160" height="8" rx="4" fill="#e07a7a"/>
-      <circle cx="35" cy="89" r="6" fill="#f9c2c2"/>
-      <circle cx="205" cy="89" r="6" fill="#f9c2c2"/>`);
-    case 'squatBar': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="80" y="40" width="80" height="14" rx="7" fill="#f9c2c2"/>
-      <rect x="110" y="54" width="20" height="36" rx="6" fill="#e07a7a"/>
-      <rect x="100" y="90" width="16" height="8" rx="4" fill="#c53030"/>
-      <rect x="124" y="90" width="16" height="8" rx="4" fill="#c53030"/>`);
-    case 'bench': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="60" y="90" width="120" height="8" rx="4" fill="#1f2937"/>
-      <rect x="70" y="50" width="100" height="10" rx="5" fill="#f9c2c2"/>
-      <rect x="100" y="76" width="40" height="10" rx="5" fill="#e07a7a"/>`);
-    case 'pulldown': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="118" y="0" width="4" height="80" fill="#f9c2c2"/>
-      <rect x="90" y="65" width="60" height="8" rx="4" fill="#e07a7a"/>
-      <rect x="110" y="80" width="20" height="20" rx="6" fill="#c53030"/>`);
-    case 'row': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="40" y="90" width="50" height="10" rx="5" fill="#c53030"/>
-      <rect x="95" y="95" width="35" height="6" rx="3" fill="#e07a7a"/>`);
-    /* Lazy Gains icons */
-    case 'toe': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <circle cx="90" cy="90" r="12" fill="#f9c2c2"/><rect x="100" y="86" width="50" height="8" rx="4" fill="#e07a7a"/>`);
-    case 'neck': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <circle cx="120" cy="60" r="16" fill="#f9c2c2"/><rect x="112" y="78" width="16" height="28" rx="6" fill="#e07a7a"/>`);
-    case 'shrug': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="95" y="60" width="50" height="30" rx="6" fill="#e07a7a"/><rect x="90" y="90" width="60" height="12" rx="6" fill="#c53030"/>`);
-    case 'breath': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <rect x="75" y="68" width="90" height="18" rx="9" fill="#e07a7a"/><circle cx="170" cy="77" r="6" fill="#f9c2c2"/>`);
-    case 'eyes': return base(`
-      <rect x="0" y="110" width="240" height="4" fill="#1f2937"/>
-      <ellipse cx="95" cy="70" rx="18" ry="10" fill="#f9c2c2"/><circle cx="95" cy="70" r="4" fill="#0b0d12"/>
-      <ellipse cx="145" cy="70" rx="18" ry="10" fill="#f9c2c2"/><circle cx="145" cy="70" r="4" fill="#0b0d12"/>`);
-    default: return base(`<text x="16" y="72" fill="#cbd5e1" font-size="14" font-weight="700">Demo</text>`);
+/* ========= Games: Tap Sprint ========= */
+const tapArena = document.getElementById('tapArena');
+const tapStart = document.getElementById('tapStart');
+const tapStop  = document.getElementById('tapStop');
+const tapReset = document.getElementById('tapReset');
+const tapStat  = document.getElementById('tapStat');
+
+let tapRunning = false;
+let tapScore = 0;
+let tapLevel = 1;           // increases with score
+let tapTargets = new Map(); // id -> element
+let tapNextId = 1;
+let tapSpawner = null;
+
+function tapUpdateStat(){ tapStat.textContent = `Score: ${tapScore} • Level: ${tapLevel}`; }
+function tapComputeLevel(){ tapLevel = Math.min(5, Math.floor(tapScore / 8) + 1); } // +8 score per level, cap 5
+function tapMaxConcurrent(){ return tapLevel; }
+function tapSpawnOne(){
+  if(!tapRunning) return;
+  if(tapTargets.size >= tapMaxConcurrent()) return;
+  const id = tapNextId++;
+  const el = document.createElement('button');
+  el.type='button';
+  el.className='target';
+  el.textContent='•';
+  el.setAttribute('aria-label','tap target');
+  const pad = 60;
+  const rect = tapArena.getBoundingClientRect();
+  const x = Math.floor(Math.random() * Math.max(1, rect.width  - pad));
+  const y = Math.floor(Math.random() * Math.max(1, rect.height - pad));
+  el.style.left = `${x}px`; el.style.top = `${y}px`;
+  el.dataset.id = String(id);
+
+  const hit = ()=>{
+    if(!tapTargets.has(id)) return;
+    tapScore += 1;
+    tapComputeLevel();
+    tapUpdateStat();
+    const node = tapTargets.get(id);
+    tapTargets.delete(id);
+    node?.remove();
+    setTimeout(tapSpawnOne, 0);
+  };
+  el.addEventListener('pointerdown', hit, {passive:true});
+  el.addEventListener('click', hit, {passive:true});
+
+  tapArena.appendChild(el);
+  tapTargets.set(id, el);
+
+  // Despawn if missed
+  setTimeout(()=>{
+    if(tapTargets.has(id)){
+      const node = tapTargets.get(id);
+      tapTargets.delete(id);
+      node?.remove();
+      if(tapRunning) tapSpawnOne();
+    }
+  }, Math.max(900, 1800 - tapLevel*120));
+}
+function tapTick(){
+  while(tapTargets.size < tapMaxConcurrent()) tapSpawnOne();
+}
+function tapStartGame(){
+  if(tapRunning) return;
+  tapRunning = true;
+  tapSpawner = setInterval(tapTick, 300);
+  tapTick();
+}
+function tapStopGame(){
+  tapRunning = false;
+  clearInterval(tapSpawner); tapSpawner=null;
+}
+function tapResetGame(){
+  tapStopGame();
+  tapScore = 0; tapLevel = 1; tapUpdateStat();
+  tapTargets.forEach(n=>n.remove()); tapTargets.clear();
+}
+tapStart.addEventListener('click', tapStartGame);
+tapStop .addEventListener('click', tapStopGame);
+tapReset.addEventListener('click', tapResetGame);
+tapUpdateStat();
+
+/* ========= Games: Swipe Sprint ========= */
+const swipeArena = document.getElementById('swipeArena');
+const swipeStart = document.getElementById('swipeStart');
+const swipeStop  = document.getElementById('swipeStop');
+const swipeReset = document.getElementById('swipeReset');
+const swipeStat  = document.getElementById('swipeStat');
+const swipeDirEl = document.getElementById('swipeDir');
+
+let swipeRunning = false;
+let swipeCorrect = 0;
+let swipeAttempts = 0;
+let swipeCurrentDir = null; // 'up','down','left','right'
+
+function nextSwipeDir(){
+  const dirs = ['up','down','left','right'];
+  swipeCurrentDir = dirs[Math.floor(Math.random()*dirs.length)];
+  swipeDirEl.textContent = (
+    swipeCurrentDir==='up' ? '↑' :
+    swipeCurrentDir==='down' ? '↓' :
+    swipeCurrentDir==='left' ? '←' : '→'
+  );
+}
+function swipeUpdateStat(){
+  swipeStat.textContent = `Correct: ${swipeCorrect} • Attempts: ${swipeAttempts}`;
+}
+function swipeStartGame(){
+  if(swipeRunning) return;
+  swipeRunning = true;
+  nextSwipeDir();
+}
+function swipeStopGame(){ swipeRunning=false; }
+function swipeResetGame(){
+  swipeStopGame();
+  swipeCorrect=0; swipeAttempts=0; swipeUpdateStat();
+  swipeDirEl.textContent='—'; swipeCurrentDir=null;
+}
+swipeStart.addEventListener('click', swipeStartGame);
+swipeStop .addEventListener('click', swipeStopGame);
+swipeReset.addEventListener('click', swipeResetGame);
+swipeUpdateStat();
+
+// Gesture detection (mouse + touch via Pointer Events)
+let startX=0, startY=0, startT=0, tracking=false;
+function onSwipeStart(e){
+  if(!swipeRunning) return;
+  tracking=true;
+  startX = e.clientX; startY = e.clientY; startT = performance.now();
+}
+function onSwipeEnd(e){
+  if(!swipeRunning || !tracking) return;
+  tracking=false;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
+  const dt = performance.now() - startT;
+
+  const minDist = 40;  // px
+  const maxTime = 800; // ms
+  let dir = null;
+  if(dt <= maxTime){
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= minDist){
+      dir = dx > 0 ? 'right' : 'left';
+    } else if(Math.abs(dy) >= minDist){
+      dir = dy > 0 ? 'down' : 'up';
+    }
+  }
+
+  if(dir){
+    swipeAttempts += 1;
+    if(dir === swipeCurrentDir){
+      swipeCorrect += 1;
+      nextSwipeDir();
+    }
+    swipeUpdateStat();
   }
 }
+['pointerdown','mousedown','touchstart'].forEach(type=>swipeArena.addEventListener(type, e=>{ if(e.pointerType!=='mouse'||type!=='mousedown') onSwipeStart(e); }, {passive:true}));
+['pointerup','mouseup','touchend','pointercancel'].forEach(type=>swipeArena.addEventListener(type, e=>{ onSwipeEnd(e); }, {passive:true}));
 
-/* Initial render */
-render();
+/* ===== Init ===== */
+function initialRender(){
+  setTab('home');
+}
+initialRender();
 </script>
 </body>
 </html>
+
 
 
 
