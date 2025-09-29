@@ -232,13 +232,13 @@
             <button class="btn" id="reflexStart">Start</button>
             <button class="btn" id="reflexStop">Stop</button>
             <button class="btn" id="reflexReset">Reset</button>
-            <span class="stat" id="reflexStat">Count: 0</span>
+            <span class="stat" id="reflexStat">Score: 0</span>
           </div>
           <div class="controlsRow">
             <span class="dirHint">Do this now → <span class="arrow" id="reflexAction">—</span></span>
           </div>
           <div class="arena" id="reflexArena" aria-label="Reflex arena"></div>
-          <p class="swipeNote">Respond fast: TAP or SWIPE ← → ↑ ↓. Wrong move resets your Count to 0.</p>
+          <p class="swipeNote">Respond fast: TAP or SWIPE ← → ↑ ↓. Wrong move resets your Score to 0.</p>
         </section>
       </div>
     </div>
@@ -346,6 +346,68 @@ function updateXPUI(){
 }
 updateXPUI();
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
+
+/* ===== Simple sound engine (fiery SFX via Web Audio API) ===== */
+const SFX = (()=>{
+  let ctx = null;
+  const ensure = ()=>{
+    if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); }
+    if(ctx.state === 'suspended'){ ctx.resume(); }
+    return ctx;
+  };
+  const env = (node, t, a=0.005, d=0.12, s=0.0, r=0.15, peak=0.9)=>{
+    const g = node.gain || node; // allow passing a GainNode or AudioParam
+    const now = t;
+    g.cancelScheduledValues(now);
+    g.setValueAtTime(0.0001, now);
+    g.linearRampToValueAtTime(peak, now+a);
+    g.linearRampToValueAtTime(s, now+a+d);
+    g.exponentialRampToValueAtTime(0.0001, Math.max(now+a+d+r, now+a+d+0.15));
+  };
+  const noiseBuffer = ()=>{
+    const c = ensure();
+    const len = c.sampleRate * 0.35;
+    const buf = c.createBuffer(1, len, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len); // slight tail
+    return buf;
+  };
+  const cachedNoise = noiseBuffer();
+
+  function whoosh(){
+    const c = ensure(); const t = c.currentTime;
+    const n = c.createBufferSource(); n.buffer = cachedNoise;
+    const g = c.createGain();
+    const bp = c.createBiquadFilter(); bp.type='highpass'; bp.frequency.value=400;
+    n.connect(bp); bp.connect(g); g.connect(c.destination);
+    env(g, t, 0.005, 0.25, 0.0008, 0.25, 0.7);
+    n.playbackRate.value = 1.2;
+    n.start(t);
+  }
+  function ignite(){
+    const c = ensure(); const t = c.currentTime;
+    // click + short noise burst
+    const o = c.createOscillator(); o.type='square'; o.frequency.setValueAtTime(280, t);
+    const og = c.createGain(); env(og, t, 0.001, 0.05, 0.0, 0.05, 0.8);
+    const n = c.createBufferSource(); n.buffer = cachedNoise;
+    const ng = c.createGain(); env(ng, t, 0.001, 0.08, 0.0, 0.06, 0.6);
+    const hp = c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1200;
+
+    o.connect(og).connect(c.destination);
+    n.connect(hp).connect(ng).connect(c.destination);
+    o.start(t); o.stop(t+0.15); n.start(t);
+  }
+  function boom(){
+    const c = ensure(); const t = c.currentTime;
+    const o = c.createOscillator(); o.type='triangle'; o.frequency.setValueAtTime(160, t);
+    o.frequency.exponentialRampToValueAtTime(60, t+0.25);
+    const g = c.createGain(); env(g, t, 0.002, 0.18, 0.0008, 0.4, 0.9);
+    const lp = c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=600;
+    o.connect(lp).connect(g).connect(c.destination);
+    o.start(t); o.stop(t+0.5);
+  }
+  return { whoosh, ignite, boom, ensure };
+})();
 
 /* ===== Data ===== */
 const LIBRARIES = {
@@ -530,6 +592,7 @@ function tapWaveSize(){ return Math.min(5, Math.floor(tapScore / 8) + 1); }
 function tapSpawnWave(){
   if(!tapRunning) return;
   if(tapTargets.size > 0) return;
+  SFX.whoosh();
   const n = tapWaveSize();
   for(let i=0;i<n;i++) tapSpawnOne();
 }
@@ -545,7 +608,7 @@ function tapSpawnOne(){
   const hit = (e)=>{
     e.preventDefault(); e.stopPropagation();
     if(!tapTargets.has(id)) return;
-    tapScore += 1; tapUpdateStat();
+    tapScore += 1; tapUpdateStat(); SFX.ignite();
     const node = tapTargets.get(id); tapTargets.delete(id); node?.remove();
     if(tapRunning && tapTargets.size === 0){ setTimeout(tapSpawnWave, 0); }
   };
@@ -553,7 +616,7 @@ function tapSpawnOne(){
   el.addEventListener('click', hit, {passive:false});
   tapArena.appendChild(el); tapTargets.set(id, el);
 }
-function tapStartGame(){ if(tapRunning) return; tapRunning = true; tapSpawnWave(); }
+function tapStartGame(){ if(tapRunning) return; SFX.ensure(); SFX.whoosh(); tapRunning = true; tapSpawnWave(); }
 function tapStopGame(){ tapRunning = false; }
 function tapResetGame(){ tapStopGame(); tapScore = 0; tapUpdateStat(); tapTargets.forEach(n=>n.remove()); tapTargets.clear(); }
 
@@ -571,7 +634,7 @@ const reflexStat  = document.getElementById('reflexStat');
 const reflexActionEl = document.getElementById('reflexAction');
 
 let reflexRunning = false;
-let reflexCount = 0;
+let reflexScore = 0;
 let currentAction = null; // 'tap','left','right','up','down'
 
 function setActionText(a){
@@ -582,14 +645,14 @@ function nextAction(){
   currentAction = actions[Math.floor(Math.random()*actions.length)];
   setActionText(currentAction);
 }
-function reflexUpdate(){ reflexStat.textContent = `Count: ${reflexCount}`; }
+function reflexUpdate(){ reflexStat.textContent = `Score: ${reflexScore}`; }
 function flashBad(){ reflexArena.classList.add('flashBad'); setTimeout(()=>reflexArena.classList.remove('flashBad'), 150); }
-function failReset(){ reflexCount = 0; reflexUpdate(); flashBad(); nextAction(); }
-function success(){ reflexCount += 1; reflexUpdate(); nextAction(); }
+function failReset(){ reflexScore = 0; reflexUpdate(); flashBad(); SFX.boom(); nextAction(); }
+function success(){ reflexScore += 1; reflexUpdate(); SFX.ignite(); nextAction(); }
 
-function reflexStartGame(){ if(reflexRunning) return; reflexRunning = true; reflexCount = 0; reflexUpdate(); nextAction(); }
+function reflexStartGame(){ if(reflexRunning) return; SFX.ensure(); reflexRunning = true; reflexScore = 0; reflexUpdate(); SFX.whoosh(); nextAction(); }
 function reflexStopGame(){ reflexRunning = false; }
-function reflexResetGame(){ reflexStopGame(); reflexCount = 0; reflexUpdate(); currentAction = null; reflexActionEl.textContent = '—'; }
+function reflexResetGame(){ reflexStopGame(); reflexScore = 0; reflexUpdate(); currentAction = null; reflexActionEl.textContent = '—'; }
 
 reflexStart.addEventListener('click', reflexStartGame);
 reflexStopBtn.addEventListener('click', reflexStopGame);
@@ -619,7 +682,7 @@ function onReflexUp(e){
 ['pointerdown','mousedown','touchstart'].forEach(type=>{
   reflexArena.addEventListener(type, e=>{ if(e.pointerType && type==='mousedown') return; onReflexDown(e); }, {passive:true});
 });
-['pointerup','mouseup','touchend','pointercancel'].forEach(type=>{
+['pointerup','mouseup','touchend','pointercancel','pointerleave'].forEach(type=>{
   reflexArena.addEventListener(type, e=>{ onReflexUp(e); }, {passive:true});
 });
 
