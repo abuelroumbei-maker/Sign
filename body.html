@@ -138,6 +138,7 @@
   .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
   .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
   .swipeNote{font-size:12px; color:#cbd5e1}
+  .flashBad{background:#4a0a14 !important;} /* quick error flash (we toggle it briefly) */
 </style>
 </head>
 <body>
@@ -200,26 +201,26 @@
             <button class="btn" id="tapStart">Start</button>
             <button class="btn" id="tapStop">Stop</button>
             <button class="btn" id="tapReset">Reset</button>
-            <span class="stat" id="tapStat">Score: 0 • Level: 1</span>
+            <span class="stat" id="tapStat">Score: 0</span>
           </div>
           <div class="arena" id="tapArena" aria-label="Tap arena"></div>
-          <p class="swipeNote">Tap the circles as fast as you can. Multi-touch supported. Level increases target count up to 5.</p>
+          <p class="swipeNote">Tap all circles. New circles only appear after you clear the current wave. Max 5 per wave.</p>
         </section>
 
-        <!-- Swipe Sprint -->
+        <!-- Reflex Sprint (swipe/tap) -->
         <section class="gameCard">
-          <h3>Swipe Sprint</h3>
+          <h3>Reflex Sprint</h3>
           <div class="controlsRow">
-            <button class="btn" id="swipeStart">Start</button>
-            <button class="btn" id="swipeStop">Stop</button>
-            <button class="btn" id="swipeReset">Reset</button>
-            <span class="stat" id="swipeStat">Correct: 0 • Attempts: 0</span>
+            <button class="btn" id="reflexStart">Start</button>
+            <button class="btn" id="reflexStop">Stop</button>
+            <button class="btn" id="reflexReset">Reset</button>
+            <span class="stat" id="reflexStat">Count: 0</span>
           </div>
           <div class="controlsRow">
-            <span class="dirHint">Swipe direction: <span class="arrow" id="swipeDir">—</span></span>
+            <span class="dirHint">Do this now → <span class="arrow" id="reflexAction">—</span></span>
           </div>
-          <div class="arena" id="swipeArena" aria-label="Swipe arena"></div>
-          <p class="swipeNote">Make a quick swipe matching the shown arrow (↑ ↓ ← →). Touch or mouse drag.</p>
+          <div class="arena" id="reflexArena" aria-label="Reflex arena"></div>
+          <p class="swipeNote">Respond fast: TAP or SWIPE ← → ↑ ↓. Wrong move resets your Count to 0.</p>
         </section>
       </div>
     </div>
@@ -242,7 +243,7 @@ function updateXPUI(){
 updateXPUI();
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
 
-/* ===== Library Data (no SVG/illustrations) ===== */
+/* ===== Library Data (no graphics) ===== */
 const LIBRARIES = {
   home: [
     { id:"pushup", name:"Push-Up", muscles:["Chest","Triceps","Anterior delts","Core"], level:"Beginner+", equipment:"Bodyweight", setsReps:"3–4 × 6–12",
@@ -391,7 +392,7 @@ function renderCard(ex){
   `;
 }
 
-/* ========= Games: Tap Sprint ========= */
+/* ========= Tap Sprint (wave-based, “Score” only) ========= */
 const tapArena = document.getElementById('tapArena');
 const tapStart = document.getElementById('tapStart');
 const tapStop  = document.getElementById('tapStop');
@@ -400,23 +401,32 @@ const tapStat  = document.getElementById('tapStat');
 
 let tapRunning = false;
 let tapScore = 0;
-let tapLevel = 1;           // increases with score
 let tapTargets = new Map(); // id -> element
 let tapNextId = 1;
-let tapSpawner = null;
 
-function tapUpdateStat(){ tapStat.textContent = `Score: ${tapScore} • Level: ${tapLevel}`; }
-function tapComputeLevel(){ tapLevel = Math.min(5, Math.floor(tapScore / 8) + 1); } // +8 score per level, cap 5
-function tapMaxConcurrent(){ return tapLevel; }
-function tapSpawnOne(){
+function tapUpdateStat(){ tapStat.textContent = `Score: ${tapScore}`; }
+
+function tapWaveSize(){
+  // increase with score; caps at 5
+  return Math.min(5, Math.floor(tapScore / 8) + 1);
+}
+
+function tapSpawnWave(){
   if(!tapRunning) return;
-  if(tapTargets.size >= tapMaxConcurrent()) return;
+  if(tapTargets.size > 0) return; // only after all cleared
+  const n = tapWaveSize();
+  for(let i=0;i<n;i++) tapSpawnOne();
+}
+
+function tapSpawnOne(){
   const id = tapNextId++;
   const el = document.createElement('button');
   el.type='button';
   el.className='target';
   el.textContent='•';
   el.setAttribute('aria-label','tap target');
+
+  // random position within arena
   const pad = 60;
   const rect = tapArena.getBoundingClientRect();
   const x = Math.floor(Math.random() * Math.max(1, rect.width  - pad));
@@ -424,48 +434,37 @@ function tapSpawnOne(){
   el.style.left = `${x}px`; el.style.top = `${y}px`;
   el.dataset.id = String(id);
 
-  const hit = ()=>{
+  const hit = (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
     if(!tapTargets.has(id)) return;
     tapScore += 1;
-    tapComputeLevel();
     tapUpdateStat();
     const node = tapTargets.get(id);
     tapTargets.delete(id);
     node?.remove();
-    setTimeout(tapSpawnOne, 0);
+    // when all cleared, spawn the next wave (fast)
+    if(tapRunning && tapTargets.size === 0){
+      setTimeout(tapSpawnWave, 0);
+    }
   };
-  el.addEventListener('pointerdown', hit, {passive:true});
-  el.addEventListener('click', hit, {passive:true});
+  // multi-input friendly
+  el.addEventListener('pointerdown', hit, {passive:false});
+  el.addEventListener('click', hit, {passive:false});
 
   tapArena.appendChild(el);
   tapTargets.set(id, el);
+}
 
-  // Despawn if missed
-  setTimeout(()=>{
-    if(tapTargets.has(id)){
-      const node = tapTargets.get(id);
-      tapTargets.delete(id);
-      node?.remove();
-      if(tapRunning) tapSpawnOne();
-    }
-  }, Math.max(900, 1800 - tapLevel*120));
-}
-function tapTick(){
-  while(tapTargets.size < tapMaxConcurrent()) tapSpawnOne();
-}
 function tapStartGame(){
   if(tapRunning) return;
   tapRunning = true;
-  tapSpawner = setInterval(tapTick, 300);
-  tapTick();
+  tapSpawnWave();
 }
-function tapStopGame(){
-  tapRunning = false;
-  clearInterval(tapSpawner); tapSpawner=null;
-}
+function tapStopGame(){ tapRunning = false; }
 function tapResetGame(){
   tapStopGame();
-  tapScore = 0; tapLevel = 1; tapUpdateStat();
+  tapScore = 0; tapUpdateStat();
   tapTargets.forEach(n=>n.remove()); tapTargets.clear();
 }
 tapStart.addEventListener('click', tapStartGame);
@@ -473,83 +472,120 @@ tapStop .addEventListener('click', tapStopGame);
 tapReset.addEventListener('click', tapResetGame);
 tapUpdateStat();
 
-/* ========= Games: Swipe Sprint ========= */
-const swipeArena = document.getElementById('swipeArena');
-const swipeStart = document.getElementById('swipeStart');
-const swipeStop  = document.getElementById('swipeStop');
-const swipeReset = document.getElementById('swipeReset');
-const swipeStat  = document.getElementById('swipeStat');
-const swipeDirEl = document.getElementById('swipeDir');
+/* ========= Reflex Sprint (tap or swipe; wrong => reset) ========= */
+const reflexArena = document.getElementById('reflexArena');
+const reflexStart = document.getElementById('reflexStart');
+const reflexStop  = document.getElementById('reflexStop');
+const reflexReset = document.getElementById('reflexReset');
+const reflexStat  = document.getElementById('reflexStat');
+const reflexActionEl = document.getElementById('reflexAction');
 
-let swipeRunning = false;
-let swipeCorrect = 0;
-let swipeAttempts = 0;
-let swipeCurrentDir = null; // 'up','down','left','right'
+let reflexRunning = false;
+let reflexCount = 0;
+let currentAction = null; // 'tap','left','right','up','down'
 
-function nextSwipeDir(){
-  const dirs = ['up','down','left','right'];
-  swipeCurrentDir = dirs[Math.floor(Math.random()*dirs.length)];
-  swipeDirEl.textContent = (
-    swipeCurrentDir==='up' ? '↑' :
-    swipeCurrentDir==='down' ? '↓' :
-    swipeCurrentDir==='left' ? '←' : '→'
-  );
+function setActionText(a){
+  reflexActionEl.textContent = a === 'tap' ? 'TAP' :
+    a === 'left' ? '←' :
+    a === 'right' ? '→' :
+    a === 'up' ? '↑' : '↓';
 }
-function swipeUpdateStat(){
-  swipeStat.textContent = `Correct: ${swipeCorrect} • Attempts: ${swipeAttempts}`;
-}
-function swipeStartGame(){
-  if(swipeRunning) return;
-  swipeRunning = true;
-  nextSwipeDir();
-}
-function swipeStopGame(){ swipeRunning=false; }
-function swipeResetGame(){
-  swipeStopGame();
-  swipeCorrect=0; swipeAttempts=0; swipeUpdateStat();
-  swipeDirEl.textContent='—'; swipeCurrentDir=null;
-}
-swipeStart.addEventListener('click', swipeStartGame);
-swipeStop .addEventListener('click', swipeStopGame);
-swipeReset.addEventListener('click', swipeResetGame);
-swipeUpdateStat();
 
-// Gesture detection (mouse + touch via Pointer Events)
-let startX=0, startY=0, startT=0, tracking=false;
-function onSwipeStart(e){
-  if(!swipeRunning) return;
-  tracking=true;
-  startX = e.clientX; startY = e.clientY; startT = performance.now();
+function nextAction(){
+  const actions = ['tap','left','right','up','down'];
+  currentAction = actions[Math.floor(Math.random()*actions.length)];
+  setActionText(currentAction);
 }
-function onSwipeEnd(e){
-  if(!swipeRunning || !tracking) return;
-  tracking=false;
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
-  const dt = performance.now() - startT;
 
-  const minDist = 40;  // px
-  const maxTime = 800; // ms
-  let dir = null;
-  if(dt <= maxTime){
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= minDist){
-      dir = dx > 0 ? 'right' : 'left';
-    } else if(Math.abs(dy) >= minDist){
-      dir = dy > 0 ? 'down' : 'up';
+function reflexUpdate(){ reflexStat.textContent = `Count: ${reflexCount}`; }
+
+function flashBad(){
+  const old = reflexArena.style.backgroundColor;
+  reflexArena.classList.add('flashBad');
+  setTimeout(()=>{ reflexArena.classList.remove('flashBad'); }, 150);
+}
+
+function failReset(){
+  reflexCount = 0;
+  reflexUpdate();
+  flashBad();
+  nextAction();
+}
+
+function success(){
+  reflexCount += 1;
+  reflexUpdate();
+  nextAction();
+}
+
+function reflexStartGame(){
+  if(reflexRunning) return;
+  reflexRunning = true;
+  reflexCount = 0; reflexUpdate();
+  nextAction();
+}
+function reflexStopGame(){ reflexRunning = false; }
+function reflexResetGame(){
+  reflexStopGame();
+  reflexCount = 0; reflexUpdate();
+  currentAction = null; reflexActionEl.textContent = '—';
+}
+reflexStart.addEventListener('click', reflexStartGame);
+reflexStop .addEventListener('click', reflexStopGame);
+reflexReset.addEventListener('click', reflexResetGame);
+
+/* Gesture detection for Reflex Sprint */
+let sx=0, sy=0, st=0, tracking=false;
+const MAX_TIME = 600;  // fast
+const MIN_DIST = 40;   // px threshold for swipe
+const TAP_MAX_DIST = 12; // px for tap
+const TAP_MAX_TIME = 300; // ms for tap
+
+function onReflexDown(e){
+  if(!reflexRunning) return;
+  tracking = true;
+  sx = e.clientX; sy = e.clientY; st = performance.now();
+}
+function onReflexUp(e){
+  if(!reflexRunning || !tracking) return;
+  tracking = false;
+  const dx = e.clientX - sx;
+  const dy = e.clientY - sy;
+  const dt = performance.now() - st;
+
+  // Determine input
+  let input = null;
+  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){
+    input = 'tap';
+  } else if(dt <= MAX_TIME){
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){
+      input = dx > 0 ? 'right' : 'left';
+    } else if(Math.abs(dy) >= MIN_DIST){
+      input = dy > 0 ? 'down' : 'up';
     }
   }
 
-  if(dir){
-    swipeAttempts += 1;
-    if(dir === swipeCurrentDir){
-      swipeCorrect += 1;
-      nextSwipeDir();
+  if(!input){
+    // too slow or too short: consider it a fail to keep it intense
+    failReset();
+    return;
     }
-    swipeUpdateStat();
-  }
+
+  if(input === currentAction) success(); else failReset();
 }
-['pointerdown','mousedown','touchstart'].forEach(type=>swipeArena.addEventListener(type, e=>{ if(e.pointerType!=='mouse'||type!=='mousedown') onSwipeStart(e); }, {passive:true}));
-['pointerup','mouseup','touchend','pointercancel'].forEach(type=>swipeArena.addEventListener(type, e=>{ onSwipeEnd(e); }, {passive:true}));
+
+['pointerdown','mousedown','touchstart'].forEach(type=>{
+  reflexArena.addEventListener(type, e=>{
+    // ignore synthetic mousedown if pointerdown exists
+    if(e.pointerType && type==='mousedown') return;
+    onReflexDown(e);
+  }, {passive:true});
+});
+['pointerup','mouseup','touchend','pointercancel'].forEach(type=>{
+  reflexArena.addEventListener(type, e=>{
+    onReflexUp(e);
+  }, {passive:true});
+});
 
 /* ===== Init ===== */
 function initialRender(){
@@ -559,6 +595,7 @@ initialRender();
 </script>
 </body>
 </html>
+
 
 
 
