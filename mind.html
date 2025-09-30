@@ -16,6 +16,7 @@
     --bg1:#0b0d12; --bg2:#0e1320;
     --tyrian:#66023C;
     --outline:#FFD700; /* bright yellow outline */
+    --success1:#10b981; --success2:#34d399; /* green button */
     --title-font: "Press Start 2P", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
@@ -64,31 +65,37 @@
       0 0 28px rgba(102,2,60,.25);
   }
 
-  /* Game area (pushed further down from the title) */
+  /* Game/Tools area (pushed further down from the title) */
   .game{
     min-height:0;
     display:grid;
     grid-template-rows:auto auto 1fr;
     gap:22px;
     max-width:1100px;
-    margin:28px auto 0; /* <-- adds distance from title */
+    margin:28px auto 0; /* distance from title */
     width:100%;
     padding-top:10px;
   }
 
-  /* START: button row + description under it */
+  /* START: two big buttons + description under Fact Evolution */
   .start-wrap{display:grid;justify-items:center;gap:14px}
+  .start-buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+
   .btn{
     appearance:none;border:none;border-radius:16px;padding:16px 24px;font-weight:900;
     cursor:pointer;transition:transform .08s ease, box-shadow .1s ease, opacity .2s ease
   }
   .btn:active{transform:translateY(1px)}
-  .btn-lg{font-size:18px;padding:20px 30px;border-radius:18px} /* larger start button */
+  .btn-lg{font-size:18px;padding:20px 30px;border-radius:18px}
   .btn-primary{
     color:#0b0d12;
     background:linear-gradient(90deg,var(--accent),var(--accent3));
     box-shadow:0 14px 28px rgba(59,130,246,.38), inset 0 -2px 0 rgba(255,255,255,.25);
-    display:flex; align-items:center; gap:12px;
+  }
+  .btn-success{
+    color:#052e24;
+    background:linear-gradient(90deg,var(--success1),var(--success2));
+    box-shadow:0 14px 28px rgba(16,185,129,.38), inset 0 -2px 0 rgba(255,255,255,.25);
   }
   .btn-ghost{background:rgba(255,255,255,.08); color:#e2e8f0; border:1px solid rgba(255,255,255,.16)}
 
@@ -120,7 +127,7 @@
   .fact-title{font-weight:900;margin:0 0 4px 0;color:#fff;font-size:14px}
   .fact-blurb{margin:0;color:#dbe7ff;font-size:12.5px;line-height:1.35;opacity:.95}
 
-  /* Evolution panel + professional evolve animation (kept) */
+  /* Panels */
   .panel{
     position:relative;
     background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
@@ -152,6 +159,21 @@
     0%{ transform:scale(0.985); filter:blur(.2px); opacity:.96; }
     100%{ transform:scale(1); filter:blur(0); opacity:1; }
   }
+
+  /* Fact checker specifics */
+  .fc-textarea{
+    width:100%; min-height:96px; resize:vertical;
+    border-radius:12px; border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06); color:#fff; padding:12px 14px;
+    font: 600 14px/1.5 var(--body-font);
+    outline:none;
+  }
+  .badge{
+    display:inline-block; padding:6px 10px; border-radius:999px; font-weight:900; font-size:12px;
+  }
+  .badge-true{ background:#22c55e; color:#052e24; }
+  .badge-false{ background:#ef4444; color:#2a0909; }
+  .badge-unknown{ background:#eab308; color:#1a1400; }
 
   .scrolly{overflow:auto;min-height:0}
   .hidden{display:none !important}
@@ -203,18 +225,21 @@
     <h1 class="title">Mind</h1>
 
     <section class="game">
-      <!-- START VIEW: button then description underneath -->
+      <!-- START VIEW: two buttons then description under Fact Evolution -->
       <div id="startView" class="start-wrap">
-        <button id="btnStartGame" class="btn btn-primary btn-lg" aria-describedby="startDesc">Fact Evolution</button>
+        <div class="start-buttons">
+          <button id="btnStartGame" class="btn btn-primary btn-lg" aria-describedby="startDesc">Fact Evolution</button>
+          <button id="btnFactChecker" class="btn btn-success btn-lg">Fact checker</button>
+        </div>
         <p id="startDesc" class="subtitle">Begin with a fact, then evolve it layer by layer.</p>
       </div>
 
-      <!-- LIST VIEW -->
+      <!-- LIST VIEW (Fact Evolution grid) -->
       <div id="factListView" class="scrolly hidden">
         <div class="fact-grid" id="factGrid"></div>
       </div>
 
-      <!-- EVOLUTION VIEW -->
+      <!-- EVOLUTION VIEW (Fact Evolution detail) -->
       <div id="evoView" class="panel hidden">
         <div class="evo-badge" id="evoMeta"></div>
         <p class="evo-text" id="evoText"></p>
@@ -224,6 +249,21 @@
           <span class="spacer"></span>
           <button class="btn btn-ghost" id="btnExit">I’m no longer interested</button>
         </div>
+      </div>
+
+      <!-- FACT CHECKER VIEW -->
+      <div id="fcView" class="panel hidden">
+        <div class="evo-badge">Fact checker</div>
+        <textarea id="fcInput" class="fc-textarea" placeholder="Type a fact, e.g. “The Sahara is the largest hot desert.”"></textarea>
+        <div id="fcResultRow" class="actions" style="align-items:center">
+          <span id="fcBadge" class="badge badge-unknown hidden">UNKNOWN</span>
+          <span id="fcMsg" style="font-size:13px;color:#cbd5e1"></span>
+          <span class="spacer"></span>
+          <button id="btnFcBack" class="btn btn-ghost">Back</button>
+          <button id="btnFcCheck" class="btn btn-success">Check</button>
+          <button id="btnFcEvolve" class="btn btn-primary hidden">EVOLVE</button>
+        </div>
+        <div id="fcExplanation" class="evo-text hidden"></div>
       </div>
     </section>
   </div>
@@ -248,7 +288,9 @@ function updateXPUI(){ const xp=loadXP(); const need=xpForNext(xp.level);
 }
 updateXPUI(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateXPUI(); });
 
-/* -------------------- GAME DATA -------------------- */
+/* ============================================================
+   FACT EVOLUTION GAME (unchanged)
+   ============================================================ */
 const FACTS = [
   {id:"sahara",title:"Sahara Desert",layers:[
     "The Sahara is the largest hot desert on Earth.",
@@ -267,9 +309,10 @@ const FACTS = [
     "Archaeologists have found edible honey in ancient tombs."]}
 ];
 
-/* -------------------- Elements -------------------- */
 const startViewEl=document.getElementById('startView');
 const btnStartGame=document.getElementById('btnStartGame');
+const btnFactChecker=document.getElementById('btnFactChecker');
+
 const factGridEl=document.getElementById('factGrid');
 const listViewEl=document.getElementById('factListView');
 const evoViewEl=document.getElementById('evoView');
@@ -278,12 +321,24 @@ const evoTextEl=document.getElementById('evoText');
 const btnDeeper=document.getElementById('btnDeeper');
 const btnExit=document.getElementById('btnExit');
 
+/* Fact checker elements */
+const fcViewEl=document.getElementById('fcView');
+const fcInputEl=document.getElementById('fcInput');
+const fcBadgeEl=document.getElementById('fcBadge');
+const fcMsgEl=document.getElementById('fcMsg');
+const fcExplainEl=document.getElementById('fcExplanation');
+const btnFcBack=document.getElementById('btnFcBack');
+const btnFcCheck=document.getElementById('btnFcCheck');
+const btnFcEvolve=document.getElementById('btnFcEvolve');
+
 let currentFact=null, layerIndex=0;
+let lastFcVerdict=null, lastFcExplain="";
 
 /* -------------------- Views -------------------- */
-function showStart(){ startViewEl.classList.remove('hidden'); listViewEl.classList.add('hidden'); evoViewEl.classList.add('hidden'); currentFact=null; layerIndex=0; }
-function showList(){ startViewEl.classList.add('hidden'); listViewEl.classList.remove('hidden'); evoViewEl.classList.add('hidden'); }
-function showEvo(){ startViewEl.classList.add('hidden'); listViewEl.classList.add('hidden'); evoViewEl.classList.remove('hidden'); }
+function showStart(){ startViewEl.classList.remove('hidden'); listViewEl.classList.add('hidden'); evoViewEl.classList.add('hidden'); fcViewEl.classList.add('hidden'); currentFact=null; layerIndex=0; }
+function showList(){ startViewEl.classList.add('hidden'); listViewEl.classList.remove('hidden'); evoViewEl.classList.add('hidden'); fcViewEl.classList.add('hidden'); }
+function showEvo(){ startViewEl.classList.add('hidden'); listViewEl.classList.add('hidden'); evoViewEl.classList.remove('hidden'); fcViewEl.classList.add('hidden'); }
+function showFc(){ startViewEl.classList.add('hidden'); listViewEl.classList.add('hidden'); evoViewEl.classList.add('hidden'); fcViewEl.classList.remove('hidden'); }
 
 /* -------------------- Renderers -------------------- */
 function renderFactGrid(){
@@ -295,7 +350,6 @@ function renderFactGrid(){
     card.className='fact-card';
     card.style.setProperty('--h',h);
     card.innerHTML=`<div class="fact-title">${escapeHTML(f.title)}</div><p class="fact-blurb">${escapeHTML(f.layers[0])}</p>`;
-    // sound + action
     card.addEventListener('click',()=>{
       playClick();
       beginEvolution(f.id);
@@ -321,6 +375,7 @@ function updateEvoPanel(){
 
 /* -------------------- Button interactions -------------------- */
 btnStartGame.addEventListener('click',()=>{ playClick(); renderFactGrid(); showList(); });
+btnFactChecker.addEventListener('click',()=>{ playClick(); resetFactChecker(); showFc(); });
 
 btnDeeper.addEventListener('click',()=>{
   if(!currentFact) return;
@@ -341,6 +396,88 @@ btnDeeper.addEventListener('click',()=>{
 });
 
 btnExit.addEventListener('click',()=>{ playClick(); showStart(); });
+
+/* -------------------- Fact checker logic -------------------- */
+function resetFactChecker(){
+  fcInputEl.value='';
+  lastFcVerdict=null; lastFcExplain='';
+  fcBadgeEl.className='badge badge-unknown hidden'; fcBadgeEl.textContent='UNKNOWN';
+  fcMsgEl.textContent='';
+  fcExplainEl.textContent=''; fcExplainEl.classList.add('hidden');
+  btnFcEvolve.classList.add('hidden');
+}
+
+btnFcBack.addEventListener('click',()=>{ playClick(); showStart(); });
+
+btnFcCheck.addEventListener('click',()=>{
+  playClick();
+  const text=fcInputEl.value.trim();
+  if(!text){ fcMsgEl.textContent='Type a fact to check.'; fcBadgeEl.classList.add('hidden'); return; }
+
+  // Heuristic/local check (no network). Replace with evaluateWithAI() when we add a backend.
+  const { verdict, message, explanation } = localHeuristicCheck(text);
+
+  lastFcVerdict = verdict;
+  lastFcExplain = explanation;
+
+  fcBadgeEl.classList.remove('hidden');
+  fcBadgeEl.textContent = verdict.toUpperCase();
+  fcBadgeEl.className = 'badge ' + (verdict==='true' ? 'badge-true' : verdict==='false' ? 'badge-false' : 'badge-unknown');
+  fcMsgEl.textContent = message;
+
+  // Show evolve button to explain
+  btnFcEvolve.classList.remove('hidden');
+});
+
+btnFcEvolve.addEventListener('click',()=>{
+  // Reveal explanation with evolve sound + tasteful glow
+  playEvolve();
+  fcExplainEl.textContent = lastFcExplain || "We couldn’t establish enough evidence. Consider specifying time/place/scope.";
+  fcExplainEl.classList.remove('hidden');
+  fcExplainEl.classList.remove('pop'); void fcExplainEl.offsetWidth; fcExplainEl.classList.add('pop');
+  fcViewEl.classList.remove('glow'); void fcViewEl.offsetWidth; fcViewEl.classList.add('glow');
+});
+
+/* Simple local rules to demo the flow (you can expand this list) */
+function localHeuristicCheck(text){
+  const t=text.toLowerCase();
+
+  // A few sample truths/falses just to make it feel responsive
+  if(/sahara .*largest .*hot desert/.test(t)) return {
+    verdict:'true',
+    message:'Matches established geography references.',
+    explanation:'The Sahara covers ~9 million km² across North Africa, the largest hot desert by area. Cold deserts like Antarctica are larger overall, but not “hot deserts.”'
+  };
+  if(/earth .* flat/.test(t)) return {
+    verdict:'false',
+    message:'Contradicted by overwhelming geophysical evidence.',
+    explanation:'Satellite imagery, circumnavigation, and gravitational measurements confirm Earth’s spheroidal shape. Horizon curvature, lunar eclipses, and GPS orbits also contradict a flat model.'
+  };
+  if(/honey .* never .* spoils|honey .* lasts forever/.test(t)) return {
+    verdict:'true',
+    message:'Generally true with caveats.',
+    explanation:'Honey’s low water activity, acidity, and antimicrobial compounds inhibit spoilage. It can crystallize or absorb moisture; proper sealing keeps it edible for very long periods.'
+  };
+
+  // Default
+  return {
+    verdict:'unknown',
+    message:'Needs verification — ambiguous, time-bound, or too broad.',
+    explanation:'To evaluate this claim, specify names, dates, units, and scope. Reliable verification typically needs a cited source and disambiguation of terms.'
+  };
+}
+
+/* ===== Integration hook (optional) =====
+   When you’re ready to use real AI, replace localHeuristicCheck()
+   with evaluateWithAI() that calls your backend:
+   - You’ll likely POST {text} to your server, which calls an AI model
+     (and optionally performs web retrieval), then returns {verdict, explanation}.
+   - This will require changes outside mind.html (I’ll flag them when you want it).
+function evaluateWithAI(text){
+  return fetch('/api/fact-check', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({text})})
+    .then(r=>r.json());
+}
+*/
 
 /* -------------------- Sounds (Web Audio, no files) -------------------- */
 let audioCtx;
@@ -399,7 +536,7 @@ function playEvolve(){
   // Soft bell overtone
   const o3=tone(1560,'sine',0.06,0.22);
 
-  // Very gentle click at the end
+  // Gentle affirmative click at the end
   setTimeout(()=>playClick(), 200);
 }
 
@@ -413,3 +550,4 @@ showStart();
 </script>
 </body>
 </html>
+
