@@ -14,7 +14,7 @@
     --bg1:#0b0d12; --bg2:#0e1320;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    --ring: #fff;
+    --ring:#fff;
   }
 
   *{box-sizing:border-box}
@@ -50,12 +50,13 @@
     font-weight:900; letter-spacing:.5px;
   }
   .cta{
-    margin-top:24px; display:inline-flex; align-items:center; gap:10px;
+    margin-top:16px; display:inline-flex; align-items:center; gap:10px;
     padding:12px 16px; border-radius:14px; border:0; cursor:pointer;
     background:linear-gradient(90deg,var(--accent),var(--accent3));
     color:#0a0b0f; font-weight:900; box-shadow:0 10px 28px rgba(0,0,0,.25);
     transition:transform .12s ease, box-shadow .12s ease, opacity .2s ease;
   }
+  .cta.secondary{ background:linear-gradient(90deg,#f9fafb,#e5e7eb); }
   .cta:hover{ transform:translateY(-1px); box-shadow:0 16px 34px rgba(0,0,0,.33) }
   .cta:active{ transform:translateY(0) }
   .cta:focus-visible{ outline:3px solid var(--ring); outline-offset:3px }
@@ -90,27 +91,27 @@
   }
   .xp-meta{position:fixed;right:18px;top:52px;font-size:12px;color:#cbd5e1;opacity:.9}
 
-  /* Studio (modal) */
-  dialog#studio{
-    border:none; padding:0; background:transparent;
-    width:min(1200px, 96vw); max-height:92vh;
-  }
-  .studio-frame{
+  .hint{ font-size:12px; opacity:.8 }
+
+  /* Studio (draw) */
+  dialog{ border:none; padding:0; background:transparent; }
+  dialog#studio, dialog#poems { width:min(1200px, 96vw); max-height:92vh; }
+  .frame{
     display:grid; grid-template-rows:auto 1fr auto;
     background:#0c1120; border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.45);
     overflow:hidden; border:1px solid rgba(255,255,255,.08)
   }
-  .studio-top{
+  .top{
     display:flex; align-items:center; justify-content:space-between; gap:10px;
     padding:12px 14px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   }
-  .studio-title{font-weight:900; letter-spacing:.3px}
-  .studio-close{
+  .title-sub{font-weight:900; letter-spacing:.3px}
+  .close-btn{
     appearance:none; border:0; background:var(--card); color:#0a0b0f; font-weight:900;
     padding:6px 10px; border-radius:10px; cursor:pointer;
   }
 
-  .studio-toolbar{
+  .toolbar{
     display:flex; flex-wrap:wrap; gap:10px; align-items:center;
     padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
     background:rgba(255,255,255,.02);
@@ -128,18 +129,16 @@
   .tool-group{ display:flex; gap:10px; align-items:center }
   .slider{ width:150px }
 
-  .studio-canvas-wrap{
+  .canvas-wrap{
     position:relative; background:#0a0f1a; display:grid; place-items:center;
     min-height:40vh; height:min(60vh, 60dvh); padding:14px;
   }
   canvas#draw{
     background:#0b0f18; border-radius:12px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
-    touch-action:none; /* prevent touch scrolling while drawing */
-    width:100%; height:100%; display:block; /* explicit CSS size */
-    max-width:100%; max-height:100%;
+    touch-action:none; width:100%; height:100%; display:block; max-width:100%; max-height:100%;
   }
 
-  .studio-bottom{
+  .bottom{
     display:flex; gap:10px; align-items:center; justify-content:flex-end;
     padding:12px 14px; background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
   }
@@ -151,7 +150,32 @@
   .btn.primary{ background:linear-gradient(90deg,var(--accent),var(--accent3)); color:#0a0b0f }
   .btn:focus-visible{ outline:3px solid var(--ring); outline-offset:3px }
 
-  .hint{ font-size:12px; opacity:.8 }
+  /* Poems UI */
+  .poems-main{ display:grid; gap:14px; padding:14px }
+  .split{ display:grid; gap:12px; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); align-items:start }
+  .card{
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px; padding:14px;
+  }
+  .input, .textarea{
+    width:100%; padding:10px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.14);
+    background:rgba(255,255,255,.06); color:#fff; font:inherit;
+  }
+  .textarea{ min-height:180px; resize:vertical }
+  .list{ display:grid; gap:8px; max-height:min(48vh, 48dvh); overflow:auto; padding-right:4px }
+  .list-item{
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1);
+    border-radius:12px; padding:10px 12px; cursor:pointer;
+  }
+  .list-item:hover{ background:rgba(255,255,255,.07) }
+
+  .poem-view{ display:grid; gap:12px }
+  .poem-title{ font-weight:900 }
+  .poem-text{ white-space:pre-wrap; line-height:1.5; }
+  .actions{ display:flex; gap:8px; flex-wrap:wrap }
+  .muted{ opacity:.8; font-size:12px }
 
   .sr-only{ position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
 </style>
@@ -178,24 +202,25 @@
   <div class="wrap" role="main">
     <h1 class="title">Heart</h1>
 
-    <button id="openStudio" class="cta" type="button" title="Open drawing panel">
-      ❤️ Pour your heart out
-    </button>
+    <div style="display:flex; gap:12px; flex-wrap:wrap; justify-content:center">
+      <button id="openStudio" class="cta" type="button" title="Open drawing panel">❤️ Pour your heart out</button>
+      <button id="openPoems" class="cta secondary" type="button" title="Open poems hub">📝 Poems</button>
+    </div>
 
     <p class="hint" style="margin-top:10px;opacity:.75">
-      Draw or hand-write with multiple colors. Save, share, or delete when you’re done.
+      Draw/write from the heart, or craft/read poems. Save, share, or keep for later.
     </p>
   </div>
 
   <!-- Drawing / Writing Studio -->
   <dialog id="studio">
-    <div class="studio-frame" role="dialog" aria-labelledby="studioTitle">
-      <div class="studio-top">
-        <div class="studio-title" id="studioTitle">Pour your heart out</div>
-        <button class="studio-close" id="closeStudio" type="button" title="Close">Close</button>
+    <div class="frame" role="dialog" aria-labelledby="studioTitle">
+      <div class="top">
+        <div class="title-sub" id="studioTitle">Pour your heart out</div>
+        <button class="close-btn" id="closeStudio" type="button" title="Close">Close</button>
       </div>
 
-      <div class="studio-toolbar" aria-label="Tools">
+      <div class="toolbar" aria-label="Tools">
         <div class="tool-group" role="group" aria-label="Mode">
           <button id="penTool" class="tool" aria-pressed="true" title="Pen">Pen</button>
           <button id="eraserTool" class="tool" aria-pressed="false" title="Eraser">Eraser</button>
@@ -226,11 +251,11 @@
         </div>
       </div>
 
-      <div class="studio-canvas-wrap" id="canvasHost">
+      <div class="canvas-wrap" id="canvasHost">
         <canvas id="draw" width="1280" height="720" aria-label="Drawing canvas"></canvas>
       </div>
 
-      <div class="studio-bottom">
+      <div class="bottom">
         <span class="hint" style="margin-right:auto">Tip: Use a stylus on touch devices for smoother handwriting.</span>
         <button id="deleteBtn" class="btn danger" type="button" title="Clear drawing">Delete</button>
         <button id="saveBtn" class="btn" type="button" title="Save PNG">Save</button>
@@ -239,16 +264,81 @@
     </div>
   </dialog>
 
+  <!-- Poems Hub -->
+  <dialog id="poems">
+    <div class="frame" role="dialog" aria-labelledby="poemsTitle">
+      <div class="top">
+        <div class="title-sub" id="poemsTitle">Poems</div>
+        <button class="close-btn" id="closePoems" type="button" title="Close">Close</button>
+      </div>
+
+      <div class="poems-main">
+        <div class="split">
+          <!-- Left: Actions -->
+          <div class="card">
+            <div style="display:flex; gap:8px; flex-wrap:wrap">
+              <button id="poemWriteTab" class="btn primary" type="button">Write a poem</button>
+              <button id="poemReadTab" class="btn" type="button">Read a poem</button>
+            </div>
+          </div>
+
+          <!-- Right: Context / Tips -->
+          <div class="card">
+            <div style="font-weight:800; margin-bottom:6px">Public-domain selection</div>
+            <div class="muted">Includes Rudyard Kipling’s <em>If—</em> (the “you’ll be a Man, my son!” poem) and other short classics you can expand gradually.</div>
+          </div>
+        </div>
+
+        <!-- Panels -->
+        <div id="poemWrite" class="card" hidden>
+          <div class="split" style="grid-template-columns:1fr">
+            <label>
+              <div class="muted" style="margin-bottom:6px">Title</div>
+              <input id="poemTitleInput" class="input" placeholder="Untitled poem" />
+            </label>
+            <label>
+              <div class="muted" style="margin-bottom:6px">Your poem</div>
+              <textarea id="poemBodyInput" class="textarea" placeholder="Write from the heart..."></textarea>
+            </label>
+            <div class="actions" style="justify-content:flex-end">
+              <button id="poemSaveBtn" class="btn" type="button">Save</button>
+              <button id="poemShareBtn" class="btn primary" type="button">Share</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="poemRead" class="card" hidden>
+          <div class="split" style="grid-template-columns:1fr">
+            <div class="list" id="poemList" aria-label="Poem list"></div>
+            <div id="poemViewer" class="poem-view" hidden>
+              <div class="poem-title" id="pvTitle"></div>
+              <div class="muted" id="pvAuthor"></div>
+              <div class="poem-text" id="pvText"></div>
+              <div class="actions">
+                <button id="pvExpand" class="btn" type="button">Expand</button>
+                <button id="pvClose" class="btn danger" type="button">Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom">
+        <span class="hint" style="margin-right:auto">Your saved poems are kept locally on this device.</span>
+        <button class="btn" id="poemsHelp" type="button" title="Help">Help</button>
+      </div>
+    </div>
+  </dialog>
+
 <script>
 (function(){
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // --- Stars (HiDPI-aware) ---
+  /* ---------------- Stars BG ---------------- */
   const canvasBG = document.getElementById('stars');
   const ctxBG = canvasBG.getContext('2d');
-  let STAR_COUNT = 160;
-  let STARS = [];
-  let raf = 0;
+  let STAR_COUNT = 160, STARS = [], raf = 0;
 
   function sizeStarCanvas(){
     const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
@@ -294,7 +384,7 @@
   addEventListener('resize', startStars, { passive:true });
   startStars();
 
-  // --- XP UI ---
+  /* ---------------- XP UI ---------------- */
   const MAX_LEVEL = 100;
   function xpForNext(level){
     if(level>=MAX_LEVEL) return Infinity;
@@ -322,7 +412,7 @@
   document.addEventListener('visibilitychange', () => { if(!document.hidden) updateXPUI(); });
   window.addEventListener('storage', (e)=>{ if(e.key==="xp_v1") updateXPUI(); });
 
-  // --- Drawing Studio ---
+  /* ---------------- Drawing Studio ---------------- */
   const studio = document.getElementById('studio');
   const openStudio = document.getElementById('openStudio');
   const closeStudio = document.getElementById('closeStudio');
@@ -341,37 +431,26 @@
   const redoStack = [];
 
   function sizeDrawCanvas(){
-    // Size the internal buffer to the *visible* CSS size, then scale by DPR.
     const rect = draw.getBoundingClientRect();
     const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
-
-    // Avoid zero-size when dialog just opened
     const cssW = Math.max(1, Math.floor(rect.width));
     const cssH = Math.max(1, Math.floor(rect.height));
-
     const needW = Math.floor(cssW * dpr);
     const needH = Math.floor(cssH * dpr);
 
     if(draw.width !== needW || draw.height !== needH){
-      // Preserve current bitmap
       let snapshot = null;
       try { snapshot = dctx.getImageData(0,0,draw.width,draw.height); } catch(e){}
       draw.width = needW; draw.height = needH;
 
-      // Map drawing ops in CSS pixels
       dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       dctx.lineCap = dctx.lineJoin = 'round';
 
       if(snapshot){
-        // Draw previous image scaled to new size
-        // Create temp canvas to place snapshot at 1:1 then scale via drawImage
         const tmp = document.createElement('canvas');
         tmp.width = snapshot.width; tmp.height = snapshot.height;
-        const tctx = tmp.getContext('2d');
-        tctx.putImageData(snapshot, 0, 0);
-        // drawImage expects device pixels; since we've set transform, use CSS pixel sizes
-        dctx.save();
-        dctx.setTransform(1,0,0,1,0,0); // reset to draw raw pixels
+        const tctx = tmp.getContext('2d'); tctx.putImageData(snapshot, 0, 0);
+        dctx.save(); dctx.setTransform(1,0,0,1,0,0);
         dctx.drawImage(tmp, 0, 0, needW, needH);
         dctx.restore();
       }
@@ -381,19 +460,17 @@
   function pushUndo(){
     try{
       if(undoStack.length >= MAX_UNDO) undoStack.shift();
-      // Save raw pixels (device size)
       const img = dctx.getImageData(0,0,draw.width,draw.height);
       undoStack.push(img);
       redoStack.length = 0;
-    }catch(e){ /* ignore if too big */ }
+    }catch(e){ /* ignore */ }
   }
 
   function restore(img){
     if(!img) return;
     draw.width = img.width; draw.height = img.height;
-    dctx.setTransform(1,0,0,1,0,0); // write raw pixels
+    dctx.setTransform(1,0,0,1,0,0);
     dctx.putImageData(img, 0, 0);
-    // Reapply DPR transform for new strokes
     const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
     dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     dctx.lineCap = dctx.lineJoin = 'round';
@@ -408,11 +485,7 @@
     }
   }
 
-  function startDrawing(p){
-    drawing = true;
-    dctx.beginPath();
-    dctx.moveTo(p.x, p.y);
-  }
+  function startDrawing(p){ drawing = true; dctx.beginPath(); dctx.moveTo(p.x, p.y); }
   function drawTo(p){
     if(!drawing) return;
     dctx.globalCompositeOperation = (mode==='pen') ? 'source-over' : 'destination-out';
@@ -422,38 +495,26 @@
     dctx.stroke();
   }
   function endDrawing(){
-    if(!drawing) return;
-    drawing = false;
-    dctx.closePath();
-    pushUndo();
-    dctx.globalCompositeOperation = 'source-over';
+    if(!drawing) return; drawing = false; dctx.closePath(); pushUndo(); dctx.globalCompositeOperation = 'source-over';
   }
 
   function openStudioModal(){
     if(typeof studio.showModal === 'function'){ studio.showModal(); }
     else { studio.setAttribute('open',''); }
-
-    // Ensure canvas sizing is correct when the dialog becomes visible
     requestAnimationFrame(()=>{
       sizeDrawCanvas();
-      // Seed undo state if empty
       if(undoStack.length===0) pushUndo();
     });
   }
-  function closeStudioModal(){
-    if(studio.open) studio.close();
-    else studio.removeAttribute('open');
-  }
+  function closeStudioModal(){ if(studio.open) studio.close(); else studio.removeAttribute('open'); }
 
   openStudio.addEventListener('click', openStudioModal);
   closeStudio.addEventListener('click', closeStudioModal);
   studio.addEventListener('cancel', (e)=>{ e.preventDefault(); closeStudioModal(); });
 
-  // Resize handling (watch container so CSS size changes trigger DPR sizing)
   const ro = new ResizeObserver(()=> sizeDrawCanvas());
   ro.observe(host);
 
-  // Pointer & touch input
   draw.addEventListener('mousedown', (e)=> startDrawing(getPos(e)));
   draw.addEventListener('mousemove', (e)=> drawTo(getPos(e)));
   addEventListener('mouseup', endDrawing);
@@ -462,14 +523,9 @@
   draw.addEventListener('touchmove', (e)=>{ e.preventDefault(); drawTo(getPos(e)); }, {passive:false});
   draw.addEventListener('touchend', (e)=>{ e.preventDefault(); endDrawing(); }, {passive:false});
 
-  // Tools
   const penTool = document.getElementById('penTool');
   const eraserTool = document.getElementById('eraserTool');
-  function setMode(m){
-    mode = m;
-    penTool.setAttribute('aria-pressed', String(m==='pen'));
-    eraserTool.setAttribute('aria-pressed', String(m==='eraser'));
-  }
+  function setMode(m){ mode = m; penTool.setAttribute('aria-pressed', String(m==='pen')); eraserTool.setAttribute('aria-pressed', String(m==='eraser')); }
   penTool.addEventListener('click', ()=>setMode('pen'));
   eraserTool.addEventListener('click', ()=>setMode('eraser'));
 
@@ -479,40 +535,28 @@
   const colorPicker = document.getElementById('colorPicker');
   colorPicker.addEventListener('input', ()=>{ brushColor = colorPicker.value; setMode('pen'); });
   document.querySelectorAll('.color-swatch').forEach(el=>{
-    el.addEventListener('click', ()=>{
-      const c = el.getAttribute('data-color');
-      brushColor = c; colorPicker.value = c; setMode('pen');
-    });
+    el.addEventListener('click', ()=>{ const c = el.getAttribute('data-color'); brushColor = c; colorPicker.value = c; setMode('pen'); });
   });
 
-  // History
   const undoBtn = document.getElementById('undoBtn');
   const redoBtn = document.getElementById('redoBtn');
   undoBtn.addEventListener('click', ()=>{
     if(undoStack.length > 1){
-      const current = undoStack.pop();
-      redoStack.push(current);
-      const prev = undoStack[undoStack.length-1];
-      restore(prev);
+      const current = undoStack.pop(); redoStack.push(current);
+      restore(undoStack[undoStack.length-1]);
     }
   });
   redoBtn.addEventListener('click', ()=>{
-    if(redoStack.length){
-      const next = redoStack.pop();
-      undoStack.push(next);
-      restore(next);
-    }
+    if(redoStack.length){ const next = redoStack.pop(); undoStack.push(next); restore(next); }
   });
 
-  // Save / Share / Delete
   const saveBtn = document.getElementById('saveBtn');
   const shareBtn = document.getElementById('shareBtn');
   const deleteBtn = document.getElementById('deleteBtn');
 
   function download(filename, blob){
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = filename;
+    const a = document.createElement('a'); a.href = url; a.download = filename;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 1000);
   }
@@ -524,39 +568,239 @@
     const blob = await canvasToBlobPromise('image/png', 1);
     const ts = new Date().toISOString().replace(/[:.]/g,'-');
     const filename = `heart-out-${ts}.png`;
-    try{
-      const preview = draw.toDataURL('image/png', 0.8);
-      localStorage.setItem('heart_last_v1', preview);
-    }catch(e){ /* may exceed quota */ }
+    try{ const preview = draw.toDataURL('image/png', 0.8); localStorage.setItem('heart_last_v1', preview); }catch(e){}
     download(filename, blob);
   });
-
   shareBtn.addEventListener('click', async ()=>{
     const blob = await canvasToBlobPromise('image/png', 0.95);
     const file = new File([blob], 'heart-out.png', {type:'image/png', lastModified: Date.now()});
     if(navigator.canShare && navigator.canShare({ files:[file] })){
-      try{ await navigator.share({ files:[file], title:'My heart on canvas', text:'Shared from Heart page' }); }
-      catch(e){ /* user canceled share */ }
+      try{ await navigator.share({ files:[file], title:'My heart on canvas', text:'Shared from Heart page' }); }catch(e){}
+    }else{ download('heart-out.png', blob); }
+  });
+  deleteBtn.addEventListener('click', ()=>{
+    const ok = confirm('Delete your current drawing? This cannot be undone.'); if(!ok) return;
+    dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,draw.width,draw.height);
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0); dctx.lineCap = dctx.lineJoin = 'round'; pushUndo();
+  });
+
+  /* ---------------- Poems Hub ---------------- */
+  const poemsDlg = document.getElementById('poems');
+  const openPoems = document.getElementById('openPoems');
+  const closePoems = document.getElementById('closePoems');
+
+  const poemWriteTab = document.getElementById('poemWriteTab');
+  const poemReadTab  = document.getElementById('poemReadTab');
+  const poemWrite = document.getElementById('poemWrite');
+  const poemRead  = document.getElementById('poemRead');
+
+  const poemTitleInput = document.getElementById('poemTitleInput');
+  const poemBodyInput  = document.getElementById('poemBodyInput');
+  const poemSaveBtn = document.getElementById('poemSaveBtn');
+  const poemShareBtn = document.getElementById('poemShareBtn');
+
+  const poemList = document.getElementById('poemList');
+  const poemViewer = document.getElementById('poemViewer');
+  const pvTitle = document.getElementById('pvTitle');
+  const pvAuthor = document.getElementById('pvAuthor');
+  const pvText = document.getElementById('pvText');
+  const pvExpand = document.getElementById('pvExpand');
+  const pvClose = document.getElementById('pvClose');
+
+  const poemsHelp = document.getElementById('poemsHelp');
+
+  function showWrite(){ poemWrite.hidden=false; poemRead.hidden=true; }
+  function showRead(){ poemWrite.hidden=true; poemRead.hidden=false; poemViewer.hidden=true; }
+  poemWriteTab.addEventListener('click', showWrite);
+  poemReadTab.addEventListener('click', showRead);
+
+  function openPoemsModal(){
+    if(typeof poemsDlg.showModal === 'function'){ poemsDlg.showModal(); }
+    else { poemsDlg.setAttribute('open',''); }
+    showRead(); // default to Read list
+  }
+  function closePoemsModal(){ if(poemsDlg.open) poemsDlg.close(); else poemsDlg.removeAttribute('open'); }
+  openPoems.addEventListener('click', openPoemsModal);
+  closePoems.addEventListener('click', closePoemsModal);
+  poemsDlg.addEventListener('cancel', (e)=>{ e.preventDefault(); closePoemsModal(); });
+
+  // Public-domain poems (short/trimmed where helpful)
+  const PD_POEMS = [
+    {
+      id:'if-kipling',
+      title:'If—',
+      author:'Rudyard Kipling (1910)',
+      lines: [
+        'If you can keep your head when all about you',
+        '  Are losing theirs and blaming it on you,',
+        'If you can trust yourself when all men doubt you,',
+        '  But make allowance for their doubting too;',
+        'If you can wait and not be tired by waiting,',
+        '  Or being lied about, don’t deal in lies,',
+        'Or being hated, don’t give way to hating,',
+        '  And yet don’t look too good, nor talk too wise:',
+        '',
+        'If you can dream—and not make dreams your master;',
+        'If you can think—and not make thoughts your aim;',
+        'If you can meet with Triumph and Disaster',
+        '  And treat those two impostors just the same;',
+        'If you can bear to hear the truth you’ve spoken',
+        '  Twisted by knaves to make a trap for fools,',
+        'Or watch the things you gave your life to, broken,',
+        '  And stoop and build ’em up with worn-out tools:',
+        '',
+        'If you can talk with crowds and keep your virtue,',
+        '  Or walk with Kings—nor lose the common touch,',
+        'If neither foes nor loving friends can hurt you,',
+        '  If all men count with you, but none too much;',
+        'If you can fill the unforgiving minute',
+        '  With sixty seconds’ worth of distance run,',
+        'Yours is the Earth and everything that’s in it,',
+        '  And—which is more—you’ll be a Man, my son!'
+      ]
+    },
+    {
+      id:'hope-dickinson',
+      title:'“Hope” is the thing with feathers',
+      author:'Emily Dickinson (c. 1861)',
+      lines:[
+        '“Hope” is the thing with feathers —',
+        'That perches in the soul —',
+        'And sings the tune without the words —',
+        'And never stops — at all —',
+        '',
+        'And sweetest — in the Gale — is heard —',
+        'And sore must be the storm —',
+        'That could abash the little Bird',
+        'That kept so many warm —'
+      ]
+    },
+    {
+      id:'road-not-taken-frost',
+      title:'The Road Not Taken',
+      author:'Robert Frost (1916)',
+      lines:[
+        'Two roads diverged in a yellow wood,',
+        'And sorry I could not travel both',
+        'And be one traveler, long I stood',
+        'And looked down one as far as I could',
+        'To where it bent in the undergrowth;'
+      ]
+    },
+    {
+      id:'ozymandias-shelley',
+      title:'Ozymandias',
+      author:'Percy Bysshe Shelley (1818)',
+      lines:[
+        'I met a traveller from an antique land,',
+        'Who said—“Two vast and trunkless legs of stone',
+        'Stand in the desert. . . . Near them, on the sand,',
+        'Half sunk a shattered visage lies…”'
+      ]
+    },
+    {
+      id:'a-red-red-rose-burns',
+      title:'A Red, Red Rose',
+      author:'Robert Burns (1794)',
+      lines:[
+        'O my Luve is like a red, red rose',
+        '  That’s newly sprung in June;',
+        'O my Luve is like the melody',
+        '  That’s sweetly played in tune.'
+      ]
+    }
+  ];
+
+  // Build list
+  function renderPoemList(){
+    poemList.innerHTML = '';
+    PD_POEMS.forEach(p=>{
+      const item = document.createElement('div');
+      item.className = 'list-item';
+      const left = document.createElement('div');
+      left.innerHTML = `<div style="font-weight:800">${p.title}</div><div class="muted">${p.author}</div>`;
+      const right = document.createElement('div');
+      right.innerHTML = '▶️';
+      item.appendChild(left); item.appendChild(right);
+      item.addEventListener('click', ()=> openPoem(p));
+      poemList.appendChild(item);
+    });
+  }
+  renderPoemList();
+
+  // Viewer progressive expansion
+  let currentPoem = null;
+  let revealed = 0;
+  const STEP = 4; // reveal 4 lines per click
+
+  function openPoem(p){
+    currentPoem = p;
+    revealed = 0;
+    pvTitle.textContent = p.title;
+    pvAuthor.textContent = p.author;
+    pvText.textContent = '';
+    poemViewer.hidden = false;
+    revealMore();
+  }
+  function revealMore(){
+    if(!currentPoem) return;
+    const next = Math.min(currentPoem.lines.length, revealed + STEP);
+    const slice = currentPoem.lines.slice(0, next).join('\n');
+    pvText.textContent = slice;
+    revealed = next;
+    // Hide Expand when done
+    pvExpand.disabled = revealed >= currentPoem.lines.length;
+    pvExpand.textContent = (revealed >= currentPoem.lines.length) ? 'Expanded' : 'Expand';
+  }
+  pvExpand.addEventListener('click', revealMore);
+  pvClose.addEventListener('click', ()=>{ poemViewer.hidden = true; currentPoem = null; revealed = 0; });
+
+  // Write: Save / Share
+  function downloadText(filename, text){
+    const blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+  function saveLocalPoem(title, body){
+    try{
+      const key = 'poems_user_v1';
+      const list = JSON.parse(localStorage.getItem(key) || '[]');
+      list.push({ title, body, ts: Date.now() });
+      localStorage.setItem(key, JSON.stringify(list));
+    }catch(e){}
+  }
+
+  poemSaveBtn.addEventListener('click', ()=>{
+    const title = (poemTitleInput.value || 'Untitled poem').trim();
+    const body = (poemBodyInput.value || '').trim();
+    const content = `${title}\n\n${body}\n`;
+    const ts = new Date().toISOString().slice(0,19).replace('T',' ');
+    downloadText(`${title.replace(/\s+/g,'_')}-${ts}.txt`, content);
+    saveLocalPoem(title, body);
+  });
+
+  poemShareBtn.addEventListener('click', ()=>{
+    const title = (poemTitleInput.value || 'Untitled poem').trim();
+    const body = (poemBodyInput.value || '').trim();
+    const content = `${title}\n\n${body}\n`;
+    const file = new File([content], `${title}.txt`, {type:'text/plain', lastModified: Date.now()});
+    if(navigator.canShare && navigator.canShare({ files:[file] })){
+      navigator.share({ files:[file], title, text:'A poem from my Heart page' }).catch(()=>{});
     }else{
-      download('heart-out.png', blob);
+      downloadText(`${title}.txt`, content);
     }
   });
 
-  deleteBtn.addEventListener('click', ()=>{
-    const ok = confirm('Delete your current drawing? This cannot be undone.');
-    if(!ok) return;
-    // Clear in raw pixel space
-    dctx.setTransform(1,0,0,1,0,0);
-    dctx.clearRect(0,0,draw.width,draw.height);
-    // Restore DPR transform for continued drawing
-    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
-    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    dctx.lineCap = dctx.lineJoin = 'round';
-    pushUndo();
+  poemsHelp.addEventListener('click', ()=>{
+    alert('Write a poem to save/share your own words, or read public-domain poems. Click a poem to reveal it gradually with “Expand”.');
   });
 
+  /* Open/Close */
+  // Poems open button already wired above
 })();
 </script>
 </body>
 </html>
-
