@@ -15,6 +15,7 @@
     --accent:#3b82f6; --accent2:#bfdbfe; --accent3:#60a5fa;
     --success1:#10b981; --success2:#34d399;
     --warn1:#f59e0b; --warn2:#fbbf24;
+    --info1:#a78bfa; --info2:#7dd3fc; /* for Dictionary button */
     --hist1:#7dd3fc; --hist2:#a78bfa; --hist3:#f472b6; --hist4:#34d399; --hist5:#fca5a5;
     --bg1:#0b0d12; --bg2:#0e1320;
     --tyrian:#66023C;
@@ -38,7 +39,7 @@
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
 
-  /* Nav stays above everything else */
+  /* Nav */
   .nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap;z-index:50}
   .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
 
@@ -51,7 +52,7 @@
 
   .wrap{height:100%;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:22px}
 
-  /* TITLE — Tyrian purple fill + bright yellow outline */
+  /* TITLE */
   .title{
     margin:0;
     font-family:var(--title-font);
@@ -67,7 +68,7 @@
       0 0 28px rgba(102,2,60,.25);
   }
 
-  /* Game/Tools area (pushed down from the title) */
+  /* Main area */
   .game{
     min-height:0;
     display:grid;
@@ -79,7 +80,7 @@
     padding-top:10px;
   }
 
-  /* START: buttons row + description */
+  /* Start buttons + subtitle */
   .start-wrap{display:grid;justify-items:center;gap:14px}
   .start-buttons{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
 
@@ -104,9 +105,14 @@
     background:linear-gradient(90deg,var(--warn1),var(--warn2));
     box-shadow:0 14px 28px rgba(245,158,11,.38), inset 0 -2px 0 rgba(255,255,255,.25);
   }
+  .btn-info{
+    color:#0b0b12;
+    background:linear-gradient(90deg,var(--info1),var(--info2));
+    box-shadow:0 14px 28px rgba(167,139,250,.38), inset 0 -2px 0 rgba(255,255,255,.25);
+  }
   .btn-ghost{background:rgba(255,255,255,.08); color:#e2e8f0; border:1px solid rgba(255,255,255,.16)}
 
-  .subtitle{margin:0;text-align:center;color:var(--muted);font-size:14px}
+  .subtitle{margin:0;text-align:center;color:#94a3b8;font-size:14px}
 
   .actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
   .spacer{flex:1 1 auto}
@@ -197,6 +203,19 @@
   .t-title{font-weight:900; font-size:14px; margin:2px 0 4px}
   .t-blurb{font-size:12.5px;color:#eaf2ff;opacity:.95;margin:0}
 
+  /* Dictionary */
+  .dict-row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+  .dict-input{
+    flex:1; min-width:240px;
+    border-radius:12px; border:1px solid rgba(255,255,255,.16);
+    background:rgba(255,255,255,.06); color:#fff;
+    padding:12px 14px; font:600 14px/1.4 var(--body-font); outline:none;
+  }
+  .dict-result h3{margin:.2rem 0 .4rem; font-size:18px}
+  .dict-meta{color:#cbd5e1; font-size:12px}
+  .dict-def{margin:.15rem 0; font-size:15px; color:#e8f0ff}
+  .dict-example{margin:.15rem 0; font-size:13px; color:#cfe2ff; opacity:.9}
+
   .scrolly{overflow:auto;min-height:0}
   .hidden{display:none !important}
 
@@ -255,6 +274,7 @@
           <button id="btnFactChecker" class="btn btn-success btn-lg">Fact checker</button>
           <button id="btnConspiracy" class="btn btn-warn btn-lg">Fun Conspiracy Theories</button>
           <button id="btnHistory" class="btn btn-primary btn-lg">Entire History of the World</button>
+          <button id="btnDictionary" class="btn btn-info btn-lg">Dictionary of the World</button>
         </div>
         <p id="startDesc" class="subtitle">Begin with a fact, then evolve it layer by layer.</p>
       </div>
@@ -331,6 +351,23 @@
           <button class="btn btn-ghost" id="btnHistClose">Close</button>
         </div>
       </div>
+
+      <!-- DICTIONARY OF THE WORLD -->
+      <div id="dictView" class="panel hidden">
+        <div class="evo-badge">Dictionary of the World</div>
+        <div class="dict-row">
+          <input id="dictQuery" class="dict-input" type="text" placeholder="Search a word… (press Enter)">
+          <span class="spacer"></span>
+          <button id="btnDictBack" class="btn btn-ghost">Back</button>
+          <button id="btnDictSearch" class="btn btn-info">Search</button>
+        </div>
+        <div id="dictResult" class="dict-result hidden">
+          <h3 id="dictWord"></h3>
+          <div id="dictMeta" class="dict-meta"></div>
+          <div id="dictDefs"></div>
+        </div>
+      </div>
+
     </section>
   </div>
 
@@ -355,7 +392,7 @@ function updateXPUI(){ const xp=loadXP(); const need=xpForNext(xp.level);
 updateXPUI(); document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateXPUI(); });
 
 /* ============================================================
-   FACT EVOLUTION (unchanged core)
+   FACT EVOLUTION
    ============================================================ */
 const FACTS = [
   {id:"sahara",title:"Sahara Desert",layers:[
@@ -380,6 +417,7 @@ const btnStartGame=document.getElementById('btnStartGame');
 const btnFactChecker=document.getElementById('btnFactChecker');
 const btnConspiracy=document.getElementById('btnConspiracy');
 const btnHistory=document.getElementById('btnHistory');
+const btnDictionary=document.getElementById('btnDictionary');
 
 const factGridEl=document.getElementById('factGrid');
 const listViewEl=document.getElementById('factListView');
@@ -418,6 +456,16 @@ const btnHistBack=document.getElementById('btnHistBack');
 const btnHistClose=document.getElementById('btnHistClose');
 const histBackRowEl=document.getElementById('histBackRow');
 
+/* Dictionary elements */
+const dictViewEl=document.getElementById('dictView');
+const dictQueryEl=document.getElementById('dictQuery');
+const dictResultEl=document.getElementById('dictResult');
+const dictWordEl=document.getElementById('dictWord');
+const dictMetaEl=document.getElementById('dictMeta');
+const dictDefsEl=document.getElementById('dictDefs');
+const btnDictBack=document.getElementById('btnDictBack');
+const btnDictSearch=document.getElementById('btnDictSearch');
+
 let currentFact=null, layerIndex=0;
 
 /* -------------------- Views -------------------- */
@@ -428,6 +476,7 @@ function hideAll(){
   fcViewEl.classList.add('hidden');
   ctViewEl.classList.add('hidden');
   histViewEl.classList.add('hidden');
+  dictViewEl.classList.add('hidden');
 }
 function showStart(){ hideAll(); startViewEl.classList.remove('hidden'); currentFact=null; layerIndex=0; }
 function showList(){ hideAll(); listViewEl.classList.remove('hidden'); }
@@ -435,6 +484,7 @@ function showEvo(){ hideAll(); evoViewEl.classList.remove('hidden'); }
 function showFc(){ hideAll(); fcViewEl.classList.remove('hidden'); }
 function showCt(){ hideAll(); ctViewEl.classList.remove('hidden'); }
 function showHist(){ hideAll(); histViewEl.classList.remove('hidden'); }
+function showDict(){ hideAll(); dictViewEl.classList.remove('hidden'); }
 
 /* -------------------- Renderers -------------------- */
 function renderFactGrid(){
@@ -469,6 +519,7 @@ btnStartGame.addEventListener('click',()=>{ playClick(); renderFactGrid(); showL
 btnFactChecker.addEventListener('click',()=>{ playClick(); resetFactChecker(); showFc(); });
 btnConspiracy.addEventListener('click',()=>{ playClick(); showRandomTheory(); showCt(); setupStars(); });
 btnHistory.addEventListener('click',()=>{ playClick(); renderTimeline(); showHist(); });
+btnDictionary.addEventListener('click',()=>{ playClick(); resetDictionary(); showDict(); });
 
 btnDeeper.addEventListener('click',()=>{
   if(!currentFact) return;
@@ -516,7 +567,6 @@ function localHeuristicCheck(text){
 }
 
 /* -------------------- Fun Conspiracy Theories -------------------- */
-/* Lighthearted entries only; purely for entertainment */
 const THEORIES = [
   {id:'bielefeld', title:'The Bielefeld Conspiracy', text:'A long-running German in-joke claims the city of Bielefeld doesn’t exist. Anyone who says they’ve been there is “part of the cover-up.”'},
   {id:'birds', title:'Birds Aren’t Real (satire)', text:'A tongue-in-cheek movement that jokes birds were replaced by surveillance drones. It’s satire about modern misinformation.'},
@@ -525,7 +575,7 @@ const THEORIES = [
   {id:'oak', title:'Oak Island Mystery', text:'Stories of a hidden pit and booby-trapped tunnels in Nova Scotia promise buried treasure. Digs found curiosities, but the vault remains elusive…'},
   {id:'shakespeare', title:'Who Wrote Shakespeare?', text:'A minority suspects alternate authors (Oxford, Marlowe, Bacon). Mainstream scholars attribute the works to Shakespeare of Stratford.'}
 ];
-const CT_RATINGS_KEY='ct_ratings_v1'; // { [id]: {count, sum} }
+const CT_RATINGS_KEY='ct_ratings_v1';
 function loadRatings(){ try{ return JSON.parse(localStorage.getItem(CT_RATINGS_KEY))||{} } catch{ return {} } }
 function saveRatings(r){ localStorage.setItem(CT_RATINGS_KEY, JSON.stringify(r)); }
 let currentTheory=null;
@@ -642,7 +692,7 @@ const EVENTS = [
 
 function renderTimeline(){
   timelineEl.innerHTML='';
-  EVENTS.forEach((e, idx)=>{
+  EVENTS.forEach((e)=>{
     const node=document.createElement('button');
     node.className='t-node';
     node.style.setProperty('--c', e.color);
@@ -684,6 +734,121 @@ btnHistEvolve.addEventListener('click',()=>{
 btnHistBack.addEventListener('click',()=>{ playClick(); histDetailEl.classList.add('hidden'); });
 btnHistClose.addEventListener('click',()=>{ playClick(); showStart(); });
 
+/* -------------------- Dictionary of the World -------------------- */
+/* Mini offline dictionary (expand anytime) */
+const MINI_DICT = {
+  "entropy": { pos:"noun", defs:[
+    "A measure of disorder or randomness in a system.",
+    "In information theory, the average information content per message."
+  ], ex:"Higher entropy means more uncertainty."},
+  "zeitgeist": { pos:"noun", defs:[
+    "The defining spirit or mood of a particular period of history."
+  ], ex:"The film captured the zeitgeist of the late 1990s."},
+  "serendipity": { pos:"noun", defs:[
+    "The occurrence of events by chance in a happy or beneficial way."
+  ], ex:"Meeting them in that tiny café was pure serendipity."},
+  "ephemeral": { pos:"adjective", defs:[
+    "Lasting for a very short time; transient."
+  ], ex:"Ephemeral blooms carpet the desert after rare rains."},
+  "axiom": { pos:"noun", defs:[
+    "A statement or proposition regarded as self-evidently true."
+  ], ex:"In geometry, Euclid’s postulates are foundational axioms."},
+  "heuristic": { pos:"noun", defs:[
+    "A practical approach to problem solving not guaranteed to be optimal but sufficient for immediate goals."
+  ], ex:"We used a heuristic to get a quick estimate."},
+  "catharsis": { pos:"noun", defs:[
+    "The process of releasing, and thereby providing relief from, strong or repressed emotions."
+  ], ex:"Writing can be a catharsis after stressful events."},
+  "dichotomy": { pos:"noun", defs:[
+    "A division or contrast between two things that are or are represented as being opposed or entirely different."
+  ], ex:"The article explores the dichotomy between freedom and security."}
+};
+/* Very light stemming/normalization for offline lookups */
+function normalizeWord(w){
+  let s=w.trim().toLowerCase().replace(/^[^a-z]+|[^a-z]+$/g,''); // strip non-letters at ends
+  if(!s) return s;
+  // try simple stems
+  const attempts=[s];
+  if(s.endsWith('ing') && s.length>4) attempts.push(s.slice(0,-3));
+  if(s.endsWith('ed') && s.length>3) attempts.push(s.slice(0,-2));
+  if(s.endsWith('es') && s.length>3) attempts.push(s.slice(0,-2));
+  if(s.endsWith('s') && s.length>2) attempts.push(s.slice(0,-1));
+  // unique
+  return attempts.filter((v,i,a)=>a.indexOf(v)===i);
+}
+
+function resetDictionary(){
+  dictQueryEl.value='';
+  dictResultEl.classList.add('hidden');
+  dictWordEl.textContent=''; dictMetaEl.textContent=''; dictDefsEl.innerHTML='';
+}
+
+btnDictionary && btnDictionary.addEventListener('click',()=>{ dictQueryEl.focus(); });
+
+btnDictBack.addEventListener('click',()=>{ playClick(); showStart(); });
+btnDictSearch.addEventListener('click',()=>{ playClick(); runDictionaryLookup(); });
+dictQueryEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); playClick(); runDictionaryLookup(); } });
+
+function runDictionaryLookup(){
+  const raw=dictQueryEl.value;
+  const variants = normalizeWord(raw);
+  if(!variants || !variants.length){ showDictNoResult(raw); return; }
+  let entry=null, keyUsed=null;
+  for(const k of variants){ if(MINI_DICT[k]){ entry=MINI_DICT[k]; keyUsed=k; break; } }
+
+  // If offline entry found
+  if(entry){
+    renderDictResult(formatWord(raw, keyUsed), entry);
+    return;
+  }
+
+  // Fallback (no network): graceful message + hook for future AI/API
+  renderDictResult(formatWord(raw), {
+    pos:'—',
+    defs:[ 'No offline entry found. Try a simpler form (singular/base).'],
+    ex:'(Optional) Enable the online dictionary/AI backend for full coverage.'
+  });
+}
+
+/* Pretty word display */
+function formatWord(input, key){
+  const w = (key || input || '').trim();
+  return w ? w.replace(/\s+/g,' ').slice(0,64) : '(empty)';
+}
+
+/* Render definition UI */
+function renderDictResult(displayWord, entry){
+  dictWordEl.textContent = displayWord;
+  dictMetaEl.textContent = entry.pos ? `Part of speech: ${entry.pos}` : '';
+  dictDefsEl.innerHTML = '';
+  (entry.defs||[]).forEach((d,i)=>{
+    const p=document.createElement('p');
+    p.className='dict-def';
+    p.textContent = `${i+1}. ${d}`;
+    dictDefsEl.appendChild(p);
+  });
+  if(entry.ex){
+    const ex=document.createElement('p');
+    ex.className='dict-example';
+    ex.textContent = `Example: ${entry.ex}`;
+    dictDefsEl.appendChild(ex);
+  }
+  dictResultEl.classList.remove('hidden');
+  // tasteful animation like others
+  dictViewEl.classList.remove('glow'); void dictViewEl.offsetWidth; dictViewEl.classList.add('glow');
+}
+
+/* ===== Optional: backend/AI hook (commented) =====
+async function lookupOnline(word){
+  // Example: fetch from your backend that calls dictionaryapi or AI
+  const res = await fetch('/api/dictionary', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({word})});
+  return res.json(); // expected {word, pos, defs:[...], ex}
+}
+*/
+
+/* -------------------- Utils -------------------- */
+function escapeHTML(str){ return String(str).replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s])); }
+
 /* -------------------- Sounds (Web Audio) -------------------- */
 let audioCtx;
 function getCtx(){ if(!audioCtx){ const AC=window.AudioContext||window.webkitAudioContext; audioCtx=new AC(); } return audioCtx; }
@@ -700,10 +865,7 @@ function playEvolve(){
   tone(1560,'sine',0.06,0.22); setTimeout(()=>playClick(),200);
 }
 
-/* -------------------- Utils -------------------- */
-function escapeHTML(str){ return String(str).replace(/[&<>"']/g, s=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s])); }
-
-/* Boot */
+/* -------------------- Boot -------------------- */
 showStart();
 
 /* Build star buttons once */
@@ -714,5 +876,6 @@ showStart();
 </script>
 </body>
 </html>
+
 
 
