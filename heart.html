@@ -130,11 +130,12 @@
 
   .studio-canvas-wrap{
     position:relative; background:#0a0f1a; display:grid; place-items:center;
-    min-height:40vh; height:min(60vh, 60dvh);
+    min-height:40vh; height:min(60vh, 60dvh); padding:14px;
   }
   canvas#draw{
     background:#0b0f18; border-radius:12px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
     touch-action:none; /* prevent touch scrolling while drawing */
+    width:100%; height:100%; display:block; /* explicit CSS size */
     max-width:100%; max-height:100%;
   }
 
@@ -225,7 +226,7 @@
         </div>
       </div>
 
-      <div class="studio-canvas-wrap">
+      <div class="studio-canvas-wrap" id="canvasHost">
         <canvas id="draw" width="1280" height="720" aria-label="Drawing canvas"></canvas>
       </div>
 
@@ -258,7 +259,6 @@
     canvasBG.style.height = h + 'px';
     ctxBG.setTransform(dpr, 0, 0, dpr, 0, 0);
   }
-
   function makeStars(){
     STARS = Array.from({length: STAR_COUNT}).map(()=>({
       x: Math.random()*innerWidth,
@@ -268,7 +268,6 @@
       dy: (Math.random()-.5)*0.15
     }));
   }
-
   function renderStaticStars(){
     ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height);
     STARS.forEach(s=>{
@@ -276,7 +275,6 @@
       ctxBG.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
     });
   }
-
   function tickStars(){
     ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height);
     STARS.forEach(s=>{
@@ -288,17 +286,15 @@
     });
     raf = requestAnimationFrame(tickStars);
   }
-
   function startStars(){
     sizeStarCanvas(); makeStars();
     if(prefersReduced){ cancelAnimationFrame(raf); renderStaticStars(); }
     else { cancelAnimationFrame(raf); raf = requestAnimationFrame(tickStars); }
   }
-
   addEventListener('resize', startStars, { passive:true });
   startStars();
 
-  // --- XP UI (kept behavior; added cross-tab sync + safety) ---
+  // --- XP UI ---
   const MAX_LEVEL = 100;
   function xpForNext(level){
     if(level>=MAX_LEVEL) return Infinity;
@@ -332,9 +328,10 @@
   const closeStudio = document.getElementById('closeStudio');
 
   const draw = document.getElementById('draw');
+  const host = document.getElementById('canvasHost');
   const dctx = draw.getContext('2d');
+
   let drawing = false;
-  let lastX = 0, lastY = 0;
   let brushColor = '#ffffff';
   let brushSize = 8;
   let mode = 'pen'; // 'pen' | 'eraser'
@@ -343,88 +340,105 @@
   const undoStack = [];
   const redoStack = [];
 
-  function fitCanvasToContainer(){
-    // Keep internal resolution high (HiDPI), but the canvas already has large base size.
-    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+  function sizeDrawCanvas(){
+    // Size the internal buffer to the *visible* CSS size, then scale by DPR.
     const rect = draw.getBoundingClientRect();
-    const targetW = Math.floor(rect.width * dpr);
-    const targetH = Math.floor(rect.height * dpr);
-    if(draw.width !== targetW || draw.height !== targetH){
-      const snapshot = dctx.getImageData(0,0,draw.width,draw.height);
-      draw.width = targetW; draw.height = targetH;
-      dctx.putImageData(snapshot, 0, 0);
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+
+    // Avoid zero-size when dialog just opened
+    const cssW = Math.max(1, Math.floor(rect.width));
+    const cssH = Math.max(1, Math.floor(rect.height));
+
+    const needW = Math.floor(cssW * dpr);
+    const needH = Math.floor(cssH * dpr);
+
+    if(draw.width !== needW || draw.height !== needH){
+      // Preserve current bitmap
+      let snapshot = null;
+      try { snapshot = dctx.getImageData(0,0,draw.width,draw.height); } catch(e){}
+      draw.width = needW; draw.height = needH;
+
+      // Map drawing ops in CSS pixels
+      dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       dctx.lineCap = dctx.lineJoin = 'round';
+
+      if(snapshot){
+        // Draw previous image scaled to new size
+        // Create temp canvas to place snapshot at 1:1 then scale via drawImage
+        const tmp = document.createElement('canvas');
+        tmp.width = snapshot.width; tmp.height = snapshot.height;
+        const tctx = tmp.getContext('2d');
+        tctx.putImageData(snapshot, 0, 0);
+        // drawImage expects device pixels; since we've set transform, use CSS pixel sizes
+        dctx.save();
+        dctx.setTransform(1,0,0,1,0,0); // reset to draw raw pixels
+        dctx.drawImage(tmp, 0, 0, needW, needH);
+        dctx.restore();
+      }
     }
   }
 
   function pushUndo(){
     try{
       if(undoStack.length >= MAX_UNDO) undoStack.shift();
-      undoStack.push(dctx.getImageData(0,0,draw.width,draw.height));
-      redoStack.length = 0; // clear redo on new action
+      // Save raw pixels (device size)
+      const img = dctx.getImageData(0,0,draw.width,draw.height);
+      undoStack.push(img);
+      redoStack.length = 0;
     }catch(e){ /* ignore if too big */ }
   }
 
   function restore(img){
     if(!img) return;
     draw.width = img.width; draw.height = img.height;
+    dctx.setTransform(1,0,0,1,0,0); // write raw pixels
     dctx.putImageData(img, 0, 0);
+    // Reapply DPR transform for new strokes
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dctx.lineCap = dctx.lineJoin = 'round';
   }
 
-  function startDrawing(x, y){
-    drawing = true;
-    lastX = x; lastY = y;
-    dctx.beginPath();
-    dctx.moveTo(x,y);
-  }
-  function drawTo(x, y){
-    if(!drawing) return;
-    if(mode==='pen'){
-      dctx.globalCompositeOperation = 'source-over';
-      dctx.strokeStyle = brushColor;
+  function getPos(evt){
+    const rect = draw.getBoundingClientRect();
+    if(evt.touches && evt.touches[0]){
+      return { x: evt.touches[0].clientX - rect.left, y: evt.touches[0].clientY - rect.top };
     }else{
-      dctx.globalCompositeOperation = 'destination-out';
-      dctx.strokeStyle = 'rgba(0,0,0,1)';
+      return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
     }
+  }
+
+  function startDrawing(p){
+    drawing = true;
+    dctx.beginPath();
+    dctx.moveTo(p.x, p.y);
+  }
+  function drawTo(p){
+    if(!drawing) return;
+    dctx.globalCompositeOperation = (mode==='pen') ? 'source-over' : 'destination-out';
+    dctx.strokeStyle = (mode==='pen') ? brushColor : 'rgba(0,0,0,1)';
     dctx.lineWidth = brushSize;
-    dctx.lineTo(x,y);
+    dctx.lineTo(p.x, p.y);
     dctx.stroke();
-    lastX = x; lastY = y;
   }
   function endDrawing(){
     if(!drawing) return;
     drawing = false;
     dctx.closePath();
-    // snapshot after stroke
     pushUndo();
     dctx.globalCompositeOperation = 'source-over';
-  }
-
-  function getPos(evt){
-    const rect = draw.getBoundingClientRect();
-    let x, y;
-    if(evt.touches && evt.touches[0]){
-      x = evt.touches[0].clientX - rect.left;
-      y = evt.touches[0].clientY - rect.top;
-    }else{
-      x = evt.clientX - rect.left;
-      y = evt.clientY - rect.top;
-    }
-    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
-    return { x: x * dpr, y: y * dpr };
   }
 
   function openStudioModal(){
     if(typeof studio.showModal === 'function'){ studio.showModal(); }
     else { studio.setAttribute('open',''); }
-    // initialize canvas context styles
-    dctx.lineCap = dctx.lineJoin = 'round';
-    // seed first undo state if empty
-    if(undoStack.length===0){
-      pushUndo();
-    }
-    // ensure sizing is correct after opening
-    setTimeout(()=>fitCanvasToContainer(), 0);
+
+    // Ensure canvas sizing is correct when the dialog becomes visible
+    requestAnimationFrame(()=>{
+      sizeDrawCanvas();
+      // Seed undo state if empty
+      if(undoStack.length===0) pushUndo();
+    });
   }
   function closeStudioModal(){
     if(studio.open) studio.close();
@@ -435,17 +449,17 @@
   closeStudio.addEventListener('click', closeStudioModal);
   studio.addEventListener('cancel', (e)=>{ e.preventDefault(); closeStudioModal(); });
 
-  // Resize handling inside modal
-  const resizeObs = new ResizeObserver(()=>fitCanvasToContainer());
-  resizeObs.observe(draw);
+  // Resize handling (watch container so CSS size changes trigger DPR sizing)
+  const ro = new ResizeObserver(()=> sizeDrawCanvas());
+  ro.observe(host);
 
-  // Input bindings
-  draw.addEventListener('mousedown', (e)=>{ const p = getPos(e); startDrawing(p.x,p.y); });
-  draw.addEventListener('mousemove', (e)=>{ const p = getPos(e); drawTo(p.x,p.y); });
+  // Pointer & touch input
+  draw.addEventListener('mousedown', (e)=> startDrawing(getPos(e)));
+  draw.addEventListener('mousemove', (e)=> drawTo(getPos(e)));
   addEventListener('mouseup', endDrawing);
 
-  draw.addEventListener('touchstart', (e)=>{ e.preventDefault(); const p = getPos(e); startDrawing(p.x,p.y); }, {passive:false});
-  draw.addEventListener('touchmove', (e)=>{ e.preventDefault(); const p = getPos(e); drawTo(p.x,p.y); }, {passive:false});
+  draw.addEventListener('touchstart', (e)=>{ e.preventDefault(); startDrawing(getPos(e)); }, {passive:false});
+  draw.addEventListener('touchmove', (e)=>{ e.preventDefault(); drawTo(getPos(e)); }, {passive:false});
   draw.addEventListener('touchend', (e)=>{ e.preventDefault(); endDrawing(); }, {passive:false});
 
   // Tools
@@ -464,19 +478,16 @@
 
   const colorPicker = document.getElementById('colorPicker');
   colorPicker.addEventListener('input', ()=>{ brushColor = colorPicker.value; setMode('pen'); });
-
   document.querySelectorAll('.color-swatch').forEach(el=>{
     el.addEventListener('click', ()=>{
       const c = el.getAttribute('data-color');
-      brushColor = c; colorPicker.value = c;
-      setMode('pen');
+      brushColor = c; colorPicker.value = c; setMode('pen');
     });
   });
 
   // History
   const undoBtn = document.getElementById('undoBtn');
   const redoBtn = document.getElementById('redoBtn');
-
   undoBtn.addEventListener('click', ()=>{
     if(undoStack.length > 1){
       const current = undoStack.pop();
@@ -505,7 +516,6 @@
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 1000);
   }
-
   function canvasToBlobPromise(type='image/png', quality=1){
     return new Promise(res=> draw.toBlob(b=>res(b), type, quality));
   }
@@ -515,10 +525,9 @@
     const ts = new Date().toISOString().replace(/[:.]/g,'-');
     const filename = `heart-out-${ts}.png`;
     try{
-      // store a small copy in localStorage (preview)
       const preview = draw.toDataURL('image/png', 0.8);
       localStorage.setItem('heart_last_v1', preview);
-    }catch(e){ /* might exceed quota; ignore */ }
+    }catch(e){ /* may exceed quota */ }
     download(filename, blob);
   });
 
@@ -526,11 +535,9 @@
     const blob = await canvasToBlobPromise('image/png', 0.95);
     const file = new File([blob], 'heart-out.png', {type:'image/png', lastModified: Date.now()});
     if(navigator.canShare && navigator.canShare({ files:[file] })){
-      try{
-        await navigator.share({ files:[file], title:'My heart on canvas', text:'Shared from Heart page' });
-      }catch(e){ /* user canceled share */ }
+      try{ await navigator.share({ files:[file], title:'My heart on canvas', text:'Shared from Heart page' }); }
+      catch(e){ /* user canceled share */ }
     }else{
-      // Fallback: download
       download('heart-out.png', blob);
     }
   });
@@ -538,7 +545,13 @@
   deleteBtn.addEventListener('click', ()=>{
     const ok = confirm('Delete your current drawing? This cannot be undone.');
     if(!ok) return;
+    // Clear in raw pixel space
+    dctx.setTransform(1,0,0,1,0,0);
     dctx.clearRect(0,0,draw.width,draw.height);
+    // Restore DPR transform for continued drawing
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    dctx.lineCap = dctx.lineJoin = 'round';
     pushUndo();
   });
 
@@ -546,3 +559,4 @@
 </script>
 </body>
 </html>
+
