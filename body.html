@@ -658,33 +658,60 @@ reflexStart.addEventListener('click', reflexStartGame);
 reflexStopBtn.addEventListener('click', reflexStopGame);
 reflexReset.addEventListener('click', reflexResetGame);
 
-/* Gesture detection */
+/* ----- Mobile-solid gesture handling (phones/tablets) ----- */
 let sx=0, sy=0, st=0, tracking=false;
-const MAX_TIME = 600, MIN_DIST = 40, TAP_MAX_DIST = 12, TAP_MAX_TIME = 300;
+const MAX_TIME = 700, MIN_DIST = 35, TAP_MAX_DIST = 14, TAP_MAX_TIME = 300;
 
-function onReflexDown(e){
-  if(!reflexRunning) return;
-  tracking = true; sx = e.clientX; sy = e.clientY; st = performance.now();
+/* Get consistent clientX/Y from any event type */
+function getPoint(e, useChanged=false){
+  if (e.changedTouches && e.changedTouches.length && useChanged){
+    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+  }
+  if (e.touches && e.touches.length){
+    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }
+  return { x: e.clientX, y: e.clientY };
 }
-function onReflexUp(e){
+
+function onReflexDownEvent(e){
+  if(!reflexRunning) return;
+  // prevent page scroll during swipe on iOS Safari
+  if(e.cancelable) e.preventDefault();
+  const p = getPoint(e, false);
+  tracking = true; sx = p.x; sy = p.y; st = performance.now();
+}
+function onReflexUpEvent(e){
   if(!reflexRunning || !tracking) return;
   tracking = false;
-  const dx = e.clientX - sx, dy = e.clientY - sy, dt = performance.now() - st;
+  const p = getPoint(e, true);
+  const dx = p.x - sx, dy = p.y - sy, dt = performance.now() - st;
+
   let input = null;
-  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){ input='tap'; }
-  else if(dt <= MAX_TIME){
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){ input = dx > 0 ? 'right' : 'left'; }
-    else if(Math.abs(dy) >= MIN_DIST){ input = dy > 0 ? 'down' : 'up'; }
+  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){
+    input = 'tap';
+  } else if(dt <= MAX_TIME){
+    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){
+      input = dx > 0 ? 'right' : 'left';
+    } else if(Math.abs(dy) >= MIN_DIST){
+      input = dy > 0 ? 'down' : 'up';
+    }
   }
+
   if(!input){ failReset(); return; }
   if(input === currentAction) success(); else failReset();
 }
-['pointerdown','mousedown','touchstart'].forEach(type=>{
-  reflexArena.addEventListener(type, e=>{ if(e.pointerType && type==='mousedown') return; onReflexDown(e); }, {passive:true});
-});
-['pointerup','mouseup','touchend','pointercancel','pointerleave'].forEach(type=>{
-  reflexArena.addEventListener(type, e=>{ onReflexUp(e); }, {passive:true});
-});
+
+/* Pointer & mouse (desktop), Touch (phones) */
+reflexArena.addEventListener('pointerdown', onReflexDownEvent, {passive:false});
+reflexArena.addEventListener('mousedown', onReflexDownEvent, {passive:false});
+reflexArena.addEventListener('touchstart', onReflexDownEvent, {passive:false});
+
+/* Listen for “up” on window so lifting outside still counts */
+window.addEventListener('pointerup', onReflexUpEvent, {passive:true});
+window.addEventListener('mouseup', onReflexUpEvent, {passive:true});
+window.addEventListener('touchend', onReflexUpEvent, {passive:true});
+window.addEventListener('touchcancel', onReflexUpEvent, {passive:true});
+window.addEventListener('pointercancel', onReflexUpEvent, {passive:true});
 
 /* ===== KNOW YOURSELF Drawer Controls ===== */
 const drawerKnow = document.getElementById('drawerKnow');
@@ -710,6 +737,7 @@ addEventListener('keydown', e=>{
 </script>
 </body>
 </html>
+
 
 
 
