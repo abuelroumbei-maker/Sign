@@ -17,4 +17,532 @@
     --ring: #fff;
   }
 
-  *{box-sizin*
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--body-font); color:var(--fg);
+    background:var(--bg1); overflow:hidden;
+    -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+  }
+
+  .bg{
+    position:fixed; inset:0; z-index:-4;
+    background:
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    animation:bgDrift 20s ease-in-out infinite alternate;
+    filter:saturate(1.05) brightness(1.03);
+    will-change: transform;
+  }
+  @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
+  @media (prefers-reduced-motion: reduce){ .bg{ animation:none } }
+
+  #stars{position:fixed; inset:0; pointer-events:none; z-index:-3; display:block}
+
+  .wrap{height:100%;display:grid;place-items:center;padding:22px;text-align:center}
+  .title{
+    margin:0; font-size:clamp(40px,10vw,86px); line-height:1.02;
+    background:linear-gradient(90deg,#fff,color-mix(in srgb,var(--accent2) 35%,#fff));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    filter:drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
+    font-weight:900; letter-spacing:.5px;
+  }
+  .cta{
+    margin-top:24px; display:inline-flex; align-items:center; gap:10px;
+    padding:12px 16px; border-radius:14px; border:0; cursor:pointer;
+    background:linear-gradient(90deg,var(--accent),var(--accent3));
+    color:#0a0b0f; font-weight:900; box-shadow:0 10px 28px rgba(0,0,0,.25);
+    transition:transform .12s ease, box-shadow .12s ease, opacity .2s ease;
+  }
+  .cta:hover{ transform:translateY(-1px); box-shadow:0 16px 34px rgba(0,0,0,.33) }
+  .cta:active{ transform:translateY(0) }
+  .cta:focus-visible{ outline:3px solid var(--ring); outline-offset:3px }
+
+  nav.nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{
+    display:inline-block;padding:8px 12px;border-radius:999px;
+    background:var(--card);color:#0a0b0f;font-weight:800;
+    text-decoration:none; transition:transform .12s ease, box-shadow .12s ease, opacity .2s ease;
+    box-shadow:0 6px 16px rgba(0,0,0,.16)
+  }
+  .pill:focus-visible{outline:2px solid #fff; outline-offset:2px}
+  .pill:hover{transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.22)}
+  .pill:active{transform:translateY(0)}
+
+  .xpWrap{
+    position:fixed; right:18px; top:18px; display:flex; align-items:center; gap:12px;
+    max-width:min(520px, 70vw);
+  }
+  .xp-badge{
+    background:var(--card);color:#0a0b0f;border-radius:12px;padding:6px 10px;
+    font-size:13px;font-weight:800;box-shadow:0 8px 18px rgba(0,0,0,.15)
+  }
+  .xp-bar{
+    flex:1;height:10px;border-radius:999px;background:rgba(255,255,255,.22);
+    overflow:hidden;position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,.25)
+  }
+  .xp-fill{
+    position:absolute;left:0;top:0;bottom:0;width:0%;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    box-shadow:0 6px 20px rgba(13,148,255,.35);transition:width .45s ease
+  }
+  .xp-meta{position:fixed;right:18px;top:52px;font-size:12px;color:#cbd5e1;opacity:.9}
+
+  /* Studio (modal) */
+  dialog#studio{
+    border:none; padding:0; background:transparent;
+    width:min(1200px, 96vw); max-height:92vh;
+  }
+  .studio-frame{
+    display:grid; grid-template-rows:auto 1fr auto;
+    background:#0c1120; border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.45);
+    overflow:hidden; border:1px solid rgba(255,255,255,.08)
+  }
+  .studio-top{
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    padding:12px 14px; background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  }
+  .studio-title{font-weight:900; letter-spacing:.3px}
+  .studio-close{
+    appearance:none; border:0; background:var(--card); color:#0a0b0f; font-weight:900;
+    padding:6px 10px; border-radius:10px; cursor:pointer;
+  }
+
+  .studio-toolbar{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+    padding:12px 14px; border-top:1px solid rgba(255,255,255,.06); border-bottom:1px solid rgba(255,255,255,.06);
+    background:rgba(255,255,255,.02);
+  }
+  .tool{
+    appearance:none; border:0; padding:8px 10px; border-radius:12px; cursor:pointer;
+    background:rgba(255,255,255,.12); color:#fff; font-weight:800;
+  }
+  .tool[aria-pressed="true"]{ outline:2px solid #fff; outline-offset:2px; background:rgba(255,255,255,.22) }
+  .color-swatch{
+    width:28px;height:28px;border-radius:999px;border:2px solid rgba(255,255,255,.65);
+    display:inline-block; cursor:pointer;
+  }
+  .grow{ flex:1 }
+  .tool-group{ display:flex; gap:10px; align-items:center }
+  .slider{ width:150px }
+
+  .studio-canvas-wrap{
+    position:relative; background:#0a0f1a; display:grid; place-items:center;
+    min-height:40vh; height:min(60vh, 60dvh);
+  }
+  canvas#draw{
+    background:#0b0f18; border-radius:12px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);
+    touch-action:none; /* prevent touch scrolling while drawing */
+    max-width:100%; max-height:100%;
+  }
+
+  .studio-bottom{
+    display:flex; gap:10px; align-items:center; justify-content:flex-end;
+    padding:12px 14px; background:linear-gradient(0deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+  }
+  .btn{
+    appearance:none; border:0; padding:10px 14px; border-radius:14px; cursor:pointer; font-weight:900;
+    background:var(--card); color:#0a0b0f;
+  }
+  .btn.danger{ background:#fecaca; color:#7f1d1d }
+  .btn.primary{ background:linear-gradient(90deg,var(--accent),var(--accent3)); color:#0a0b0f }
+  .btn:focus-visible{ outline:3px solid var(--ring); outline-offset:3px }
+
+  .hint{ font-size:12px; opacity:.8 }
+
+  .sr-only{ position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0 }
+</style>
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <nav class="nav" aria-label="Site">
+    <a class="pill" href="index.html" title="Go to Home">← Home</a>
+    <a class="pill" href="body.html" title="Go to Body">Body</a>
+    <a class="pill" href="mind.html" title="Go to Mind">Mind</a>
+    <a class="pill" href="soul.html" title="Go to Soul">Soul</a>
+  </nav>
+
+  <div class="xpWrap" role="status" aria-live="polite">
+    <div class="xp-badge" id="xpBadge" aria-label="Level badge">Level 0</div>
+    <div class="xp-bar" aria-label="Experience progress">
+      <div class="xp-fill" id="xpFill"></div>
+    </div>
+  </div>
+  <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
+
+  <div class="wrap" role="main">
+    <h1 class="title">Heart</h1>
+
+    <button id="openStudio" class="cta" type="button" title="Open drawing panel">
+      ❤️ Pour your heart out
+    </button>
+
+    <p class="hint" style="margin-top:10px;opacity:.75">
+      Draw or hand-write with multiple colors. Save, share, or delete when you’re done.
+    </p>
+  </div>
+
+  <!-- Drawing / Writing Studio -->
+  <dialog id="studio">
+    <div class="studio-frame" role="dialog" aria-labelledby="studioTitle">
+      <div class="studio-top">
+        <div class="studio-title" id="studioTitle">Pour your heart out</div>
+        <button class="studio-close" id="closeStudio" type="button" title="Close">Close</button>
+      </div>
+
+      <div class="studio-toolbar" aria-label="Tools">
+        <div class="tool-group" role="group" aria-label="Mode">
+          <button id="penTool" class="tool" aria-pressed="true" title="Pen">Pen</button>
+          <button id="eraserTool" class="tool" aria-pressed="false" title="Eraser">Eraser</button>
+        </div>
+
+        <div class="tool-group" role="group" aria-label="Color">
+          <span class="color-swatch" data-color="#ffffff" style="background:#ffffff"></span>
+          <span class="color-swatch" data-color="#ef4444" style="background:#ef4444"></span>
+          <span class="color-swatch" data-color="#22c55e" style="background:#22c55e"></span>
+          <span class="color-swatch" data-color="#3b82f6" style="background:#3b82f6"></span>
+          <span class="color-swatch" data-color="#f59e0b" style="background:#f59e0b"></span>
+          <label class="tool" style="display:inline-flex;align-items:center;gap:8px">
+            <span style="opacity:.85">Pick</span>
+            <input id="colorPicker" type="color" value="#ffffff" style="width:28px;height:28px;border:0;background:transparent;padding:0">
+          </label>
+        </div>
+
+        <div class="tool-group" role="group" aria-label="Brush size">
+          <label class="tool" for="size">Size</label>
+          <input id="size" class="slider" type="range" min="1" max="48" value="8">
+        </div>
+
+        <div class="grow"></div>
+
+        <div class="tool-group" role="group" aria-label="History">
+          <button id="undoBtn" class="tool" title="Undo">Undo</button>
+          <button id="redoBtn" class="tool" title="Redo">Redo</button>
+        </div>
+      </div>
+
+      <div class="studio-canvas-wrap">
+        <canvas id="draw" width="1280" height="720" aria-label="Drawing canvas"></canvas>
+      </div>
+
+      <div class="studio-bottom">
+        <span class="hint" style="margin-right:auto">Tip: Use a stylus on touch devices for smoother handwriting.</span>
+        <button id="deleteBtn" class="btn danger" type="button" title="Clear drawing">Delete</button>
+        <button id="saveBtn" class="btn" type="button" title="Save PNG">Save</button>
+        <button id="shareBtn" class="btn primary" type="button" title="Share">Share</button>
+      </div>
+    </div>
+  </dialog>
+
+<script>
+(function(){
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // --- Stars (HiDPI-aware) ---
+  const canvasBG = document.getElementById('stars');
+  const ctxBG = canvasBG.getContext('2d');
+  let STAR_COUNT = 160;
+  let STARS = [];
+  let raf = 0;
+
+  function sizeStarCanvas(){
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    const { innerWidth: w, innerHeight: h } = window;
+    canvasBG.width = Math.floor(w * dpr);
+    canvasBG.height = Math.floor(h * dpr);
+    canvasBG.style.width = w + 'px';
+    canvasBG.style.height = h + 'px';
+    ctxBG.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function makeStars(){
+    STARS = Array.from({length: STAR_COUNT}).map(()=>({
+      x: Math.random()*innerWidth,
+      y: Math.random()*innerHeight,
+      z: Math.random()*1.5 + .3,
+      dx: (Math.random()-.5)*0.15,
+      dy: (Math.random()-.5)*0.15
+    }));
+  }
+
+  function renderStaticStars(){
+    ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height);
+    STARS.forEach(s=>{
+      ctxBG.fillStyle = `rgba(255,255,255,${0.25*s.z})`;
+      ctxBG.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
+    });
+  }
+
+  function tickStars(){
+    ctxBG.clearRect(0,0,canvasBG.width,canvasBG.height);
+    STARS.forEach(s=>{
+      s.x += s.dx*s.z; s.y += s.dy*s.z;
+      if(s.x<0) s.x+= innerWidth; if(s.x>innerWidth) s.x-= innerWidth;
+      if(s.y<0) s.y+= innerHeight; if(s.y>innerHeight) s.y-= innerHeight;
+      ctxBG.fillStyle = `rgba(255,255,255,${0.25*s.z})`;
+      ctxBG.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z);
+    });
+    raf = requestAnimationFrame(tickStars);
+  }
+
+  function startStars(){
+    sizeStarCanvas(); makeStars();
+    if(prefersReduced){ cancelAnimationFrame(raf); renderStaticStars(); }
+    else { cancelAnimationFrame(raf); raf = requestAnimationFrame(tickStars); }
+  }
+
+  addEventListener('resize', startStars, { passive:true });
+  startStars();
+
+  // --- XP UI (kept behavior; added cross-tab sync + safety) ---
+  const MAX_LEVEL = 100;
+  function xpForNext(level){
+    if(level>=MAX_LEVEL) return Infinity;
+    const base=200, growth=1.12;
+    return Math.round(base*Math.pow(growth,level));
+  }
+  function loadXP(){
+    try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; }
+    catch { return {level:0, xp:0}; }
+  }
+  function updateXPUI(){
+    const xp = loadXP();
+    const need = xpForNext(xp.level);
+    const badge = document.getElementById('xpBadge');
+    const fill = document.getElementById('xpFill');
+    const meta = document.getElementById('xpMeta');
+
+    badge.textContent = `Level ${xp.level}`;
+    const pct = xp.level>=MAX_LEVEL ? 100 : Math.max(0, Math.min(100, Math.round(100*(xp.xp/need))));
+    fill.style.width = pct + "%";
+    meta.textContent = xp.level>=MAX_LEVEL ? `MAX • Level ${MAX_LEVEL}` : `${xp.xp} / ${need} XP`;
+    fill.setAttribute('aria-valuenow', String(pct));
+  }
+  updateXPUI();
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) updateXPUI(); });
+  window.addEventListener('storage', (e)=>{ if(e.key==="xp_v1") updateXPUI(); });
+
+  // --- Drawing Studio ---
+  const studio = document.getElementById('studio');
+  const openStudio = document.getElementById('openStudio');
+  const closeStudio = document.getElementById('closeStudio');
+
+  const draw = document.getElementById('draw');
+  const dctx = draw.getContext('2d');
+  let drawing = false;
+  let lastX = 0, lastY = 0;
+  let brushColor = '#ffffff';
+  let brushSize = 8;
+  let mode = 'pen'; // 'pen' | 'eraser'
+
+  const MAX_UNDO = 30;
+  const undoStack = [];
+  const redoStack = [];
+
+  function fitCanvasToContainer(){
+    // Keep internal resolution high (HiDPI), but the canvas already has large base size.
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    const rect = draw.getBoundingClientRect();
+    const targetW = Math.floor(rect.width * dpr);
+    const targetH = Math.floor(rect.height * dpr);
+    if(draw.width !== targetW || draw.height !== targetH){
+      const snapshot = dctx.getImageData(0,0,draw.width,draw.height);
+      draw.width = targetW; draw.height = targetH;
+      dctx.putImageData(snapshot, 0, 0);
+      dctx.lineCap = dctx.lineJoin = 'round';
+    }
+  }
+
+  function pushUndo(){
+    try{
+      if(undoStack.length >= MAX_UNDO) undoStack.shift();
+      undoStack.push(dctx.getImageData(0,0,draw.width,draw.height));
+      redoStack.length = 0; // clear redo on new action
+    }catch(e){ /* ignore if too big */ }
+  }
+
+  function restore(img){
+    if(!img) return;
+    draw.width = img.width; draw.height = img.height;
+    dctx.putImageData(img, 0, 0);
+  }
+
+  function startDrawing(x, y){
+    drawing = true;
+    lastX = x; lastY = y;
+    dctx.beginPath();
+    dctx.moveTo(x,y);
+  }
+  function drawTo(x, y){
+    if(!drawing) return;
+    if(mode==='pen'){
+      dctx.globalCompositeOperation = 'source-over';
+      dctx.strokeStyle = brushColor;
+    }else{
+      dctx.globalCompositeOperation = 'destination-out';
+      dctx.strokeStyle = 'rgba(0,0,0,1)';
+    }
+    dctx.lineWidth = brushSize;
+    dctx.lineTo(x,y);
+    dctx.stroke();
+    lastX = x; lastY = y;
+  }
+  function endDrawing(){
+    if(!drawing) return;
+    drawing = false;
+    dctx.closePath();
+    // snapshot after stroke
+    pushUndo();
+    dctx.globalCompositeOperation = 'source-over';
+  }
+
+  function getPos(evt){
+    const rect = draw.getBoundingClientRect();
+    let x, y;
+    if(evt.touches && evt.touches[0]){
+      x = evt.touches[0].clientX - rect.left;
+      y = evt.touches[0].clientY - rect.top;
+    }else{
+      x = evt.clientX - rect.left;
+      y = evt.clientY - rect.top;
+    }
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    return { x: x * dpr, y: y * dpr };
+  }
+
+  function openStudioModal(){
+    if(typeof studio.showModal === 'function'){ studio.showModal(); }
+    else { studio.setAttribute('open',''); }
+    // initialize canvas context styles
+    dctx.lineCap = dctx.lineJoin = 'round';
+    // seed first undo state if empty
+    if(undoStack.length===0){
+      pushUndo();
+    }
+    // ensure sizing is correct after opening
+    setTimeout(()=>fitCanvasToContainer(), 0);
+  }
+  function closeStudioModal(){
+    if(studio.open) studio.close();
+    else studio.removeAttribute('open');
+  }
+
+  openStudio.addEventListener('click', openStudioModal);
+  closeStudio.addEventListener('click', closeStudioModal);
+  studio.addEventListener('cancel', (e)=>{ e.preventDefault(); closeStudioModal(); });
+
+  // Resize handling inside modal
+  const resizeObs = new ResizeObserver(()=>fitCanvasToContainer());
+  resizeObs.observe(draw);
+
+  // Input bindings
+  draw.addEventListener('mousedown', (e)=>{ const p = getPos(e); startDrawing(p.x,p.y); });
+  draw.addEventListener('mousemove', (e)=>{ const p = getPos(e); drawTo(p.x,p.y); });
+  addEventListener('mouseup', endDrawing);
+
+  draw.addEventListener('touchstart', (e)=>{ e.preventDefault(); const p = getPos(e); startDrawing(p.x,p.y); }, {passive:false});
+  draw.addEventListener('touchmove', (e)=>{ e.preventDefault(); const p = getPos(e); drawTo(p.x,p.y); }, {passive:false});
+  draw.addEventListener('touchend', (e)=>{ e.preventDefault(); endDrawing(); }, {passive:false});
+
+  // Tools
+  const penTool = document.getElementById('penTool');
+  const eraserTool = document.getElementById('eraserTool');
+  function setMode(m){
+    mode = m;
+    penTool.setAttribute('aria-pressed', String(m==='pen'));
+    eraserTool.setAttribute('aria-pressed', String(m==='eraser'));
+  }
+  penTool.addEventListener('click', ()=>setMode('pen'));
+  eraserTool.addEventListener('click', ()=>setMode('eraser'));
+
+  const sizeInput = document.getElementById('size');
+  sizeInput.addEventListener('input', ()=>{ brushSize = parseInt(sizeInput.value,10)||8; });
+
+  const colorPicker = document.getElementById('colorPicker');
+  colorPicker.addEventListener('input', ()=>{ brushColor = colorPicker.value; setMode('pen'); });
+
+  document.querySelectorAll('.color-swatch').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const c = el.getAttribute('data-color');
+      brushColor = c; colorPicker.value = c;
+      setMode('pen');
+    });
+  });
+
+  // History
+  const undoBtn = document.getElementById('undoBtn');
+  const redoBtn = document.getElementById('redoBtn');
+
+  undoBtn.addEventListener('click', ()=>{
+    if(undoStack.length > 1){
+      const current = undoStack.pop();
+      redoStack.push(current);
+      const prev = undoStack[undoStack.length-1];
+      restore(prev);
+    }
+  });
+  redoBtn.addEventListener('click', ()=>{
+    if(redoStack.length){
+      const next = redoStack.pop();
+      undoStack.push(next);
+      restore(next);
+    }
+  });
+
+  // Save / Share / Delete
+  const saveBtn = document.getElementById('saveBtn');
+  const shareBtn = document.getElementById('shareBtn');
+  const deleteBtn = document.getElementById('deleteBtn');
+
+  function download(filename, blob){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+
+  function canvasToBlobPromise(type='image/png', quality=1){
+    return new Promise(res=> draw.toBlob(b=>res(b), type, quality));
+  }
+
+  saveBtn.addEventListener('click', async ()=>{
+    const blob = await canvasToBlobPromise('image/png', 1);
+    const ts = new Date().toISOString().replace(/[:.]/g,'-');
+    const filename = `heart-out-${ts}.png`;
+    try{
+      // store a small copy in localStorage (preview)
+      const preview = draw.toDataURL('image/png', 0.8);
+      localStorage.setItem('heart_last_v1', preview);
+    }catch(e){ /* might exceed quota; ignore */ }
+    download(filename, blob);
+  });
+
+  shareBtn.addEventListener('click', async ()=>{
+    const blob = await canvasToBlobPromise('image/png', 0.95);
+    const file = new File([blob], 'heart-out.png', {type:'image/png', lastModified: Date.now()});
+    if(navigator.canShare && navigator.canShare({ files:[file] })){
+      try{
+        await navigator.share({ files:[file], title:'My heart on canvas', text:'Shared from Heart page' });
+      }catch(e){ /* user canceled share */ }
+    }else{
+      // Fallback: download
+      download('heart-out.png', blob);
+    }
+  });
+
+  deleteBtn.addEventListener('click', ()=>{
+    const ok = confirm('Delete your current drawing? This cannot be undone.');
+    if(!ok) return;
+    dctx.clearRect(0,0,draw.width,draw.height);
+    pushUndo();
+  });
+
+})();
+</script>
+</body>
+</html>
