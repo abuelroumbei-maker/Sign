@@ -1,683 +1,165 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Today Is The Day I… — Home</title>
-  <meta name="theme-color" content="#0b0d12" />
-  <meta name="description" content="A hand-painted, artful interface for small daily wins. Keep your streak, level up, and explore Body, Heart, Mind, Soul." />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Today Is The Day I… — Home</title>
+<meta name="theme-color" content="#0b0d12" />
 
-  <!-- Hand-drawn fonts (each main button uses a different one) -->
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Rock+Salt&family=Permanent+Marker&family=Caveat:wght@700&family=Gloria+Hallelujah&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
 
-  <style>
-    :root{
-      /* palette tuned for “paper + ink”; stars/trails keep their color logic */
-      --paper:#f8f7f3;
-      --ink:#111216;
-      --muted:#6b7280;
-      --accent-ink:#0f172a;
-      --accent1:#475569; /* button borders / strokes */
-      --accent2:#1f2937; /* deeper ink */
-      --fg:#0f172a;
+<style>
+  :root{
+    --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
+    --bg1:#0b0d12; --bg2:#0e1320;
+    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Robito, Arial, sans-serif;
+    --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{ margin:0; font-family: var(--body-font); color:var(--fg); background:#0b0d12; overflow:hidden; }
 
-      --card:#ffffffea;
+  /* Subtle animated gradient background */
+  .bg{
+    position:fixed; inset:0; z-index:-4;
+    background:
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    filter:saturate(1.1) brightness(1.05);
+    animation:bgDrift 20s ease-in-out infinite alternate;
+  }
+  @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
 
-      --bg1:#0b0d12; --bg2:#0e1320;
+  /* Layout */
+  .wrap{height:100%; display:grid; grid-template-rows:auto 1fr; padding:18px}
+  header{
+    display:flex; align-items:center; justify-content:space-between; gap:12px;
+    background:var(--card); border-radius:16px; padding:10px 12px;
+    box-shadow: 0 14px 40px rgba(3,7,18,.35); backdrop-filter: blur(8px);
+  }
+  .brand{ display:flex; align-items:center; gap:10px; }
+  .brand h1{
+    margin:0; font-size:clamp(20px,5vw,30px); font-family: var(--title-font);
+    background:linear-gradient(90deg,#fff,#dbeafe,#fff);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    filter:drop-shadow(0 6px 16px rgba(255,255,255,.1));
+  }
+  .head-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
 
-      --title-font: "Rock Salt", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-      --body-font:  ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    }
+  .btn{ position:relative; appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f;
+        padding:10px 12px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent2));
+        box-shadow:0 10px 24px rgba(13,148,255,.25); font-size:14px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+  .btn:hover{ filter:brightness(1.06); box-shadow:0 14px 32px rgba(13,148,255,.35) }
+  .btn.ghost{ background:#ffffff; color:var(--accent); border:2px solid rgba(109,94,252,.35); box-shadow:0 8px 22px rgba(2,6,23,.08) }
+  .btn.subtle{ background:#ffffff; color:#0a0b0f; border:1px solid rgba(2,6,23,.12); box-shadow:0 6px 18px rgba(2,6,23,.06) }
 
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0; font-family:var(--body-font);
-      color:var(--fg); background:#0b0d12; overflow:hidden;
-      transition: color .28s ease, background .28s ease, filter .28s ease;
-    }
+  main.app{ display:grid; grid-template-columns: 1fr minmax(280px, 360px); gap:14px; height:calc(100% - 12px); }
 
-    /* Subtle animated gradient background (kept) */
-    .bg{
-      position:fixed; inset:0; z-index:-4;
-      background:
-        radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, #9ba1ff 35%, transparent), transparent 60%),
-        radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, #90e0ff 35%, transparent), transparent 60%),
-        radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, #5eead4 30%, transparent), transparent 60%),
-        linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
-      filter:saturate(1.05) brightness(1.02);
-      animation:bgDrift 20s ease-in-out infinite alternate;
-    }
-    @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
+  /* Feed */
+  .feed{
+    background: var(--card); border-radius:16px; height:100%; overflow:auto; padding:14px 14px 18px;
+    box-shadow: 0 18px 50px rgba(3,7,18,.35); backdrop-filter: blur(8px);
+  }
+  .feed .placeholder{
+    color:#334155; font-size:15px; line-height:1.55; background:#f8fafc; border:1px dashed #cbd5e1;
+    padding:16px; border-radius:12px;
+  }
 
-    /* Canvas layers (preserved) */
-    #stars   { position:fixed; inset:0; pointer-events:none; z-index:-3 }
-    #trail   { position:fixed; inset:0; pointer-events:none; z-index:-2 }
-    #clickfx { position:fixed; inset:0; pointer-events:none; z-index: 998 }
+  /* Actions column */
+  .actions{
+    display:flex; flex-direction:column; gap:12px; height:100%;
+  }
+  .card{ background: var(--card); border-radius:16px; padding:14px; box-shadow: 0 18px 50px rgba(3,7,18,.35); backdrop-filter: blur(8px); }
+  .tabs{ display:grid; gap:10px; }
+  .tabLink{
+    --halo: #93c5fd; position:relative; overflow:hidden; outline:none; text-decoration:none; text-align:center;
+    color:#0a0b0f; font-weight:900; padding:16px 18px; border-radius:14px; font-size:18px;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    box-shadow: 0 12px 28px rgba(13,148,255,.28);
+  }
+  .tabLink:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
 
-    /* Layout */
-    .wrap{height:100%; display:grid; place-items:center; padding:22px}
-    .app{width:min(980px, 96vw)}
+  .aside-links{ display:flex; gap:10px; flex-wrap:wrap; }
+  .muted{ color:#475569; font-size:12px; }
 
-    /* Paper panel for the artful UI */
-    .paper{
-      background: var(--paper);
-      border-radius: 20px;
-      padding: 18px 18px 14px;
-      box-shadow:
-        0 25px 60px rgba(3,7,18,.38),
-        inset 0 1px 0 rgba(255,255,255,.5);
-      filter: url(#paperWobble);
-      position: relative;
-      overflow: hidden;
-      transform: translateY(10px) scale(.985); opacity:0; animation:cardIn .6s ease forwards;
-    }
-    @keyframes cardIn{to{transform:translateY(0) scale(1); opacity:1}}
+  /* Canvas layer: Rainbow trail only */
+  #trail{ position:fixed; inset:0; pointer-events:none; z-index:-2 }
 
-    /* Header: title (sketchy), right-side utilities */
-    .hdr{
-      display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px;
-    }
-    .title{
-      display:flex; align-items:baseline; gap:12px; margin:0;
-      font-family:var(--title-font); font-size:clamp(22px,4.8vw,34px);
-      color:var(--ink);
-      text-shadow: 0 .5px var(--ink);
-      letter-spacing:.5px;
-    }
-    .subtitle{
-      font-size:12px; color:var(--muted); margin:0; transform:translateY(-2px);
-    }
-
-    /* Utility buttons (top-right): Today + Login */
-    .utilRow{display:flex; gap:10px; align-items:center}
-    .inkBtn{
-      appearance:none; background:transparent; color:var(--accent-ink);
-      border:2px solid var(--accent1); border-radius:12px; padding:8px 12px;
-      font-weight:800; cursor:pointer;
-      box-shadow: 0 8px 0 rgba(15,23,42,.1), 0 2px 0 rgba(0,0,0,.12) inset;
-      filter: url(#strokeWobble);
-      transition: transform .04s ease, box-shadow .2s ease;
-    }
-    .inkBtn:hover{ transform: translateY(-1px) }
-    .inkBtn:active{ transform: translateY(0) scale(.99) }
-
-    /* XP strip (kept) */
-    .xp{ display:flex; align-items:center; gap:12px; margin:6px 0 12px; }
-    .xp-badge{
-      background:#fff; color:#0f172a; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:900;
-      box-shadow: 0 8px 18px rgba(0,0,0,.12);
-      filter:url(#strokeWobble);
-    }
-    .xp-bar{ flex:1; height:12px; border-radius:999px; background:#e7e6e0; overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.15) }
-    .xp-fill{
-      position:absolute; left:0; top:0; bottom:0; width:0%;
-      background:
-        repeating-linear-gradient(90deg, #111 0 2px, #0000 2px 6px),
-        linear-gradient(90deg, #111 0%, #333 100%);
-      opacity:.85;
-      transition: width .45s ease;
-    }
-    .xp-meta{ font-size:12px; color:#4b5563; }
-
-    /* Grid of hand-painted buttons */
-    .grid{
-      display:grid; gap:14px;
-      grid-template-columns: repeat(4, 1fr);
-    }
-    @media (max-width:900px){
-      .grid{ grid-template-columns: repeat(2, 1fr); }
-    }
-    @media (max-width:520px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    .paintBtn{
-      position:relative; padding:24px 14px 20px; min-height:120px;
-      background: #fff;
-      border: 3px solid var(--accent2);
-      border-radius: 20px;
-      box-shadow: 0 18px 40px rgba(3,7,18,.25);
-      cursor:pointer;
-      text-align:center;
-      display:flex; align-items:center; justify-content:center;
-      filter:url(#strokeWobble);
-      transition: transform .06s ease, box-shadow .2s ease;
-      user-select:none;
-    }
-    .paintBtn:hover{ transform: translateY(-2px) }
-    .paintBtn:active{ transform: translateY(0) scale(.99) }
-    .paintBtn .label{
-      font-size: clamp(28px, 5vw, 46px);
-      line-height:1;
-      color: var(--ink);
-      text-shadow: 0 .7px var(--ink);
-      transform: rotate(-1deg);
-    }
-
-    /* Assign fonts per button */
-    .font-body  { font-family: "Permanent Marker", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-    .font-heart { font-family: "Caveat", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-    .font-mind  { font-family: "Gloria Hallelujah", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-    .font-soul  { font-family: "Rock Salt", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; }
-
-    /* Small sketchy underline on hover */
-    .paintBtn::after{
-      content:""; position:absolute; left:10%; right:10%; bottom:14px; height:10px;
-      background: url('#sketch-underline');
-      opacity:.55; transform: rotate(-1.5deg) scaleY(.7);
-      pointer-events:none;
-    }
-
-    /* “Today” modal (task of the day is secondary now) */
-    .modal{
-      position: fixed; inset:0; z-index:9999; display:none;
-      align-items:center; justify-content:center; padding:20px;
-      background: rgba(0,0,0,.5); backdrop-filter: blur(4px);
-    }
-    .modal.show{ display:flex }
-    .modalCard{
-      width:min(560px, 94vw);
-      background: var(--card);
-      border: 2px solid #0f172a;
-      border-radius: 18px;
-      padding: 16px;
-      box-shadow: 0 30px 70px rgba(0,0,0,.45);
-      filter:url(#paperWobble);
-    }
-    .modalHead{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .modalTitle{ font-family:"Gloria Hallelujah", var(--body-font); font-size:22px; margin:0; color:#111 }
-    .closeBtn{ appearance:none; border:2px solid #111; background:#fff; border-radius:10px; padding:6px 10px; font-weight:800; cursor:pointer; filter:url(#strokeWobble); }
-
-    .badge{display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:#111; color:#fff; margin:6px 0}
-    .todayText{ font-size:clamp(20px,4.5vw,30px); line-height:1.3; margin:10px 0 8px; color:#0f172a }
-    .meta{ font-size:13px; color:#475569 }
-
-    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:12px}
-    .big{
-      appearance:none; border:2px solid #111; background:#fff; color:#0f172a;
-      border-radius:14px; padding:12px 14px; font-weight:900; cursor:pointer;
-      filter:url(#strokeWobble);
-      transition: transform .05s ease;
-    }
-    .big:hover{ transform: translateY(-1px) }
-    .big:active{ transform: translateY(0) scale(.99) }
-    .ghost{
-      background:#f0f0ec;
-    }
-
-    /* Level-Up panel (kept) */
-    #levelUpPanel{
-      position: fixed; right: 18px; bottom: 18px; z-index: 9998;
-      width: min(380px, 92vw);
-      background: #0f172aee;
-      color: #fff; border: 1px solid rgba(255,255,255,.15);
-      border-radius: 16px; padding: 14px 14px 10px;
-      box-shadow: 0 22px 60px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.06);
-      transform: translateY(20px); opacity:0; pointer-events:none;
-      transition: transform .28s ease, opacity .28s ease;
-      backdrop-filter: blur(8px);
-    }
-    #levelUpPanel.show{ transform: translateY(0); opacity:1; pointer-events:auto; }
-    #levelUpTitle{ font-weight: 900; margin: 0 0 6px; }
-    #levelUpMeta{ font-size: 12px; opacity:.85; margin: 0 0 10px; }
-    .chip{
-      display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px;
-      background:linear-gradient(90deg,#e9ecff22,#e5f9ff22);
-      border:1px solid rgba(255,255,255,.18); color:#fff; margin-right:8px;
-    }
-    .lp-row{ display:flex; gap:8px; flex-wrap:wrap; }
-    .lp-btn{
-      appearance:none; border:0; border-radius:12px; cursor:pointer; font-weight:800;
-      padding:8px 12px;
-      background:linear-gradient(135deg,#7dd3fc,#93c5fd);
-      color:#0a0b0f; box-shadow:0 10px 24px rgba(13,148,255,.25);
-    }
-    .lp-btn.ghost{
-      background:#0f172a; color:#e2e8f0; border:1px solid rgba(255,255,255,.18);
-      box-shadow:none;
-    }
-    #levelUpDetails{ margin-top:10px; font-size:13px; line-height:1.4; display:none; }
-    #levelUpDetails.show{ display:block; }
-    #levelUpClose{ position:absolute; top:8px; right:10px; background:none; border:none; color:#94a3b8; cursor:pointer; }
-
-    /* Toast (kept) */
-    #toast{
-      position:fixed; left:50%; bottom:24px; transform:translateX(-50%) translateY(120%);
-      background:#111; color:#fff; padding:12px 16px; border-radius:12px;
-      box-shadow:0 12px 32px rgba(0,0,0,.45); font-size:14px; z-index:999; max-width:90vw;
-      text-align:center; opacity:0; transition:transform .35s ease, opacity .35s ease;
-    }
-
-    /* Auth modal */
-    .authForm{ display:grid; gap:10px; margin-top:10px }
-    .input{
-      appearance:none; width:100%; padding:10px 12px; border-radius:10px;
-      border:2px solid #111; background:#fff; color:#111; font-weight:700;
-      filter:url(#strokeWobble);
-    }
-    .hint{ font-size:12px; color:#6b7280 }
-
-    @media (prefers-reduced-motion: reduce){
-      .bg{animation:none}
-    }
-  </style>
+  @media (max-width: 860px){
+    main.app{ grid-template-columns:1fr; }
+  }
+</style>
 </head>
 <body>
-  <!-- SVG filters & tiny inline assets -->
-  <svg width="0" height="0" style="position:absolute">
-    <defs>
-      <!-- Wobble stroke for hand-painted edges -->
-      <filter id="strokeWobble">
-        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="1" result="noise" seed="3"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G"/>
-      </filter>
-      <!-- Paper wobble -->
-      <filter id="paperWobble">
-        <feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="1" result="noise" seed="2"/>
-        <feDisplacementMap in="SourceGraphic" in2="noise" scale="0.8"/>
-      </filter>
-      <!-- Sketchy underline pattern -->
-      <pattern id="sketch-underline" patternUnits="objectBoundingBox" width="1" height="1" viewBox="0 0 120 20">
-        <path d="M4 12 C 34 10, 54 16, 86 12 S 116 10, 118 12" stroke="#111" stroke-width="3" fill="none" />
-      </pattern>
-    </defs>
-  </svg>
+  <div class="bg"></div>
+  <canvas id="trail"></canvas>
 
-  <!-- Background & Canvases (kept) -->
-  <div class="bg" aria-hidden="true"></div>
-  <canvas id="stars" aria-hidden="true"></canvas>
-  <canvas id="trail" aria-hidden="true"></canvas>
-  <canvas id="clickfx" aria-hidden="true"></canvas>
-
-  <!-- App -->
   <div class="wrap">
-    <main class="app" role="main">
-      <section class="paper" aria-labelledby="pageTitle">
-        <header class="hdr">
-          <div>
-            <h1 id="pageTitle" class="title">Today Is The Day I…</h1>
-            <p class="subtitle">An artful space to nudge tiny wins.</p>
-          </div>
-          <div class="utilRow">
-            <button id="todayBtn" class="inkBtn" type="button" aria-controls="modalToday" aria-expanded="false">Today</button>
-            <button id="authBtn" class="inkBtn" type="button" aria-controls="modalAuth" aria-expanded="false">Log in / Sign up</button>
-          </div>
-        </header>
+    <header>
+      <div class="brand">
+        <div style="font-size:22px">🌈</div>
+        <h1>Today Is The Day I…</h1>
+      </div>
+      <div class="head-actions">
+        <!-- "Today" moved aside as a small button -->
+        <a class="btn ghost" href="#" id="todayBtn" title="Today">Today</a>
+        <!-- Optional auth button -->
+        <a class="btn subtle" href="#" id="authBtn">Log in / Sign up</a>
+      </div>
+    </header>
 
-        <!-- XP strip (kept) -->
-        <div class="xp" aria-describedby="xpMeta">
-          <div class="xp-badge" id="xpBadge" aria-live="polite">Level 0</div>
-          <div class="xp-bar" aria-hidden="true"><div class="xp-fill" id="xpFill"></div></div>
-        </div>
-        <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
-
-        <!-- Hand-painted main buttons -->
-        <div class="grid" id="mainGrid">
-          <button class="paintBtn" id="btnBody"  type="button" data-dest="body.html">
-            <span class="label font-body">Body</span>
-          </button>
-          <button class="paintBtn" id="btnHeart" type="button" data-dest="heart.html">
-            <span class="label font-heart">Heart</span>
-          </button>
-          <button class="paintBtn" id="btnMind"  type="button" data-dest="mind.html">
-            <span class="label font-mind">Mind</span>
-          </button>
-          <button class="paintBtn" id="btnSoul"  type="button" data-dest="soul.html">
-            <span class="label font-soul">Soul</span>
-          </button>
+    <main class="app">
+      <!-- Potential social feed (empty for now) -->
+      <section class="feed" aria-label="Feed">
+        <div class="placeholder">
+          <strong>Future social feed lives here.</strong><br>
+          You can stream posts, streaks, or community prompts. For now this area is intentionally empty.
         </div>
       </section>
+
+      <!-- Main actions column: the four buttons are the star of the page -->
+      <aside class="actions" aria-label="Main actions">
+        <div class="card">
+          <div class="tabs" id="tabs">
+            <a class="tabLink" href="body.html"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</a>
+            <a class="tabLink" href="heart.html" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</a>
+            <a class="tabLink" href="mind.html"  style="--halo:#93c5fd;background:linear-gradient(135deg,#3b82f6,#bfdbfe)">🧠 Mind</a>
+            <a class="tabLink" href="soul.html"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</a>
+          </div>
+          <div class="muted" style="margin-top:10px">These are the primary destinations. "Today" has been moved to the header.</div>
+        </div>
+
+        <div class="card">
+          <div class="aside-links">
+            <a class="btn ghost" href="#">Browse</a>
+            <a class="btn ghost" href="#">Explore</a>
+          </div>
+          <div class="muted" style="margin-top:10px">Add more quick links or stats here later.</div>
+        </div>
+      </aside>
     </main>
   </div>
 
-  <!-- Today Modal (task of the day is secondary) -->
-  <div id="modalToday" class="modal" role="dialog" aria-modal="true" aria-labelledby="todayTitle" aria-hidden="true">
-    <div class="modalCard">
-      <div class="modalHead">
-        <h2 class="modalTitle" id="todayTitle">Today’s Little Nudge</h2>
-        <button class="closeBtn" id="todayClose" type="button">Close</button>
-      </div>
-      <div class="badge" id="tag">Sign</div>
-      <div class="todayText" id="messageText"></div>
-      <div class="meta" id="explain"></div>
-      <div class="row">
-        <button id="willDoBtn" class="big" type="button">Will do</button>
-        <button id="doneBtn" class="big ghost" type="button">Done for today</button>
-      </div>
-      <div class="meta" id="todayMeta" style="margin-top:8px"></div>
-    </div>
-  </div>
-
-  <!-- Auth Modal (optional / local only) -->
-  <div id="modalAuth" class="modal" role="dialog" aria-modal="true" aria-labelledby="authTitle" aria-hidden="true">
-    <div class="modalCard">
-      <div class="modalHead">
-        <h2 class="modalTitle" id="authTitle">Welcome</h2>
-        <button class="closeBtn" id="authClose" type="button">Close</button>
-      </div>
-      <p class="hint">Logging in is optional. Locally stored only (no server). Use it to save a display name.</p>
-      <form id="authForm" class="authForm">
-        <input id="displayName" class="input" type="text" name="name" placeholder="Display name (e.g. Alex)" autocomplete="nickname">
-        <input id="email" class="input" type="email" name="email" placeholder="Email (optional)" autocomplete="email">
-        <input id="password" class="input" type="password" name="password" placeholder="Password (optional)" autocomplete="new-password">
-        <div class="row">
-          <button id="saveAuth" class="big" type="submit">Save</button>
-          <button id="logout" class="big ghost" type="button">Log out</button>
-        </div>
-        <div class="hint" id="authStatus"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Level-Up Panel (kept) -->
-  <div id="levelUpPanel" role="dialog" aria-live="polite" aria-modal="false" aria-labelledby="levelUpTitle" aria-describedby="levelUpMeta">
-    <button id="levelUpClose" aria-label="Close">✕</button>
-    <h3 id="levelUpTitle">Level Up!</h3>
-    <p id="levelUpMeta">You became <span id="levelNum" class="chip">Level 1</span></p>
-    <div class="lp-row">
-      <button id="okBtn" class="lp-btn" type="button">Okay</button>
-      <button id="soWhatBtn" class="lp-btn ghost" type="button" aria-expanded="false" aria-controls="levelUpDetails">So what?</button>
-    </div>
-    <div id="levelUpDetails">
-      <div>Next level needs <span id="nextXpNeed">—</span> XP.</div>
-      <div>Tip: keep your streak — it’s the easiest way to grow.</div>
-    </div>
-  </div>
-
-  <!-- Toast -->
-  <div id="toast" role="status" aria-live="polite"><span id="toastText">Saved</span></div>
-
-  <noscript>
-    <div style="position:fixed;inset:12px;z-index:99999;background:#fff3cd;border:1px solid #ffeeba;border-radius:12px;padding:12px;">
-      This page needs JavaScript to run. Please enable JavaScript.
-    </div>
-  </noscript>
-
 <script>
-/* ====== DATA (same list; extend freely) ====== */
-const SIGNS = [
-  { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
-  { text: "Say thank you to someone.", explain: "Appreciation changes the day for both people.", tag:"Kindness" },
-  { text: "Ask one curious question.", explain: "Questions open doors to new ideas.", tag:"Curiosity" },
-  { text: "Tidy a tiny space for 60 seconds.", explain: "Small resets make big differences.", tag:"Care" },
-  { text: "Doodle something colorful.", explain: "No rules. Just play with color.", tag:"Create" }
-];
-
-/* ====== UTIL ====== */
-const qs = s => document.querySelector(s);
-function ymd(d=new Date()){return d.toISOString().slice(0,10)}
-function dayOfYear(d=new Date()){const start=new Date(d.getFullYear(),0,0);return Math.floor((d-start)/86400000)}
-function getSeed(){ let s=localStorage.getItem("seed"); if(!s){ s=Math.floor(Math.random()*100000).toString(); localStorage.setItem("seed", s);} return parseInt(s,10)}
-function pickTodayIndex(){ if (!SIGNS.length) return 0; const idx=(dayOfYear()+getSeed())%SIGNS.length; return idx<0?idx+SIGNS.length:idx }
-function loadState(){ try{return JSON.parse(localStorage.getItem("state_v2"))||{}}catch{return{}} }
-function saveState(s){ localStorage.setItem("state_v2", JSON.stringify(s)) }
-function showToast(msg, ms=1800){
-  const toast=qs("#toast"), toastText=qs("#toastText");
-  toastText.textContent=msg;
-  toast.style.opacity="1"; toast.style.transform="translateX(-50%) translateY(0)";
-  clearTimeout(showToast._h);
-  showToast._h=setTimeout(()=>{ toast.style.opacity="0"; toast.style.transform="translateX(-50%) translateY(120%)"; }, ms);
-}
-
-/* ====== STATE ====== */
-const state=loadState(); const todayKey=ymd();
-
-/* ====== XP (kept) ====== */
-function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
-function saveXP(x){ localStorage.setItem("xp_v1", JSON.stringify(x)); }
-const MAX_LEVEL = 100;
-function xpForNext(level){ if(level>=MAX_LEVEL) return Infinity; const base = 200; const growth = 1.12; return Math.round(base * Math.pow(growth, level)); }
-let xpState = loadXP();
-const xpBadge = qs("#xpBadge"), xpFill = qs("#xpFill"), xpMeta = qs("#xpMeta");
-function updateXPUI(){
-  const need = xpForNext(xpState.level);
-  xpBadge.textContent = `Level ${xpState.level}`;
-  if(xpState.level>=MAX_LEVEL){
-    xpFill.style.width = "100%";
-    xpMeta.textContent = `MAX • Level ${MAX_LEVEL}`;
-  }else{
-    xpFill.style.width = Math.round(100 * (xpState.xp / need)) + "%";
-    xpMeta.textContent = `${xpState.xp} / ${need} XP`;
-  }
-}
-const panel = qs('#levelUpPanel');
-const levelNumEl = qs('#levelNum');
-const nextXpNeedEl = qs('#nextXpNeed');
-const okBtn = qs('#okBtn');
-const soWhatBtn = qs('#soWhatBtn');
-const detailsEl = qs('#levelUpDetails');
-const levelUpClose = qs('#levelUpClose');
-function showLevelUpPanel(level){
-  levelNumEl.textContent = `Level ${level}`;
-  const need = xpForNext(level);
-  nextXpNeedEl.textContent = (Number.isFinite(need) ? need : '—');
-  detailsEl.classList.remove('show');
-  panel.classList.add('show');
-  okBtn.focus();
-}
-function hideLevelUpPanel(){ panel.classList.remove('show'); }
-okBtn.addEventListener('click', hideLevelUpPanel, {passive:true});
-levelUpClose.addEventListener('click', hideLevelUpPanel, {passive:true});
-soWhatBtn.addEventListener('click', ()=>{ const open = detailsEl.classList.toggle('show'); soWhatBtn.setAttribute('aria-expanded', String(open)); });
-
-function addXP(amount){
-  let gained = amount;
-  while(gained>0 && xpState.level < MAX_LEVEL){
-    const need = xpForNext(xpState.level) - xpState.xp;
-    if(gained >= need){
-      gained -= need;
-      xpState.level++;
-      xpState.xp = 0;
-      triggerShootingStar(true);
-      showLevelUpPanel(xpState.level);
-      if(xpState.level>=MAX_LEVEL){
-        xpState.xp = xpForNext(MAX_LEVEL-1);
-        gained = 0;
-      }
-    }else{
-      xpState.xp += gained;
-      gained = 0;
-      triggerShootingStar(false);
-    }
-  }
-  saveXP(xpState);
-  updateXPUI();
-  showToast("+XP");
-}
-
-/* ====== TODAY (modal) ====== */
-const modalToday = qs("#modalToday");
-const todayBtn = qs("#todayBtn");
-const todayClose = qs("#todayClose");
-const willDoBtn = qs("#willDoBtn");
-const doneBtn = qs("#doneBtn");
-const tag = qs("#tag"), messageText = qs("#messageText"), explain = qs("#explain"), todayMeta = qs("#todayMeta");
-
-function openToday(){
-  // ensure record & stable sign index
-  if(!state[todayKey]) state[todayKey]={planned:null,done:null,signIndex:pickTodayIndex()};
-  const rec = state[todayKey];
-  const s = SIGNS[((rec.signIndex % SIGNS.length)+SIGNS.length)%SIGNS.length];
-  tag.textContent=s.tag||"Sign";
-  messageText.textContent=s.text||"";
-  explain.textContent=s.explain||"";
-  todayMeta.textContent = rec.planned ? "You planned this today." : "Tap “Will do” if you plan to try it.";
-  modalToday.classList.add("show");
-  modalToday.setAttribute("aria-hidden","false");
-  todayBtn.setAttribute("aria-expanded","true");
-}
-function closeToday(){
-  modalToday.classList.remove("show");
-  modalToday.setAttribute("aria-hidden","true");
-  todayBtn.setAttribute("aria-expanded","false");
-}
-todayBtn.addEventListener('click', openToday);
-todayClose.addEventListener('click', closeToday);
-modalToday.addEventListener('click', e=>{ if(e.target===modalToday) closeToday(); });
-
-willDoBtn.addEventListener('click', ()=>{
-  state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
-  state[todayKey].planned=true; state[todayKey].done=null;
-  saveState(state);
-  todayMeta.textContent="You planned this today. Come back later to mark it done.";
-  showToast("Planned for today");
-});
-doneBtn.addEventListener('click', ()=>{
-  state[todayKey]=state[todayKey]||{signIndex:pickTodayIndex()};
-  if(state[todayKey].done!==true){ addXP(100); }
-  state[todayKey].done=true; saveState(state);
-  todayMeta.textContent="Marked done ✅";
-});
-
-/* ====== AUTH (optional, local only) ====== */
-const modalAuth = qs("#modalAuth");
-const authBtn = qs("#authBtn");
-const authClose = qs("#authClose");
-const authForm = qs("#authForm");
-const authStatus = qs("#authStatus");
-const displayName = qs("#displayName");
-const email = qs("#email");
-const password = qs("#password");
-const logoutBtn = qs("#logout");
-
-function loadAuth(){
-  try{
-    const a = JSON.parse(localStorage.getItem("auth_v1")) || {};
-    displayName.value = a.name || "";
-    email.value = a.email || "";
-    password.value = "";
-    authStatus.textContent = a.name ? `Signed in as ${a.name}` : "Not signed in.";
-    authBtn.textContent = a.name ? a.name : "Log in / Sign up";
-  }catch{ /* noop */ }
-}
-function saveAuthLocal(name, mail){
-  localStorage.setItem("auth_v1", JSON.stringify({name, email:mail||""}));
-  loadAuth();
-  showToast("Saved");
-}
-function clearAuth(){
-  localStorage.removeItem("auth_v1");
-  loadAuth();
-  showToast("Signed out");
-}
-
-function openAuth(){ loadAuth(); modalAuth.classList.add("show"); modalAuth.setAttribute("aria-hidden","false"); authBtn.setAttribute("aria-expanded","true"); }
-function closeAuth(){ modalAuth.classList.remove("show"); modalAuth.setAttribute("aria-hidden","true"); authBtn.setAttribute("aria-expanded","false"); }
-
-authBtn.addEventListener('click', openAuth);
-authClose.addEventListener('click', closeAuth);
-modalAuth.addEventListener('click', e=>{ if(e.target===modalAuth) closeAuth(); });
-authForm.addEventListener('submit', (e)=>{ e.preventDefault(); saveAuthLocal(displayName.value.trim(), email.value.trim()); });
-logoutBtn.addEventListener('click', clearAuth);
-
-/* ====== MAIN NAV BUTTONS ====== */
-function go(e){
-  const dest = e.currentTarget.getAttribute('data-dest');
-  // NOTE: navigation goes to separate pages you already have.
-  // If you later want SPA behavior, we can inline stubs here — would require edits beyond index.html.
-  if(dest) location.href = dest;
-}
-["btnBody","btnHeart","btnMind","btnSoul"].forEach(id=>{
-  const el = qs("#"+id); if(el) el.addEventListener('click', go);
-});
-
-/* ====== STARS + SHOOTERS (kept) ====== */
-const stars = qs("#stars"), sctx = stars.getContext("2d");
-function resizeStars(){ stars.width=innerWidth; stars.height=innerHeight; }
-resizeStars(); addEventListener('resize', resizeStars, {passive:true});
-const STARS = Array.from({length: 160}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.5 + 0.3 }));
-const SHOOTERS = [];
-function triggerShootingStar(isLevelUp=false){
-  const len = isLevelUp ? 220 : 160;
-  const startY = Math.random()*innerHeight*0.5 + (isLevelUp?20:60);
-  const startX = -80;
-  SHOOTERS.push({ x:startX, y:startY, vx:16, vy:-5.6, life:isLevelUp?1000:700, maxLife:isLevelUp?1000:700, length:len, glow:isLevelUp?1.0:0.7 });
-}
-let mousePX=.5, mousePY=.5; addEventListener('pointermove', e=>{ mousePX=e.clientX/innerWidth; mousePY=e.clientY/innerHeight; }, {passive:true});
-(function drawStars(){
-  requestAnimationFrame(drawStars);
-  sctx.clearRect(0,0,stars.width,stars.height);
-  STARS.forEach(s=>{ s.x += (mousePX - .5) * s.z * .3; s.y += (mousePY - .5) * s.z * .3;
-    if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
-    sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
-  for(let i=SHOOTERS.length-1;i>=0;i--){
-    const sh=SHOOTERS[i]; sh.x+=sh.vx; sh.y+=sh.vy; sh.vy+=.12; sh.life-=16; const t=Math.max(0, sh.life/sh.maxLife);
-    sctx.save(); sctx.globalCompositeOperation="lighter";
-    const tailX=sh.x - sh.length, tailY=sh.y - sh.length*0.2;
-    const g=sctx.createLinearGradient(tailX, tailY, sh.x, sh.y);
-    g.addColorStop(0,'rgba(255,255,255,0)'); g.addColorStop(0.7,`rgba(255,255,255,${0.35*sh.glow*t})`); g.addColorStop(1,`rgba(255,255,255,${0.95*sh.glow*t})`);
-    sctx.strokeStyle=g; sctx.lineWidth=2.2; sctx.beginPath(); sctx.moveTo(tailX,tailY); sctx.lineTo(sh.x,sh.y); sctx.stroke();
-    sctx.beginPath(); sctx.arc(sh.x,sh.y,2.8,0,Math.PI*2); sctx.fillStyle=`rgba(255,255,255,${0.9*t})`; sctx.fill(); sctx.restore();
-    if(sh.life<=0 || sh.x>innerWidth+200 || sh.y>innerHeight+200) SHOOTERS.splice(i,1);
-  }
+/* ====== RAINBOW MOUSE TRAIL ONLY ====== */
+const trail = document.getElementById("trail"), tctx = trail.getContext("2d");
+function size(){ trail.width=innerWidth; trail.height=innerHeight; } size(); addEventListener('resize', size);
+let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>160) points.shift(); });
+(function draw(){ requestAnimationFrame(draw); const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height); if(points.length<2) return; tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
+  for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue; const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360; tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
 })();
 
-/* ====== RAINBOW MOUSE TRAIL (kept) ====== */
-const trail = qs("#trail"), tctx = trail.getContext("2d");
-function resizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; }
-resizeTrail(); addEventListener('resize', resizeTrail, {passive:true});
-let points=[];
-addEventListener('pointermove', e=>{
-  points.push({x:e.clientX, y:e.clientY, t:Date.now()});
-  if(points.length>140) points.splice(0, points.length-140);
-}, {passive:true});
-(function drawTrail(){
-  requestAnimationFrame(drawTrail);
-  const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height);
-  if(points.length<2) return;
-  tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
-  for(let i=1;i<points.length;i++){
-    const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue;
-    const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360;
-    tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke();
-  }
-})();
-
-/* ====== CLICK FIREWORKS (kept) ====== */
-const clickfx = qs("#clickfx"), cfx = clickfx.getContext("2d");
-function resizeFX(){ clickfx.width=innerWidth; clickfx.height=innerHeight; }
-resizeFX(); addEventListener('resize', resizeFX, {passive:true});
-const PALETTES = {
-  bg:['#111','#2b2b2b','#4b5563','#111','#0f172a'], /* inky */
-  willdo:['#111','#374151','#111','#0f172a'],
-  done:['#111','#111','#2b2b2b','#111']
-};
-function burst(x,y, palette, count=18){
-  const parts=[];
-  for(let i=0;i<count;i++){
-    parts.push({x,y,vx:(Math.random()-.5)*5,vy:(Math.random()-.5)*5-2,life:560,r:2+Math.random()*2,c:palette[i%palette.length]});
-  }
-  (function loop(){
-    cfx.clearRect(0,0,clickfx.width,clickfx.height);
-    const alive=[];
-    parts.forEach(p=>{
-      p.x+=p.vx; p.y+=p.vy; p.vy+=.05; p.life-=16;
-      if(p.life>0){ alive.push(p); cfx.fillStyle=p.c; cfx.beginPath(); cfx.arc(p.x,p.y,p.r,0,Math.PI*2); cfx.fill(); }
-    });
-    if(alive.length) requestAnimationFrame(loop);
-  })();
-}
-function paletteForTarget(target){
-  const btn = target.closest ? target.closest('button') : null;
-  if (btn){
-    if (btn.id === 'willDoBtn') return PALETTES.willdo;
-    if (btn.id === 'doneBtn')   return PALETTES.done;
-  }
-  return PALETTES.bg;
-}
-document.addEventListener('pointerdown', e=>{
-  burst(e.clientX, e.clientY, paletteForTarget(e.target), 20);
-}, {passive:true});
-
-/* ====== INIT ====== */
-updateXPUI();
-loadAuth();
+/* ====== PLACEHOLDER HANDLERS ====== */
+document.getElementById('todayBtn').addEventListener('click', (e)=>{ e.preventDefault(); alert('Today view is tucked away for now. Hook this to your Today page or modal later.'); });
+document.getElementById('authBtn').addEventListener('click', (e)=>{ e.preventDefault(); alert('Auth is optional. Wire this up to your login/signup flow when ready.'); });
 </script>
 </body>
 </html>
+
 
 
 
