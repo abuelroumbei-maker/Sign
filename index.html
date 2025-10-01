@@ -9,11 +9,12 @@
 <style>
   :root{
     --bg1:#0b0d12; --bg2:#0e1320;
-    --pastel-green:#bbf7d0; /* Body */
-    --pastel-red:#fecaca;   /* Heart */
-    --pastel-blue:#bae6fd;  /* Mind */
-    --pastel-yellow:#fef9c3;/* Soul */
+    --pastel-green:#86efac; /* Body */
+    --pastel-red:#fca5a5;   /* Heart */
+    --pastel-blue:#93c5fd;  /* Mind */
+    --pastel-yellow:#fde68a;/* Soul */
     --pastel-pink:#fbcfe8;  /* Today */
+    --pastel-brown:#d6ccc2; /* Who am I */
     --tyrian-purple:#66023c;/* Plus */
   }
   *{box-sizing:border-box} 
@@ -36,18 +37,18 @@
 
   .top-right{ position:absolute; top:10px; right:10px; display:flex; flex-direction:column; gap:10px; }
   .login-btn{ background:#fff; }
-  .whoami-btn{ background:linear-gradient(135deg,#a78bfa,#22d3ee); color:#fff; }
+  .whoami-btn{ background:var(--pastel-brown); color:#000; }
 
   nav{ position:fixed; bottom:0; left:0; right:0; height:60px; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); display:flex; justify-content:space-around; align-items:center; }
-  nav a{ flex:1; display:flex; justify-content:center; align-items:center; font-size:20px; font-weight:900; padding:10px; border-radius:14px; margin:0 6px; text-decoration:none; color:#0a0b0f; }
-  nav .body{ background:var(--pastel-green); }
-  nav .heart{ background:var(--pastel-red); }
-  nav .plus{ background:var(--tyrian-purple); color:#fff; font-size:26px; }
-  nav .mind{ background:var(--pastel-blue); }
-  nav .soul{ background:var(--pastel-yellow); }
+  nav a, nav button{ flex:1; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:900; margin:0 6px; text-decoration:none; background:none; border:none; }
+  nav .b{ color:var(--pastel-green); }
+  nav .h{ color:var(--pastel-red); }
+  nav .m{ color:var(--pastel-blue); }
+  nav .s{ color:var(--pastel-yellow); }
+  nav .plus{ background:var(--tyrian-purple); color:#fff; border-radius:50%; width:42px; height:42px; font-size:26px; }
 
   @media (max-width: 480px){
-    nav a{ font-size:16px; }
+    nav a, nav button{ font-size:20px; }
     .btn{ padding:8px 10px; font-size:14px; }
   }
 </style>
@@ -67,11 +68,11 @@
   </div>
 
   <nav>
-    <a href="body.html" class="body">B</a>
-    <a href="heart.html" class="heart">H</a>
-    <a href="#" class="plus">+</a>
-    <a href="mind.html" class="mind">M</a>
-    <a href="soul.html" class="soul">S</a>
+    <a href="body.html" class="b">B</a>
+    <a href="heart.html" class="h">H</a>
+    <button class="plus">+</button>
+    <a href="mind.html" class="m">M</a>
+    <a href="soul.html" class="s">S</a>
   </nav>
 
 <script>
@@ -90,6 +91,7 @@ let points=[];addEventListener('pointermove',e=>{points.push({x:e.clientX,y:e.cl
 </script>
 </body>
 </html>
+
 
 
 
