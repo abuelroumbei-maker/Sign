@@ -12,7 +12,8 @@
 <style>
   :root{
     --fg:#e5e7eb; --muted:#9aa4b2; --card:#111827cc;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --pink:#f472b6; --amber:#f59e0b; --lime:#84cc16;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
+    --pink:#ef4444; --blue:#3b82f6; --yellow:#facc15; --amber:#f59e0b; --green:#22c55e; --tyrian:#66023C;
     --bg1:#0b0d12; --bg2:#0e1320;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -21,7 +22,7 @@
   html,body{height:100%}
   body{ margin:0; font-family: var(--body-font); color:var(--fg); background:#0b0d12; overflow:hidden; }
 
-  /* Animated gradient + visible stars */
+  /* Background */
   .bg{ position:fixed; inset:0; z-index:-3; background:
       radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 60%),
       radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 30%, transparent), transparent 60%),
@@ -33,26 +34,27 @@
   #stars{ position:fixed; inset:0; z-index:-2; pointer-events:none }
   #trail{ position:fixed; inset:0; z-index:-1; pointer-events:none }
 
-  /* Top-right controls */
-  .controls{ position:fixed; right:14px; top:14px; display:flex; gap:8px; z-index:10; }
+  /* Top-right compact controls */
+  .controls{ position:fixed; right:12px; top:12px; display:flex; gap:8px; z-index:10; }
   .btn{ appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f; padding:10px 12px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
   .btn.today{ background:linear-gradient(135deg,#60a5fa,#93c5fd); box-shadow:0 10px 24px rgba(13,148,255,.28); font-size:14px; }
   .btn.auth{ background:#ffffff; color:#0a0b0f; box-shadow:0 10px 24px rgba(0,0,0,.25); font-weight:800; font-size:13px; }
 
-  /* Edge buttons (large, no emojis) */
-  .edge-btn{ position:fixed; transform:translate(-50%,-50%); z-index:5; white-space:nowrap;
-    appearance:none; border:0; cursor:pointer; font-weight:900; font-size:clamp(16px,2.6vw,22px); color:#0a0b0f;
-    padding:16px 20px; border-radius:16px; box-shadow:0 14px 36px rgba(0,0,0,.35); text-decoration:none; }
-  #btnTop{ left:50%; top:7.5%; background:linear-gradient(135deg,#22c55e,#a7f3d0) }
-  #btnRight{ left:93.5%; top:50%; background:linear-gradient(135deg,#3b82f6,#bfdbfe) }
-  #btnBottom{ left:50%; top:93.5%; background:linear-gradient(135deg,#8b5cf6,#ddd6fe) }
-  #btnLeft{ left:6.5%; top:50%; background:linear-gradient(135deg,#ef4444,#fecaca) }
+  /* Bottom nav (Instagram-like) */
+  .bottom-nav{ position:fixed; left:0; right:0; bottom:0; z-index:12; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:10px 14px env(safe-area-inset-bottom); background:rgba(8,10,15,.48); backdrop-filter: blur(10px); border-top:1px solid rgba(255,255,255,.08); }
+  .nav-btn{ appearance:none; border:0; cursor:pointer; height:48px; border-radius:12px; font-weight:1000; font-size:18px; color:#0a0b0f; text-decoration:none; display:grid; place-items:center; box-shadow:0 8px 20px rgba(0,0,0,.28); }
+  .nav-btn.b{ background:linear-gradient(135deg,#fde047,#facc15); }  /* B = Body, yellow like Instagram home */
+  .nav-btn.h{ background:linear-gradient(135deg,#fb7185,#ef4444); color:#0b0d12; }
+  .nav-btn.add{ background:linear-gradient(135deg,#8a2a56,#66023C); color:#f1f5f9; } /* Tyrian purple */
+  .nav-btn.m{ background:linear-gradient(135deg,#60a5fa,#3b82f6); }
+  .nav-btn.s{ background:linear-gradient(135deg,#fde047,#f59e0b); }
 
-  /* Personality test panel (left bottom corner trigger) */
-  .test-launch{ position:fixed; left:14px; bottom:14px; z-index:10; }
-  .btn.test{ background:linear-gradient(135deg,#a78bfa,#c4b5fd); box-shadow:0 10px 24px rgba(0,0,0,.25); font-size:14px; }
+  /* Compass container (center, appears after results) */
+  .compass{ position:fixed; left:50%; top:50%; transform:translate(-50%,-55%); width:min(92vw, 640px); height:min(92vw, 640px); max-height:64vh; display:none; z-index:9; }
+  .compass.show{ display:block; }
+  #compCanvas{ width:100%; height:100%; display:block; }
 
-  /* Modal */
+  /* Test modal */
   .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:20; }
   .modal.show{ display:grid; }
   .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter: blur(2px); }
@@ -60,7 +62,6 @@
   .sheet h2{ margin:2px 0 8px; font-family:var(--title-font); }
   .q{ background:#0f172acc; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; margin:10px 0; }
   .scale{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-  .scale label{ font-size:12px; opacity:.9 }
   .scale .points{ display:flex; gap:6px; }
   .scale input{ display:none }
   .pill{ user-select:none; cursor:pointer; font-size:12px; font-weight:800; padding:8px 10px; border-radius:999px; background:#111827; border:1px solid rgba(255,255,255,.14); color:#cbd5e1; }
@@ -68,20 +69,16 @@
 
   .sheet .row{ display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
   .sheet .actions{ display:flex; gap:10px; }
-  .primary{ background:linear-gradient(135deg,#22d3ee,#60a5fa); }
-  .ghost{ background:#ffffff; }
+  .btn.primary{ background:linear-gradient(135deg,#22d3ee,#60a5fa); }
+  .btn.ghost{ background:#ffffff; }
+  .results-actions{ display:none; gap:10px; justify-content:flex-end; margin-top:10px; }
+  .results-actions.show{ display:flex; }
 
-  /* Compass canvas in center (hidden until results) */
-  .compass{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:min(90vw, 640px); height:min(90vw, 640px); max-height:72vh; display:none; z-index:9; }
-  .compass.show{ display:block; }
-  #compCanvas{ width:100%; height:100%; display:block; }
+  /* Mobile spacing so nav doesn't overlap */
+  .pad-bottom{ padding-bottom:88px; }
 
-  /* Mobile positioning */
-  @media (max-width: 720px){
-    #btnTop{ top:10%; }
-    #btnBottom{ top:90%; }
-    #btnLeft{ left:10%; }
-    #btnRight{ left:90%; }
+  @media (max-width: 420px){
+    .nav-btn{ height:44px; font-size:16px; }
     .controls{ right:10px; top:10px; }
   }
 </style>
@@ -97,19 +94,24 @@
     <a class="btn auth" href="#" id="authBtn">Log in / Sign up</a>
   </div>
 
-  <!-- Four main edges (no emojis) -->
-  <a id="btnTop" class="edge-btn" href="body.html">Body</a>
-  <a id="btnRight" class="edge-btn" href="mind.html">Mind</a>
-  <a id="btnBottom" class="edge-btn" href="soul.html">Soul</a>
-  <a id="btnLeft" class="edge-btn" href="heart.html">Heart</a>
+  <!-- Compass (shows after finishing the test) -->
+  <div id="compWrap" class="compass" aria-hidden="true">
+    <canvas id="compCanvas" width="1024" height="1024"></canvas>
+  </div>
 
-  <!-- Personality test launcher -->
-  <div class="test-launch"><button class="btn test" id="launchTest">Personality test</button></div>
+  <!-- Bottom nav: B H + M S -->
+  <nav class="bottom-nav" aria-label="Primary">
+    <a class="nav-btn b" href="body.html" aria-label="Body">B</a>
+    <a class="nav-btn h" href="heart.html" aria-label="Heart">H</a>
+    <button class="nav-btn add" id="launchTest" aria-label="Open personality test">+</button>
+    <a class="nav-btn m" href="mind.html" aria-label="Mind">M</a>
+    <a class="nav-btn s" href="soul.html" aria-label="Soul">S</a>
+  </nav>
 
   <!-- Personality Test Modal -->
   <div class="modal" id="testModal" aria-hidden="true" role="dialog" aria-label="Personality test">
     <div class="scrim" id="closeModal"></div>
-    <div class="sheet">
+    <div class="sheet pad-bottom">
       <div class="row">
         <h2>Short Personality Test</h2>
         <div class="actions">
@@ -119,12 +121,11 @@
       </div>
       <p class="muted">Rate each from <strong>Strongly Disagree (1)</strong> to <strong>Strongly Agree (5)</strong>.</p>
       <form id="testForm"></form>
+      <div class="results-actions" id="resultsActions">
+        <button class="btn ghost" id="retakeBtn">Retake test</button>
+        <button class="btn primary" id="closeResultsBtn">Close</button>
+      </div>
     </div>
-  </div>
-
-  <!-- Personalized Compass (Heart↔Mind on X, Body↔Soul on Y) -->
-  <div id="compWrap" class="compass" aria-hidden="true">
-    <canvas id="compCanvas" width="1024" height="1024"></canvas>
   </div>
 
 <script>
@@ -164,25 +165,11 @@ const QUESTIONS = [
   'When making decisions, I balance logic and facts with intuition and values.'
 ];
 
-// Map each question to an axis and polarity.
-// x-axis: Heart (-)  ← 0 .... 5 →  Mind (+)
-// y-axis: Body  (-)  ↓        ↑  Soul (+)
+// x-axis: Heart (-) ↔ Mind (+);  y-axis: Body (-) ↔ Soul (+)
 const MAP = [
-  {axis:'x', w:+1}, // logic -> Mind
-  {axis:'x', w:+0.8},
-  {axis:'x', w:+0.8},
-  {axis:'x', w:+1},
-  {axis:'x', w:+0.8},
-  {axis:'y', w:-0.8}, // practical over enlightenment -> Body (negative toward Soul)
-  {axis:'y', w:-0.8}, // daily responsibilities -> Body
-  {axis:'y', w:+1},   // spiritual growth -> Soul
-  {axis:'y', w:+0.8}, // inner peace -> Soul
-  {axis:'y', w:+1},   // metaphysical -> Soul
-  {axis:'x', w:+0.6}, // science/tech -> Mind
-  {axis:'x', w:+0.6}, // grounded/practical -> Mind
-  {axis:'x', w:+0.6}, // utility-focused creativity -> Mind
-  {axis:'y', w:+0.8}, // spiritual/imaginative essential -> Soul
-  {axis:'x', w:0},    // balanced: neutral on x; we will add small y toward Soul for values
+  {axis:'x', w:+1}, {axis:'x', w:+0.8}, {axis:'x', w:+0.8}, {axis:'x', w:+1}, {axis:'x', w:+0.8},
+  {axis:'y', w:-0.8}, {axis:'y', w:-0.8}, {axis:'y', w:+1}, {axis:'y', w:+0.8}, {axis:'y', w:+1},
+  {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'y', w:+0.8}, {axis:'x', w:0}
 ];
 
 const form = document.getElementById('testForm');
@@ -191,6 +178,9 @@ const launchBtn = document.getElementById('launchTest');
 const closeModal = document.getElementById('closeModal');
 const cancelBtn = document.getElementById('cancelTest');
 const submitBtn = document.getElementById('submitTest');
+const resultsBar = document.getElementById('resultsActions');
+const retakeBtn = document.getElementById('retakeBtn');
+const closeResultsBtn = document.getElementById('closeResultsBtn');
 
 function buildForm(){
   form.innerHTML = '';
@@ -214,7 +204,7 @@ function buildForm(){
   });
 }
 
-function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); buildForm(); }
+function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); buildForm(); resultsBar.classList.remove('show'); }
 function closeTest(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
 launchBtn.addEventListener('click', openModal);
 closeModal.addEventListener('click', closeTest);
@@ -233,58 +223,65 @@ function scoreAndDraw(){
     const v = Number(sel.value); // 1..5
     const norm = (v-3)/2; // -1..+1
     const m = MAP[i];
-    if(m.axis==='x') x += norm * m.w; else if(m.axis==='y') y += norm * m.w; else {
-      // for the balanced item, give tiny Soul tilt when agree
-      y += norm * 0.3;
-    }
+    if(m.axis==='x') x += norm * m.w; else if(m.axis==='y') y += norm * m.w; else { y += norm * 0.3; }
   });
   if(answered < QUESTIONS.length){ alert('Please answer all questions.'); return; }
-  // clamp softly
   x = Math.max(-3, Math.min(3, x));
   y = Math.max(-3, Math.min(3, y));
   drawCompass(x/3, y/3);
-  closeTest();
+  resultsBar.classList.add('show');
 }
 
 submitBtn.addEventListener('click', scoreAndDraw);
+retakeBtn.addEventListener('click', ()=>{ buildForm(); resultsBar.classList.remove('show'); });
+closeResultsBtn.addEventListener('click', closeTest);
 
 function drawCompass(nx, ny){
   compWrap.classList.add('show'); compWrap.setAttribute('aria-hidden','false');
   const w=canvas.width, h=canvas.height; ctx.clearRect(0,0,w,h);
-  // colorful quadrant gradient
+  // quadrant color wash
   const grad = ctx.createLinearGradient(0,0,w,h);
-  grad.addColorStop(0, 'rgba(244,114,182,0.25)');   // Heart (pink)
-  grad.addColorStop(0.5, 'rgba(34,211,238,0.10)');  // center cool
-  grad.addColorStop(1, 'rgba(99,102,241,0.25)');    // Mind (indigo)
+  grad.addColorStop(0, 'rgba(239,68,68,0.20)');   // Heart red tint
+  grad.addColorStop(0.5, 'rgba(34,211,238,0.08)');
+  grad.addColorStop(1, 'rgba(59,130,246,0.25)');  // Mind blue tint
   ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
-  // add radial soul/body tints
-  const soul = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h/1.2); soul.addColorStop(0,'rgba(168,85,247,0.28)'); soul.addColorStop(1,'rgba(168,85,247,0)');
+  // Soul (top) yellow glow and Body (bottom) green glow
+  const soul = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h/1.2); soul.addColorStop(0,'rgba(250,204,21,0.28)'); soul.addColorStop(1,'rgba(250,204,21,0)');
   ctx.fillStyle = soul; ctx.fillRect(0,0,w,h);
-  const body = ctx.createRadialGradient(w/2, h, 0, w/2, h, h/1.2); body.addColorStop(0,'rgba(132,204,22,0.28)'); body.addColorStop(1,'rgba(132,204,22,0)');
+  const body = ctx.createRadialGradient(w/2, h, 0, w/2, h, h/1.2); body.addColorStop(0,'rgba(34,197,94,0.28)'); body.addColorStop(1,'rgba(34,197,94,0)');
   ctx.fillStyle = body; ctx.fillRect(0,0,w,h);
 
   // grid
   ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
-  // axes
-  ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(w/2,0); ctx.lineTo(w/2,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+  // axes with arrows
+  ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=3; // bolder for clarity
+  // Y axis
+  ctx.beginPath(); ctx.moveTo(w/2, h-10); ctx.lineTo(w/2, 10); ctx.stroke();
+  // arrowheads
+  ctx.beginPath(); ctx.moveTo(w/2,10); ctx.lineTo(w/2-8,26); ctx.lineTo(w/2+8,26); ctx.closePath(); ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fill();
+  ctx.beginPath(); ctx.moveTo(w/2,h-10); ctx.lineTo(w/2-8,h-26); ctx.lineTo(w/2+8,h-26); ctx.closePath(); ctx.fill();
+  // X axis
+  ctx.beginPath(); ctx.moveTo(10, h/2); ctx.lineTo(w-10, h/2); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(w-10,h/2); ctx.lineTo(w-26,h/2-8); ctx.lineTo(w-26,h/2+8); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(10,h/2); ctx.lineTo(26,h/2-8); ctx.lineTo(26,h/2+8); ctx.closePath(); ctx.fill();
 
-  // axis labels
-  ctx.fillStyle='#e5e7eb'; ctx.font='bold 18px system-ui';
-  ctx.textAlign='left'; ctx.fillText('Heart', 10, h/2 - 10);
-  ctx.textAlign='right'; ctx.fillText('Mind', w-10, h/2 - 10);
-  ctx.save(); ctx.translate(w/2 + 12, 22); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('Soul', 0, 0); ctx.restore();
-  ctx.save(); ctx.translate(w/2 + 12, h - 12); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('Body', 0, 0); ctx.restore();
+  // axis labels (colorful)
+  ctx.font='bold 22px system-ui'; ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=8;
+  ctx.fillStyle='#ef4444'; ctx.textAlign='left'; ctx.fillText('Heart', 14, h/2 - 12);
+  ctx.fillStyle='#3b82f6'; ctx.textAlign='right'; ctx.fillText('Mind', w-14, h/2 - 12);
+  ctx.save(); ctx.translate(w/2 + 14, 28); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#facc15'; ctx.fillText('Soul', 0, 0); ctx.restore();
+  ctx.save(); ctx.translate(w/2 + 14, h - 16); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#22c55e'; ctx.fillText('Body', 0, 0); ctx.restore();
+  ctx.shadowBlur=0;
 
   // point + bloom
   const px = nx * (w/2 - 24) + w/2; const py = h/2 - ny * (h/2 - 24);
   const bloom = ctx.createRadialGradient(px,py,0, px,py, 80); bloom.addColorStop(0,'rgba(255,255,255,.95)'); bloom.addColorStop(1,'rgba(255,255,255,0)');
   ctx.fillStyle = bloom; ctx.beginPath(); ctx.arc(px,py,80,0,Math.PI*2); ctx.fill();
-  // ring
-  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.stroke();
+  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.stroke();
   ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
 
-  // small legend
-  ctx.font='13px system-ui'; ctx.textAlign='left'; ctx.fillText('Your position', px+14, py-10);
+  // legend near point
+  ctx.font='bold 14px system-ui'; ctx.textAlign='left'; ctx.fillStyle='#e5e7eb'; ctx.fillText('Your position', px+14, py-10);
 }
 
 /* Auth placeholder */
