@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Who am I — Compass Test</title>
+<meta name="theme-color" content="#0b0d12" />
+
+<style>
+  :root{
+    --fg:#e5e7eb; --muted:#9aa4b2; --card:#111827cc; --bg1:#0b0d12; --bg2:#0e1320;
+    --pastel-green1:#bbf7d0; --pastel-green2:#86efac; /* Body */
+    --pastel-red1:#fecaca;   --pastel-red2:#fca5a5; /* Heart */
+    --pastel-blue1:#bae6fd;  --pastel-blue2:#93c5fd; /* Mind */
+    --pastel-yellow1:#fef3c7;--pastel-yellow2:#fde68a; /* Soul */
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{ margin:0; font-family: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; color:var(--fg); background:#0b0d12; overflow:hidden; }
+
+  .bg{ position:fixed; inset:0; z-index:-3; background:
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, #6d5efc 30%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, #00c2ff 30%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, #2dd4bf 25%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+      animation:bgDrift 22s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03); }
+  @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
+
+  #stars{ position:fixed; inset:0; z-index:-2; pointer-events:none }
+  #trail{ position:fixed; inset:0; z-index:-1; pointer-events:none }
+
+  .wrap{ position:relative; height:100%; display:grid; grid-template-rows:auto 1fr; }
+
+  header{ display:flex; justify-content:space-between; align-items:center; gap:10px; padding:10px 12px; }
+  .left{ display:flex; gap:8px; align-items:center; }
+  .right{ display:flex; gap:8px; align-items:center; }
+  .btn{ appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f; padding:10px 12px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 10px 24px rgba(0,0,0,.28); }
+  .btn.back{ background:#ffffff; }
+
+  main{ display:grid; grid-template-columns:1fr; gap:12px; padding:12px; height:calc(100vh - 72px); }
+  .sheet{ background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:14px; box-shadow:0 24px 70px rgba(0,0,0,.5); overflow:auto; }
+
+  .sheet h1{ margin:0 0 6px; font-size:clamp(20px,5vw,28px); }
+  .muted{ color:#cbd5e1; opacity:.9; margin:0 0 8px; }
+  .q{ background:#0f172acc; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; margin:10px 0; }
+  .scale{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+  .scale .points{ display:flex; gap:6px; }
+  .scale input{ display:none }
+  .pill{ user-select:none; cursor:pointer; font-size:12px; font-weight:800; padding:8px 10px; border-radius:999px; background:#111827; border:1px solid rgba(255,255,255,.14); color:#cbd5e1; }
+  input:checked + .pill{ background:linear-gradient(135deg,#22d3ee,#a78bfa); color:#0b0d12; border-color:transparent; }
+
+  .actions{ display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap; margin-top:10px; }
+  .btn.primary{ background:linear-gradient(135deg,#22d3ee,#60a5fa); }
+
+  .compass-wrap{ display:none; grid-template-rows:auto auto 1fr auto; gap:10px; }
+  .compass-wrap.show{ display:grid; }
+  .legend{ display:flex; gap:8px; flex-wrap:wrap; font-size:12px; }
+  .chip{ border-radius:999px; padding:6px 10px; background:#111827; border:1px solid rgba(255,255,255,.14); color:#e5e7eb; }
+  .chip.body{ background:linear-gradient(135deg,var(--pastel-green1),var(--pastel-green2)); color:#064e3b; }
+  .chip.heart{ background:linear-gradient(135deg,var(--pastel-red1),var(--pastel-red2)); color:#7f1d1d; }
+  .chip.mind{ background:linear-gradient(135deg,var(--pastel-blue1),var(--pastel-blue2)); color:#082f49; }
+  .chip.soul{ background:linear-gradient(135deg,var(--pastel-yellow1),var(--pastel-yellow2)); color:#713f12; }
+
+  .compass{ width:min(92vw, 680px); height:min(92vw, 680px); max-height:64vh; background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:8px; justify-self:center; }
+  #compCanvas{ width:100%; height:100%; display:block; }
+
+  .result-actions{ display:none; gap:10px; justify-content:flex-end; }
+  .result-actions.show{ display:flex; }
+
+  @media (max-width: 480px){
+    main{ padding-bottom:calc(env(safe-area-inset-bottom) + 8px); }
+    .btn{ padding:9px 10px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <canvas id="stars"></canvas>
+  <canvas id="trail"></canvas>
+
+  <div class="wrap">
+    <header>
+      <div class="left">
+        <a class="btn back" href="index.html">⟵ Back</a>
+      </div>
+      <div class="right">
+        <!-- reserved for future controls -->
+      </div>
+    </header>
+
+    <main>
+      <section class="sheet" id="testSheet">
+        <h1>Who am I — Personality Compass</h1>
+        <p class="muted">Rate each from <strong>Strongly Disagree (1)</strong> to <strong>Strongly Agree (5)</strong>. X-axis is <strong style="color:#fecaca">Heart</strong> ↔ <strong style="color:#93c5fd">Mind</strong>. Y-axis is <strong style="color:#bbf7d0">Body</strong> ↔ <strong style="color:#fde68a">Soul</strong>.</p>
+        <form id="testForm"></form>
+        <div class="actions">
+          <button class="btn primary" id="submitBtn">See my compass</button>
+        </div>
+
+        <div class="compass-wrap" id="compWrap">
+          <div class="legend">
+            <span class="chip heart">Heart (X−)</span>
+            <span class="chip mind">Mind (X+)</span>
+            <span class="chip body">Body (Y−)</span>
+            <span class="chip soul">Soul (Y+)</span>
+          </div>
+          <div class="compass"><canvas id="compCanvas" width="1024" height="1024"></canvas></div>
+          <div class="result-actions" id="resultActions">
+            <a class="btn" href="#" id="retakeBtn">Retake test</a>
+            <a class="btn primary" href="#" id="closeBtn">Close</a>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+<script>
+/* ==== Stars ==== */
+const stars = document.getElementById('stars'); const sctx = stars.getContext('2d');
+function sizeStars(){ stars.width = innerWidth; stars.height = innerHeight; } sizeStars(); addEventListener('resize', sizeStars);
+const STARS = Array.from({length: 200}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.8 + 0.3 }));
+let mpX=.5, mpY=.5; addEventListener('pointermove', e=>{ mpX=e.clientX/innerWidth; mpY=e.clientY/innerHeight; });
+(function drawStars(){ requestAnimationFrame(drawStars); sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{ s.x += (mpX - .5) * s.z * .25; s.y += (mpY - .5) * s.z * .25; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height; sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
+})();
+
+/* ==== Rainbow Trail ==== */
+const trail = document.getElementById('trail'); const tctx = trail.getContext('2d');
+function sizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; } sizeTrail(); addEventListener('resize', sizeTrail);
+let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>160) points.shift(); });
+(function drawTrail(){ requestAnimationFrame(drawTrail); const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height); if(points.length<2) return; tctx.lineCap='round'; tctx.lineJoin='round'; tctx.globalCompositeOperation='lighter';
+  for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue; const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360; tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
+})();
+
+/* ==== Test ==== */
+const QUESTIONS = [
+  'I prefer solving problems using logic and facts rather than imagination.',
+  'I often break complex tasks into step-by-step plans.',
+  'I enjoy activities like math, coding, or puzzles more than drawing, music, or storytelling.',
+  'I trust data and research more than intuition or “gut feelings.”',
+  'When faced with a new idea, my first instinct is to analyze how it works rather than what it could inspire.',
+  'I believe that practical achievements (career, wealth, tangible goals) are more important than personal enlightenment.',
+  'I spend more time thinking about daily responsibilities than abstract questions like “What is the meaning of life?”',
+  'I believe spiritual or philosophical growth is just as important as material success.',
+  'I am more interested in personal well-being and inner peace than in professional accomplishments.',
+  'I often reflect on metaphysical or spiritual ideas (purpose, higher consciousness, energy, etc.).',
+  'I feel more inspired by science and technology than by art or spirituality.',
+  'I admire people who are grounded and practical more than those who are dreamers or visionaries.',
+  'I believe creativity is more valuable when it produces real-world results than when it’s purely self-expression.',
+  'I see spiritual or imaginative experiences as essential parts of human life.',
+  'When making decisions, I balance logic and facts with intuition and values.'
+];
+
+// x-axis: Heart (-) ↔ Mind (+);  y-axis: Body (-) ↔ Soul (+)
+const MAP = [
+  {axis:'x', w:+1}, {axis:'x', w:+0.8}, {axis:'x', w:+0.8}, {axis:'x', w:+1}, {axis:'x', w:+0.8},
+  {axis:'y', w:-0.8}, {axis:'y', w:-0.8}, {axis:'y', w:+1}, {axis:'y', w:+0.8}, {axis:'y', w:+1},
+  {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'y', w:+0.8}, {axis:'x', w:0}
+];
+
+const form = document.getElementById('testForm');
+const submitBtn = document.getElementById('submitBtn');
+const compWrap = document.getElementById('compWrap');
+const compCanvas = document.getElementById('compCanvas');
+const ctx = compCanvas.getContext('2d');
+const retakeBtn = document.getElementById('retakeBtn');
+const closeBtn = document.getElementById('closeBtn');
+
+function buildForm(){
+  form.innerHTML='';
+  QUESTIONS.forEach((q,i)=>{
+    const id = `q${i}`;
+    const wrap = document.createElement('div'); wrap.className='q';
+    wrap.innerHTML = `<div>${i+1}. ${q}</div>`;
+    const scale = document.createElement('div'); scale.className='scale';
+    const labels = ['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+    const points = document.createElement('div'); points.className='points';
+    labels.forEach((lab,idx)=>{
+      const radioId = `${id}_${idx+1}`;
+      const input = document.createElement('input'); input.type='radio'; input.name=id; input.id=radioId; input.value=String(idx+1);
+      const pill = document.createElement('label'); pill.className='pill'; pill.setAttribute('for', radioId); pill.title = lab; pill.textContent = `${idx+1}`;
+      points.appendChild(input); points.appendChild(pill);
+    });
+    const start = document.createElement('label'); start.textContent = 'Strongly Disagree';
+    const end = document.createElement('label'); end.textContent = 'Strongly Agree';
+    scale.appendChild(start); scale.appendChild(points); scale.appendChild(end);
+    wrap.appendChild(scale); form.appendChild(wrap);
+  });
+}
+
+function score(){
+  let x=0, y=0; let answered=0;
+  QUESTIONS.forEach((_,i)=>{
+    const sel = form.querySelector(`input[name=q${i}]:checked`);
+    if(!sel) return; answered++;
+    const v = Number(sel.value); const norm = (v-3)/2; // -1..+1
+    const m = MAP[i];
+    if(m.axis==='x') x += norm * m.w; else if(m.axis==='y') y += norm * m.w; else { y += norm * 0.3; }
+  });
+  if(answered < QUESTIONS.length){ alert('Please answer all questions.'); return null; }
+  return { x: Math.max(-3, Math.min(3, x)), y: Math.max(-3, Math.min(3, y)) };
+}
+
+function drawCompass(nx, ny){
+  compWrap.classList.add('show');
+  document.getElementById('resultActions').classList.add('show');
+  const w=compCanvas.width, h=compCanvas.height; ctx.clearRect(0,0,w,h);
+  // colorful field
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, 'rgba(239,68,68,0.20)');   // Heart red
+  grad.addColorStop(0.5, 'rgba(34,211,238,0.08)');
+  grad.addColorStop(1, 'rgba(59,130,246,0.25)');  // Mind blue
+  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+  const soul = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h/1.2); soul.addColorStop(0,'rgba(254,243,199,0.38)'); soul.addColorStop(1,'rgba(254,243,199,0)');
+  ctx.fillStyle = soul; ctx.fillRect(0,0,w,h);
+  const body = ctx.createRadialGradient(w/2, h, 0, w/2, h, h/1.2); body.addColorStop(0,'rgba(187,247,208,0.38)'); body.addColorStop(1,'rgba(187,247,208,0)');
+  ctx.fillStyle = body; ctx.fillRect(0,0,w,h);
+
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+  // axes with arrows and colorful labels
+  ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(w/2, h-10); ctx.lineTo(w/2, 10); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(10, h/2); ctx.lineTo(w-10, h/2); ctx.stroke();
+  // arrowheads
+  ctx.fillStyle='rgba(255,255,255,.85)';
+  ctx.beginPath(); ctx.moveTo(w/2,10); ctx.lineTo(w/2-8,26); ctx.lineTo(w/2+8,26); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(w/2,h-10); ctx.lineTo(w/2-8,h-26); ctx.lineTo(w/2+8,h-26); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(w-10,h/2); ctx.lineTo(w-26,h/2-8); ctx.lineTo(w-26,h/2+8); ctx.closePath(); ctx.fill();
+  ctx.beginPath(); ctx.moveTo(10,h/2); ctx.lineTo(26,h/2-8); ctx.lineTo(26,h/2+8); ctx.closePath(); ctx.fill();
+
+  // labels
+  ctx.font='bold 22px system-ui'; ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=8;
+  ctx.textAlign='left'; ctx.fillStyle='#ef4444'; ctx.fillText('Heart', 14, h/2 - 12);
+  ctx.textAlign='right'; ctx.fillStyle='#3b82f6'; ctx.fillText('Mind', w-14, h/2 - 12);
+  ctx.save(); ctx.translate(w/2 + 14, 28); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#fde68a'; ctx.fillText('Soul', 0, 0); ctx.restore();
+  ctx.save(); ctx.translate(w/2 + 14, h - 16); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#86efac'; ctx.fillText('Body', 0, 0); ctx.restore();
+  ctx.shadowBlur=0;
+
+  // point + highlight
+  const px = nx * (w/2 - 24) + w/2; const py = h/2 - ny * (h/2 - 24);
+  const bloom = ctx.createRadialGradient(px,py,0, px,py, 80); bloom.addColorStop(0,'rgba(255,255,255,.95)'); bloom.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = bloom; ctx.beginPath(); ctx.arc(px,py,80,0,Math.PI*2); ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+  ctx.font='bold 14px system-ui'; ctx.textAlign='left'; ctx.fillStyle='#e5e7eb'; ctx.fillText('Your position', px+14, py-10);
+}
+
+function onSubmit(){
+  const res = score(); if(!res) return;
+  drawCompass(res.x/3, res.y/3);
+}
+
+retakeBtn.addEventListener('click', ()=>{ buildForm(); document.getElementById('resultActions').classList.remove('show'); compWrap.classList.remove('show'); });
+closeBtn.addEventListener('click', (e)=>{ e.preventDefault(); window.location.href = 'index.html'; });
+submitBtn.addEventListener('click', (e)=>{ e.preventDefault(); onSubmit(); });
+
+/* Build on load */
+buildForm();
+</script>
+</body>
+</html>
