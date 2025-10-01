@@ -12,9 +12,14 @@
 <style>
   :root{
     --fg:#e5e7eb; --muted:#9aa4b2; --card:#111827cc;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
-    --pink:#ef4444; --blue:#3b82f6; --yellow:#facc15; --amber:#f59e0b; --green:#22c55e; --tyrian:#66023C;
     --bg1:#0b0d12; --bg2:#0e1320;
+    /* Pastel palette */
+    --pastel-green1:#bbf7d0; --pastel-green2:#86efac;
+    --pastel-red1:#fecaca;   --pastel-red2:#fca5a5;
+    --pastel-blue1:#bae6fd;  --pastel-blue2:#93c5fd;
+    --pastel-yellow1:#fef3c7;--pastel-yellow2:#fde68a;
+    --pastel-pink1:#fbcfe8;  --pastel-pink2:#f9a8d4;
+    --tyrian:#66023C;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
@@ -24,9 +29,9 @@
 
   /* Background */
   .bg{ position:fixed; inset:0; z-index:-3; background:
-      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 60%),
-      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 30%, transparent), transparent 60%),
-      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 25%, transparent), transparent 60%),
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, #6d5efc 30%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, #00c2ff 30%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, #2dd4bf 25%, transparent), transparent 60%),
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
       animation:bgDrift 22s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03); }
   @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
@@ -34,53 +39,25 @@
   #stars{ position:fixed; inset:0; z-index:-2; pointer-events:none }
   #trail{ position:fixed; inset:0; z-index:-1; pointer-events:none }
 
-  /* Top-right compact controls */
-  .controls{ position:fixed; right:12px; top:12px; display:flex; gap:8px; z-index:10; }
-  .btn{ appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f; padding:10px 12px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
-  .btn.today{ background:linear-gradient(135deg,#60a5fa,#93c5fd); box-shadow:0 10px 24px rgba(13,148,255,.28); font-size:14px; }
-  .btn.auth{ background:#ffffff; color:#0a0b0f; box-shadow:0 10px 24px rgba(0,0,0,.25); font-weight:800; font-size:13px; }
+  /* Corners: Today (top-left) & Auth/WhoAmI (top-right) */
+  .corner-left{ position:fixed; left:12px; top:12px; z-index:10; display:flex; flex-direction:column; gap:8px; align-items:flex-start; }
+  .corner-right{ position:fixed; right:12px; top:12px; z-index:10; display:flex; flex-direction:column; gap:8px; align-items:flex-end; }
+  .btn{ appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f; padding:10px 12px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; box-shadow:0 10px 24px rgba(0,0,0,.28); }
+  .btn.today{ background:linear-gradient(135deg,var(--pastel-pink1),var(--pastel-pink2)); font-size:14px; }
+  .btn.auth{ background:#ffffff; color:#0a0b0f; font-weight:800; font-size:13px; }
+  .btn.who{ background:linear-gradient(135deg,#a78bfa,#c4b5fd); font-size:13px; color:#0a0b0f; }
 
-  /* Bottom nav (Instagram-like) */
-  .bottom-nav{ position:fixed; left:0; right:0; bottom:0; z-index:12; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:10px 14px env(safe-area-inset-bottom); background:rgba(8,10,15,.48); backdrop-filter: blur(10px); border-top:1px solid rgba(255,255,255,.08); }
+  /* Bottom nav (Instagram-like order) */
+  .bottom-nav{ position:fixed; left:0; right:0; bottom:0; z-index:12; display:grid; grid-template-columns:repeat(5,1fr); gap:8px; padding:10px 14px calc(env(safe-area-inset-bottom) + 10px); background:rgba(8,10,15,.48); backdrop-filter: blur(10px); border-top:1px solid rgba(255,255,255,.08); }
   .nav-btn{ appearance:none; border:0; cursor:pointer; height:48px; border-radius:12px; font-weight:1000; font-size:18px; color:#0a0b0f; text-decoration:none; display:grid; place-items:center; box-shadow:0 8px 20px rgba(0,0,0,.28); }
-  .nav-btn.b{ background:linear-gradient(135deg,#fde047,#facc15); }  /* B = Body, yellow like Instagram home */
-  .nav-btn.h{ background:linear-gradient(135deg,#fb7185,#ef4444); color:#0b0d12; }
-  .nav-btn.add{ background:linear-gradient(135deg,#8a2a56,#66023C); color:#f1f5f9; } /* Tyrian purple */
-  .nav-btn.m{ background:linear-gradient(135deg,#60a5fa,#3b82f6); }
-  .nav-btn.s{ background:linear-gradient(135deg,#fde047,#f59e0b); }
+  .nav-btn.b{ background:linear-gradient(135deg,var(--pastel-green1),var(--pastel-green2)); }   /* B = Body (pastel green) */
+  .nav-btn.h{ background:linear-gradient(135deg,var(--pastel-red1),var(--pastel-red2)); }      /* H = Heart (pastel red) */
+  .nav-btn.add{ background:linear-gradient(135deg,#8a2a56,var(--tyrian)); color:#f1f5f9; }      /* + = Tyrian purple */
+  .nav-btn.m{ background:linear-gradient(135deg,var(--pastel-blue1),var(--pastel-blue2)); }     /* M = Mind (pastel sky blue) */
+  .nav-btn.s{ background:linear-gradient(135deg,var(--pastel-yellow1),var(--pastel-yellow2)); } /* S = Soul (pastel yellow) */
 
-  /* Compass container (center, appears after results) */
-  .compass{ position:fixed; left:50%; top:50%; transform:translate(-50%,-55%); width:min(92vw, 640px); height:min(92vw, 640px); max-height:64vh; display:none; z-index:9; }
-  .compass.show{ display:block; }
-  #compCanvas{ width:100%; height:100%; display:block; }
-
-  /* Test modal */
-  .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:20; }
-  .modal.show{ display:grid; }
-  .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter: blur(2px); }
-  .sheet{ position:relative; width:min(980px, 96vw); max-height:92vh; overflow:auto; background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:16px; box-shadow:0 24px 70px rgba(0,0,0,.6); }
-  .sheet h2{ margin:2px 0 8px; font-family:var(--title-font); }
-  .q{ background:#0f172acc; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; margin:10px 0; }
-  .scale{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
-  .scale .points{ display:flex; gap:6px; }
-  .scale input{ display:none }
-  .pill{ user-select:none; cursor:pointer; font-size:12px; font-weight:800; padding:8px 10px; border-radius:999px; background:#111827; border:1px solid rgba(255,255,255,.14); color:#cbd5e1; }
-  input:checked + .pill{ background:linear-gradient(135deg,#22d3ee,#a78bfa); color:#0b0d12; border-color:transparent; }
-
-  .sheet .row{ display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
-  .sheet .actions{ display:flex; gap:10px; }
-  .btn.primary{ background:linear-gradient(135deg,#22d3ee,#60a5fa); }
-  .btn.ghost{ background:#ffffff; }
-  .results-actions{ display:none; gap:10px; justify-content:flex-end; margin-top:10px; }
-  .results-actions.show{ display:flex; }
-
-  /* Mobile spacing so nav doesn't overlap */
-  .pad-bottom{ padding-bottom:88px; }
-
-  @media (max-width: 420px){
-    .nav-btn{ height:44px; font-size:16px; }
-    .controls{ right:10px; top:10px; }
-  }
+  /* Mobile sizing */
+  @media (max-width: 420px){ .nav-btn{ height:44px; font-size:16px; } }
 </style>
 </head>
 <body>
@@ -88,48 +65,28 @@
   <canvas id="stars"></canvas>
   <canvas id="trail"></canvas>
 
-  <!-- Top-right compact controls -->
-  <div class="controls">
+  <!-- Top-left Today -->
+  <div class="corner-left">
     <a class="btn today" href="today.html" title="Today is the day I…">Today is the day I…</a>
-    <a class="btn auth" href="#" id="authBtn">Log in / Sign up</a>
   </div>
 
-  <!-- Compass (shows after finishing the test) -->
-  <div id="compWrap" class="compass" aria-hidden="true">
-    <canvas id="compCanvas" width="1024" height="1024"></canvas>
+  <!-- Top-right Auth + Who am I (links to dedicated page) -->
+  <div class="corner-right">
+    <a class="btn auth" href="#" id="authBtn">Log in / Sign up</a>
+    <a class="btn who" href="whoami.html" id="whoBtn">Who am I</a>
   </div>
 
   <!-- Bottom nav: B H + M S -->
   <nav class="bottom-nav" aria-label="Primary">
     <a class="nav-btn b" href="body.html" aria-label="Body">B</a>
     <a class="nav-btn h" href="heart.html" aria-label="Heart">H</a>
-    <button class="nav-btn add" id="launchTest" aria-label="Open personality test">+</button>
+    <button class="nav-btn add" id="plusBtn" aria-label="Create">+</button>
     <a class="nav-btn m" href="mind.html" aria-label="Mind">M</a>
     <a class="nav-btn s" href="soul.html" aria-label="Soul">S</a>
   </nav>
 
-  <!-- Personality Test Modal -->
-  <div class="modal" id="testModal" aria-hidden="true" role="dialog" aria-label="Personality test">
-    <div class="scrim" id="closeModal"></div>
-    <div class="sheet pad-bottom">
-      <div class="row">
-        <h2>Short Personality Test</h2>
-        <div class="actions">
-          <button class="btn ghost" id="cancelTest">Cancel</button>
-          <button class="btn primary" id="submitTest">See my compass</button>
-        </div>
-      </div>
-      <p class="muted">Rate each from <strong>Strongly Disagree (1)</strong> to <strong>Strongly Agree (5)</strong>.</p>
-      <form id="testForm"></form>
-      <div class="results-actions" id="resultsActions">
-        <button class="btn ghost" id="retakeBtn">Retake test</button>
-        <button class="btn primary" id="closeResultsBtn">Close</button>
-      </div>
-    </div>
-  </div>
-
 <script>
-/* ==== Stars ==== */
+/* ===== Stars ===== */
 const stars = document.getElementById('stars'); const sctx = stars.getContext('2d');
 function sizeStars(){ stars.width = innerWidth; stars.height = innerHeight; } sizeStars(); addEventListener('resize', sizeStars);
 const STARS = Array.from({length: 200}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.8 + 0.3 }));
@@ -138,7 +95,7 @@ let mpX=.5, mpY=.5; addEventListener('pointermove', e=>{ mpX=e.clientX/innerWidt
   STARS.forEach(s=>{ s.x += (mpX - .5) * s.z * .25; s.y += (mpY - .5) * s.z * .25; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height; sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
 })();
 
-/* ==== Rainbow Mouse Trail ==== */
+/* ===== Rainbow Mouse Trail ===== */
 const trail = document.getElementById('trail'); const tctx = trail.getContext('2d');
 function sizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; } sizeTrail(); addEventListener('resize', sizeTrail);
 let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>160) points.shift(); });
@@ -146,146 +103,9 @@ let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:
   for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue; const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360; tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
 })();
 
-/* ==== Personality Test Build ==== */
-const QUESTIONS = [
-  'I prefer solving problems using logic and facts rather than imagination.',
-  'I often break complex tasks into step-by-step plans.',
-  'I enjoy activities like math, coding, or puzzles more than drawing, music, or storytelling.',
-  'I trust data and research more than intuition or “gut feelings.”',
-  'When faced with a new idea, my first instinct is to analyze how it works rather than what it could inspire.',
-  'I believe that practical achievements (career, wealth, tangible goals) are more important than personal enlightenment.',
-  'I spend more time thinking about daily responsibilities than abstract questions like “What is the meaning of life?”',
-  'I believe spiritual or philosophical growth is just as important as material success.',
-  'I am more interested in personal well-being and inner peace than in professional accomplishments.',
-  'I often reflect on metaphysical or spiritual ideas (purpose, higher consciousness, energy, etc.).',
-  'I feel more inspired by science and technology than by art or spirituality.',
-  'I admire people who are grounded and practical more than those who are dreamers or visionaries.',
-  'I believe creativity is more valuable when it produces real-world results than when it’s purely self-expression.',
-  'I see spiritual or imaginative experiences as essential parts of human life.',
-  'When making decisions, I balance logic and facts with intuition and values.'
-];
-
-// x-axis: Heart (-) ↔ Mind (+);  y-axis: Body (-) ↔ Soul (+)
-const MAP = [
-  {axis:'x', w:+1}, {axis:'x', w:+0.8}, {axis:'x', w:+0.8}, {axis:'x', w:+1}, {axis:'x', w:+0.8},
-  {axis:'y', w:-0.8}, {axis:'y', w:-0.8}, {axis:'y', w:+1}, {axis:'y', w:+0.8}, {axis:'y', w:+1},
-  {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'x', w:+0.6}, {axis:'y', w:+0.8}, {axis:'x', w:0}
-];
-
-const form = document.getElementById('testForm');
-const modal = document.getElementById('testModal');
-const launchBtn = document.getElementById('launchTest');
-const closeModal = document.getElementById('closeModal');
-const cancelBtn = document.getElementById('cancelTest');
-const submitBtn = document.getElementById('submitTest');
-const resultsBar = document.getElementById('resultsActions');
-const retakeBtn = document.getElementById('retakeBtn');
-const closeResultsBtn = document.getElementById('closeResultsBtn');
-
-function buildForm(){
-  form.innerHTML = '';
-  QUESTIONS.forEach((q,i)=>{
-    const id = `q${i}`;
-    const wrap = document.createElement('div'); wrap.className='q';
-    wrap.innerHTML = `<div>${i+1}. ${q}</div>`;
-    const scale = document.createElement('div'); scale.className='scale';
-    const labels = ['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
-    const points = document.createElement('div'); points.className='points';
-    labels.forEach((lab,idx)=>{
-      const radioId = `${id}_${idx+1}`;
-      const input = document.createElement('input'); input.type='radio'; input.name=id; input.id=radioId; input.value=String(idx+1);
-      const pill = document.createElement('label'); pill.className='pill'; pill.setAttribute('for', radioId); pill.textContent = `${idx+1}`;
-      points.appendChild(input); points.appendChild(pill);
-    });
-    const start = document.createElement('label'); start.textContent = 'Strongly Disagree';
-    const end = document.createElement('label'); end.textContent = 'Strongly Agree';
-    scale.appendChild(start); scale.appendChild(points); scale.appendChild(end);
-    wrap.appendChild(scale); form.appendChild(wrap);
-  });
-}
-
-function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); buildForm(); resultsBar.classList.remove('show'); }
-function closeTest(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
-launchBtn.addEventListener('click', openModal);
-closeModal.addEventListener('click', closeTest);
-cancelBtn.addEventListener('click', closeTest);
-
-/* ==== Scoring and Compass ==== */
-const compWrap = document.getElementById('compWrap');
-const canvas = document.getElementById('compCanvas');
-const ctx = canvas.getContext('2d');
-
-function scoreAndDraw(){
-  let x=0, y=0; let answered=0;
-  QUESTIONS.forEach((_,i)=>{
-    const sel = form.querySelector(`input[name=q${i}]:checked`);
-    if(!sel) return; answered++;
-    const v = Number(sel.value); // 1..5
-    const norm = (v-3)/2; // -1..+1
-    const m = MAP[i];
-    if(m.axis==='x') x += norm * m.w; else if(m.axis==='y') y += norm * m.w; else { y += norm * 0.3; }
-  });
-  if(answered < QUESTIONS.length){ alert('Please answer all questions.'); return; }
-  x = Math.max(-3, Math.min(3, x));
-  y = Math.max(-3, Math.min(3, y));
-  drawCompass(x/3, y/3);
-  resultsBar.classList.add('show');
-}
-
-submitBtn.addEventListener('click', scoreAndDraw);
-retakeBtn.addEventListener('click', ()=>{ buildForm(); resultsBar.classList.remove('show'); });
-closeResultsBtn.addEventListener('click', closeTest);
-
-function drawCompass(nx, ny){
-  compWrap.classList.add('show'); compWrap.setAttribute('aria-hidden','false');
-  const w=canvas.width, h=canvas.height; ctx.clearRect(0,0,w,h);
-  // quadrant color wash
-  const grad = ctx.createLinearGradient(0,0,w,h);
-  grad.addColorStop(0, 'rgba(239,68,68,0.20)');   // Heart red tint
-  grad.addColorStop(0.5, 'rgba(34,211,238,0.08)');
-  grad.addColorStop(1, 'rgba(59,130,246,0.25)');  // Mind blue tint
-  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
-  // Soul (top) yellow glow and Body (bottom) green glow
-  const soul = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h/1.2); soul.addColorStop(0,'rgba(250,204,21,0.28)'); soul.addColorStop(1,'rgba(250,204,21,0)');
-  ctx.fillStyle = soul; ctx.fillRect(0,0,w,h);
-  const body = ctx.createRadialGradient(w/2, h, 0, w/2, h, h/1.2); body.addColorStop(0,'rgba(34,197,94,0.28)'); body.addColorStop(1,'rgba(34,197,94,0)');
-  ctx.fillStyle = body; ctx.fillRect(0,0,w,h);
-
-  // grid
-  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
-  // axes with arrows
-  ctx.strokeStyle='rgba(255,255,255,.85)'; ctx.lineWidth=3; // bolder for clarity
-  // Y axis
-  ctx.beginPath(); ctx.moveTo(w/2, h-10); ctx.lineTo(w/2, 10); ctx.stroke();
-  // arrowheads
-  ctx.beginPath(); ctx.moveTo(w/2,10); ctx.lineTo(w/2-8,26); ctx.lineTo(w/2+8,26); ctx.closePath(); ctx.fillStyle='rgba(255,255,255,.85)'; ctx.fill();
-  ctx.beginPath(); ctx.moveTo(w/2,h-10); ctx.lineTo(w/2-8,h-26); ctx.lineTo(w/2+8,h-26); ctx.closePath(); ctx.fill();
-  // X axis
-  ctx.beginPath(); ctx.moveTo(10, h/2); ctx.lineTo(w-10, h/2); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(w-10,h/2); ctx.lineTo(w-26,h/2-8); ctx.lineTo(w-26,h/2+8); ctx.closePath(); ctx.fill();
-  ctx.beginPath(); ctx.moveTo(10,h/2); ctx.lineTo(26,h/2-8); ctx.lineTo(26,h/2+8); ctx.closePath(); ctx.fill();
-
-  // axis labels (colorful)
-  ctx.font='bold 22px system-ui'; ctx.shadowColor='rgba(0,0,0,.35)'; ctx.shadowBlur=8;
-  ctx.fillStyle='#ef4444'; ctx.textAlign='left'; ctx.fillText('Heart', 14, h/2 - 12);
-  ctx.fillStyle='#3b82f6'; ctx.textAlign='right'; ctx.fillText('Mind', w-14, h/2 - 12);
-  ctx.save(); ctx.translate(w/2 + 14, 28); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#facc15'; ctx.fillText('Soul', 0, 0); ctx.restore();
-  ctx.save(); ctx.translate(w/2 + 14, h - 16); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillStyle='#22c55e'; ctx.fillText('Body', 0, 0); ctx.restore();
-  ctx.shadowBlur=0;
-
-  // point + bloom
-  const px = nx * (w/2 - 24) + w/2; const py = h/2 - ny * (h/2 - 24);
-  const bloom = ctx.createRadialGradient(px,py,0, px,py, 80); bloom.addColorStop(0,'rgba(255,255,255,.95)'); bloom.addColorStop(1,'rgba(255,255,255,0)');
-  ctx.fillStyle = bloom; ctx.beginPath(); ctx.arc(px,py,80,0,Math.PI*2); ctx.fill();
-  ctx.strokeStyle='rgba(255,255,255,.95)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.stroke();
-  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
-
-  // legend near point
-  ctx.font='bold 14px system-ui'; ctx.textAlign='left'; ctx.fillStyle='#e5e7eb'; ctx.fillText('Your position', px+14, py-10);
-}
-
-/* Auth placeholder */
+/* Placeholder actions */
 document.getElementById('authBtn').addEventListener('click', ()=> alert('Hook up your auth flow here.'));
+document.getElementById('plusBtn').addEventListener('click', ()=> alert('Plus: reserved for future create action.'));
 </script>
 </body>
 </html>
