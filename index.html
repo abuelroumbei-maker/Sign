@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Home — Today Is The Day I…</title>
+<title>Home — Compass</title>
 <meta name="theme-color" content="#0b0d12" />
 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,7 +12,7 @@
 <style>
   :root{
     --fg:#e5e7eb; --muted:#9aa4b2; --card:#111827cc;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --warn:#f59e0b;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --pink:#f472b6; --amber:#f59e0b; --lime:#84cc16;
     --bg1:#0b0d12; --bg2:#0e1320;
     --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -22,64 +22,67 @@
   body{ margin:0; font-family: var(--body-font); color:var(--fg); background:#0b0d12; overflow:hidden; }
 
   /* Animated gradient + visible stars */
-  .bg{
-    position:fixed; inset:0; z-index:-3;
-    background:
+  .bg{ position:fixed; inset:0; z-index:-3; background:
       radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 60%),
       radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 30%, transparent), transparent 60%),
       radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 25%, transparent), transparent 60%),
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
-    animation:bgDrift 22s ease-in-out infinite alternate;
-    filter:saturate(1.05) brightness(1.03);
-  }
+      animation:bgDrift 22s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03); }
   @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
 
   #stars{ position:fixed; inset:0; z-index:-2; pointer-events:none }
   #trail{ position:fixed; inset:0; z-index:-1; pointer-events:none }
 
-  /* Center cluster */
-  .center{
-    position:fixed; left:50%; top:50%; transform:translate(-50%,-56%);
-    display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
-    padding:12px; width:min(92vw, 720px);
-  }
-  .hero-btn{
-    appearance:none; border:0; cursor:pointer; font-weight:900; font-size:clamp(20px,5vw,32px);
-    padding:16px 22px; border-radius:18px; color:#0a0b0f; text-decoration:none;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    box-shadow:0 16px 42px rgba(13,148,255,.35);
-  }
-  .auth-btn{ appearance:none; border:0; cursor:pointer; font-weight:800; font-size:16px; color:#0a0b0f;
-    padding:12px 16px; border-radius:14px; background:#ffffff; box-shadow:0 10px 28px rgba(0,0,0,.25); }
-  .inline-links{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+  /* Top-right controls */
+  .controls{ position:fixed; right:14px; top:14px; display:flex; gap:8px; z-index:10; }
+  .btn{ appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f; padding:10px 12px; border-radius:12px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
+  .btn.today{ background:linear-gradient(135deg,#60a5fa,#93c5fd); box-shadow:0 10px 24px rgba(13,148,255,.28); font-size:14px; }
+  .btn.auth{ background:#ffffff; color:#0a0b0f; box-shadow:0 10px 24px rgba(0,0,0,.25); font-weight:800; font-size:13px; }
 
-  /* Side anchors for the four main buttons */
+  /* Edge buttons (large, no emojis) */
   .edge-btn{ position:fixed; transform:translate(-50%,-50%); z-index:5; white-space:nowrap;
     appearance:none; border:0; cursor:pointer; font-weight:900; font-size:clamp(16px,2.6vw,22px); color:#0a0b0f;
-    padding:16px 20px; border-radius:16px; box-shadow:0 14px 36px rgba(0,0,0,.35);
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-  }
-  #btnTop{ left:50%; top:6.5%; }
-  #btnRight{ left:93.5%; top:50%; }
-  #btnBottom{ left:50%; top:93.5%; }
-  #btnLeft{ left:6.5%; top:50%; }
+    padding:16px 20px; border-radius:16px; box-shadow:0 14px 36px rgba(0,0,0,.35); text-decoration:none; }
+  #btnTop{ left:50%; top:7.5%; background:linear-gradient(135deg,#22c55e,#a7f3d0) }
+  #btnRight{ left:93.5%; top:50%; background:linear-gradient(135deg,#3b82f6,#bfdbfe) }
+  #btnBottom{ left:50%; top:93.5%; background:linear-gradient(135deg,#8b5cf6,#ddd6fe) }
+  #btnLeft{ left:6.5%; top:50%; background:linear-gradient(135deg,#ef4444,#fecaca) }
 
-  /* Personal Compass (appears after test) */
-  .compass{ position:fixed; left:50%; top:58%; transform:translate(-50%,-50%);
-    width:min(86vw, 560px); height:min(86vw, 560px); max-height:64vh; display:none;
-    background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:10px; backdrop-filter: blur(6px);
-  }
+  /* Personality test panel (left bottom corner trigger) */
+  .test-launch{ position:fixed; left:14px; bottom:14px; z-index:10; }
+  .btn.test{ background:linear-gradient(135deg,#a78bfa,#c4b5fd); box-shadow:0 10px 24px rgba(0,0,0,.25); font-size:14px; }
+
+  /* Modal */
+  .modal{ position:fixed; inset:0; display:none; place-items:center; z-index:20; }
+  .modal.show{ display:grid; }
+  .scrim{ position:absolute; inset:0; background:rgba(0,0,0,.55); backdrop-filter: blur(2px); }
+  .sheet{ position:relative; width:min(980px, 96vw); max-height:92vh; overflow:auto; background:var(--card); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:16px; box-shadow:0 24px 70px rgba(0,0,0,.6); }
+  .sheet h2{ margin:2px 0 8px; font-family:var(--title-font); }
+  .q{ background:#0f172acc; border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px 12px; margin:10px 0; }
+  .scale{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+  .scale label{ font-size:12px; opacity:.9 }
+  .scale .points{ display:flex; gap:6px; }
+  .scale input{ display:none }
+  .pill{ user-select:none; cursor:pointer; font-size:12px; font-weight:800; padding:8px 10px; border-radius:999px; background:#111827; border:1px solid rgba(255,255,255,.14); color:#cbd5e1; }
+  input:checked + .pill{ background:linear-gradient(135deg,#22d3ee,#a78bfa); color:#0b0d12; border-color:transparent; }
+
+  .sheet .row{ display:flex; gap:12px; justify-content:space-between; align-items:center; flex-wrap:wrap; }
+  .sheet .actions{ display:flex; gap:10px; }
+  .primary{ background:linear-gradient(135deg,#22d3ee,#60a5fa); }
+  .ghost{ background:#ffffff; }
+
+  /* Compass canvas in center (hidden until results) */
+  .compass{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); width:min(90vw, 640px); height:min(90vw, 640px); max-height:72vh; display:none; z-index:9; }
   .compass.show{ display:block; }
   #compCanvas{ width:100%; height:100%; display:block; }
-  .test-btn{ appearance:none; border:0; cursor:pointer; font-weight:900; font-size:16px; color:#0a0b0f;
-    padding:12px 14px; border-radius:14px; background:linear-gradient(135deg,#a78bfa,#c4b5fd); box-shadow:0 12px 30px rgba(0,0,0,.25); }
 
-  /* Mobile tweaks */
+  /* Mobile positioning */
   @media (max-width: 720px){
     #btnTop{ top:10%; }
     #btnBottom{ top:90%; }
     #btnLeft{ left:10%; }
     #btnRight{ left:90%; }
+    .controls{ right:10px; top:10px; }
   }
 </style>
 </head>
@@ -88,37 +91,53 @@
   <canvas id="stars"></canvas>
   <canvas id="trail"></canvas>
 
+  <!-- Top-right compact controls -->
+  <div class="controls">
+    <a class="btn today" href="today.html" title="Today is the day I…">Today is the day I…</a>
+    <a class="btn auth" href="#" id="authBtn">Log in / Sign up</a>
+  </div>
+
   <!-- Four main edges (no emojis) -->
-  <a id="btnTop" class="edge-btn" href="body.html"  style="background:linear-gradient(135deg,#22c55e,#a7f3d0)">Body</a>
-  <a id="btnRight" class="edge-btn" href="mind.html"  style="background:linear-gradient(135deg,#3b82f6,#bfdbfe)">Mind</a>
-  <a id="btnBottom" class="edge-btn" href="soul.html"  style="background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">Soul</a>
-  <a id="btnLeft" class="edge-btn" href="heart.html" style="background:linear-gradient(135deg,#ef4444,#fecaca)">Heart</a>
+  <a id="btnTop" class="edge-btn" href="body.html">Body</a>
+  <a id="btnRight" class="edge-btn" href="mind.html">Mind</a>
+  <a id="btnBottom" class="edge-btn" href="soul.html">Soul</a>
+  <a id="btnLeft" class="edge-btn" href="heart.html">Heart</a>
 
-  <!-- Center cluster: Today CTA + Auth + Personality Test -->
-  <section class="center">
-    <a id="todayBtn" class="hero-btn" href="today.html">Today is the day I…</a>
-    <button id="authBtn" class="auth-btn">Log in / Sign up</button>
-    <div class="inline-links">
-      <button class="test-btn" id="takeTestBtn" aria-controls="compWrap" aria-expanded="false">Take short personality test</button>
+  <!-- Personality test launcher -->
+  <div class="test-launch"><button class="btn test" id="launchTest">Personality test</button></div>
+
+  <!-- Personality Test Modal -->
+  <div class="modal" id="testModal" aria-hidden="true" role="dialog" aria-label="Personality test">
+    <div class="scrim" id="closeModal"></div>
+    <div class="sheet">
+      <div class="row">
+        <h2>Short Personality Test</h2>
+        <div class="actions">
+          <button class="btn ghost" id="cancelTest">Cancel</button>
+          <button class="btn primary" id="submitTest">See my compass</button>
+        </div>
+      </div>
+      <p class="muted">Rate each from <strong>Strongly Disagree (1)</strong> to <strong>Strongly Agree (5)</strong>.</p>
+      <form id="testForm"></form>
     </div>
-  </section>
+  </div>
 
-  <!-- Personalized Compass (political-compass-like) -->
+  <!-- Personalized Compass (Heart↔Mind on X, Body↔Soul on Y) -->
   <div id="compWrap" class="compass" aria-hidden="true">
-    <canvas id="compCanvas" width="800" height="800"></canvas>
+    <canvas id="compCanvas" width="1024" height="1024"></canvas>
   </div>
 
 <script>
-/* ====== Stars (subtle parallax) ====== */
+/* ==== Stars ==== */
 const stars = document.getElementById('stars'); const sctx = stars.getContext('2d');
 function sizeStars(){ stars.width = innerWidth; stars.height = innerHeight; } sizeStars(); addEventListener('resize', sizeStars);
-const STARS = Array.from({length: 180}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.6 + 0.3 }));
+const STARS = Array.from({length: 200}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.8 + 0.3 }));
 let mpX=.5, mpY=.5; addEventListener('pointermove', e=>{ mpX=e.clientX/innerWidth; mpY=e.clientY/innerHeight; });
 (function drawStars(){ requestAnimationFrame(drawStars); sctx.clearRect(0,0,stars.width,stars.height);
   STARS.forEach(s=>{ s.x += (mpX - .5) * s.z * .25; s.y += (mpY - .5) * s.z * .25; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height; sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
 })();
 
-/* ====== Rainbow Mouse Trail ====== */
+/* ==== Rainbow Mouse Trail ==== */
 const trail = document.getElementById('trail'); const tctx = trail.getContext('2d');
 function sizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; } sizeTrail(); addEventListener('resize', sizeTrail);
 let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>160) points.shift(); });
@@ -126,63 +145,154 @@ let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:
   for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue; const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360; tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
 })();
 
-/* ====== Personality Test (very short) ====== */
-const takeBtn = document.getElementById('takeTestBtn'); const comp = document.getElementById('compWrap'); const canvas = document.getElementById('compCanvas'); const ctx = canvas.getContext('2d');
-let answers = null; // store last run
+/* ==== Personality Test Build ==== */
+const QUESTIONS = [
+  'I prefer solving problems using logic and facts rather than imagination.',
+  'I often break complex tasks into step-by-step plans.',
+  'I enjoy activities like math, coding, or puzzles more than drawing, music, or storytelling.',
+  'I trust data and research more than intuition or “gut feelings.”',
+  'When faced with a new idea, my first instinct is to analyze how it works rather than what it could inspire.',
+  'I believe that practical achievements (career, wealth, tangible goals) are more important than personal enlightenment.',
+  'I spend more time thinking about daily responsibilities than abstract questions like “What is the meaning of life?”',
+  'I believe spiritual or philosophical growth is just as important as material success.',
+  'I am more interested in personal well-being and inner peace than in professional accomplishments.',
+  'I often reflect on metaphysical or spiritual ideas (purpose, higher consciousness, energy, etc.).',
+  'I feel more inspired by science and technology than by art or spirituality.',
+  'I admire people who are grounded and practical more than those who are dreamers or visionaries.',
+  'I believe creativity is more valuable when it produces real-world results than when it’s purely self-expression.',
+  'I see spiritual or imaginative experiences as essential parts of human life.',
+  'When making decisions, I balance logic and facts with intuition and values.'
+];
 
-function runShortTest(){
-  // 6 quick sliders via prompt() for simplicity; replace with real UI later
-  const qs = [
-    {k:'analytical', q:'Prefer structured plans over improvisation? (0 improv … 10 structured)', axis:'x', weight:+1},
-    {k:'intuitive',  q:'Trust your gut over data? (0 data … 10 gut)',          axis:'x', weight:-1},
-    {k:'mind',       q:'Solve via thinking not feelings? (0 feeling … 10 thinking)', axis:'y', weight:+1},
-    {k:'heart',      q:'Value empathy over logic? (0 logic … 10 empathy)',          axis:'y', weight:-1},
-    {k:'solo',       q:'Work solo rather than with people? (0 team … 10 solo)',      axis:'y', weight:+0.4},
-    {k:'spont',      q:'Enjoy spontaneity? (0 rigid … 10 spontaneous)',              axis:'x', weight:-0.4},
-  ];
-  let x=0,y=0, count=0; answers={};
-  for(const item of qs){
-    let v = prompt(item.q, '5');
-    if(v===null) return; // cancelled
-    v = Math.max(0, Math.min(10, Number(v)));
-    answers[item.k]=v; count++;
-    const norm = (v-5)/5; // -1..+1
-    if(item.axis==='x') x += norm * item.weight; else y += norm * item.weight;
-  }
-  // clamp
-  x=Math.max(-2,Math.min(2,x)); y=Math.max(-2,Math.min(2,y));
-  showCompass(x,y);
+// Map each question to an axis and polarity.
+// x-axis: Heart (-)  ← 0 .... 5 →  Mind (+)
+// y-axis: Body  (-)  ↓        ↑  Soul (+)
+const MAP = [
+  {axis:'x', w:+1}, // logic -> Mind
+  {axis:'x', w:+0.8},
+  {axis:'x', w:+0.8},
+  {axis:'x', w:+1},
+  {axis:'x', w:+0.8},
+  {axis:'y', w:-0.8}, // practical over enlightenment -> Body (negative toward Soul)
+  {axis:'y', w:-0.8}, // daily responsibilities -> Body
+  {axis:'y', w:+1},   // spiritual growth -> Soul
+  {axis:'y', w:+0.8}, // inner peace -> Soul
+  {axis:'y', w:+1},   // metaphysical -> Soul
+  {axis:'x', w:+0.6}, // science/tech -> Mind
+  {axis:'x', w:+0.6}, // grounded/practical -> Mind
+  {axis:'x', w:+0.6}, // utility-focused creativity -> Mind
+  {axis:'y', w:+0.8}, // spiritual/imaginative essential -> Soul
+  {axis:'x', w:0},    // balanced: neutral on x; we will add small y toward Soul for values
+];
+
+const form = document.getElementById('testForm');
+const modal = document.getElementById('testModal');
+const launchBtn = document.getElementById('launchTest');
+const closeModal = document.getElementById('closeModal');
+const cancelBtn = document.getElementById('cancelTest');
+const submitBtn = document.getElementById('submitTest');
+
+function buildForm(){
+  form.innerHTML = '';
+  QUESTIONS.forEach((q,i)=>{
+    const id = `q${i}`;
+    const wrap = document.createElement('div'); wrap.className='q';
+    wrap.innerHTML = `<div>${i+1}. ${q}</div>`;
+    const scale = document.createElement('div'); scale.className='scale';
+    const labels = ['Strongly Disagree','Disagree','Neutral','Agree','Strongly Agree'];
+    const points = document.createElement('div'); points.className='points';
+    labels.forEach((lab,idx)=>{
+      const radioId = `${id}_${idx+1}`;
+      const input = document.createElement('input'); input.type='radio'; input.name=id; input.id=radioId; input.value=String(idx+1);
+      const pill = document.createElement('label'); pill.className='pill'; pill.setAttribute('for', radioId); pill.textContent = `${idx+1}`;
+      points.appendChild(input); points.appendChild(pill);
+    });
+    const start = document.createElement('label'); start.textContent = 'Strongly Disagree';
+    const end = document.createElement('label'); end.textContent = 'Strongly Agree';
+    scale.appendChild(start); scale.appendChild(points); scale.appendChild(end);
+    wrap.appendChild(scale); form.appendChild(wrap);
+  });
 }
 
-function showCompass(x,y){
-  comp.classList.add('show'); comp.setAttribute('aria-hidden','false');
-  // draw axes
+function openModal(){ modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); buildForm(); }
+function closeTest(){ modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+launchBtn.addEventListener('click', openModal);
+closeModal.addEventListener('click', closeTest);
+cancelBtn.addEventListener('click', closeTest);
+
+/* ==== Scoring and Compass ==== */
+const compWrap = document.getElementById('compWrap');
+const canvas = document.getElementById('compCanvas');
+const ctx = canvas.getContext('2d');
+
+function scoreAndDraw(){
+  let x=0, y=0; let answered=0;
+  QUESTIONS.forEach((_,i)=>{
+    const sel = form.querySelector(`input[name=q${i}]:checked`);
+    if(!sel) return; answered++;
+    const v = Number(sel.value); // 1..5
+    const norm = (v-3)/2; // -1..+1
+    const m = MAP[i];
+    if(m.axis==='x') x += norm * m.w; else if(m.axis==='y') y += norm * m.w; else {
+      // for the balanced item, give tiny Soul tilt when agree
+      y += norm * 0.3;
+    }
+  });
+  if(answered < QUESTIONS.length){ alert('Please answer all questions.'); return; }
+  // clamp softly
+  x = Math.max(-3, Math.min(3, x));
+  y = Math.max(-3, Math.min(3, y));
+  drawCompass(x/3, y/3);
+  closeTest();
+}
+
+submitBtn.addEventListener('click', scoreAndDraw);
+
+function drawCompass(nx, ny){
+  compWrap.classList.add('show'); compWrap.setAttribute('aria-hidden','false');
   const w=canvas.width, h=canvas.height; ctx.clearRect(0,0,w,h);
-  ctx.fillStyle='rgba(17,24,39,.85)'; ctx.fillRect(0,0,w,h);
+  // colorful quadrant gradient
+  const grad = ctx.createLinearGradient(0,0,w,h);
+  grad.addColorStop(0, 'rgba(244,114,182,0.25)');   // Heart (pink)
+  grad.addColorStop(0.5, 'rgba(34,211,238,0.10)');  // center cool
+  grad.addColorStop(1, 'rgba(99,102,241,0.25)');    // Mind (indigo)
+  ctx.fillStyle = grad; ctx.fillRect(0,0,w,h);
+  // add radial soul/body tints
+  const soul = ctx.createRadialGradient(w/2, 0, 0, w/2, 0, h/1.2); soul.addColorStop(0,'rgba(168,85,247,0.28)'); soul.addColorStop(1,'rgba(168,85,247,0)');
+  ctx.fillStyle = soul; ctx.fillRect(0,0,w,h);
+  const body = ctx.createRadialGradient(w/2, h, 0, w/2, h, h/1.2); body.addColorStop(0,'rgba(132,204,22,0.28)'); body.addColorStop(1,'rgba(132,204,22,0)');
+  ctx.fillStyle = body; ctx.fillRect(0,0,w,h);
+
   // grid
-  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+  ctx.strokeStyle='rgba(255,255,255,.12)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
   // axes
-  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(w/2,0); ctx.lineTo(w/2,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
-  // labels
-  ctx.fillStyle='#e5e7eb'; ctx.font='16px system-ui'; ctx.fillText('Analytical', 18, h/2-10); ctx.fillText('Intuitive', w-110, h/2-10);
-  ctx.save(); ctx.translate(w/2+10, 22); ctx.rotate(-Math.PI/2); ctx.fillText('Mind (Thinking)', 0,0); ctx.restore();
-  ctx.save(); ctx.translate(w/2+10, h-12); ctx.rotate(-Math.PI/2); ctx.fillText('Heart (Feeling)', 0,0); ctx.restore();
-  // point
-  const px = (x/2)* (w/2) + w/2; const py = h/2 - (y/2)*(h/2);
-  const grad = ctx.createRadialGradient(px,py,0, px,py, 60); grad.addColorStop(0,'rgba(99,102,241,.95)'); grad.addColorStop(1,'rgba(99,102,241,0)');
-  ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(px,py,60,0,Math.PI*2); ctx.fill();
-  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill();
-  ctx.font='14px system-ui'; ctx.fillText(`You`, px+10, py-10);
+  ctx.strokeStyle='rgba(255,255,255,.6)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(w/2,0); ctx.lineTo(w/2,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+
+  // axis labels
+  ctx.fillStyle='#e5e7eb'; ctx.font='bold 18px system-ui';
+  ctx.textAlign='left'; ctx.fillText('Heart', 10, h/2 - 10);
+  ctx.textAlign='right'; ctx.fillText('Mind', w-10, h/2 - 10);
+  ctx.save(); ctx.translate(w/2 + 12, 22); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('Soul', 0, 0); ctx.restore();
+  ctx.save(); ctx.translate(w/2 + 12, h - 12); ctx.rotate(-Math.PI/2); ctx.textAlign='left'; ctx.fillText('Body', 0, 0); ctx.restore();
+
+  // point + bloom
+  const px = nx * (w/2 - 24) + w/2; const py = h/2 - ny * (h/2 - 24);
+  const bloom = ctx.createRadialGradient(px,py,0, px,py, 80); bloom.addColorStop(0,'rgba(255,255,255,.95)'); bloom.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle = bloom; ctx.beginPath(); ctx.arc(px,py,80,0,Math.PI*2); ctx.fill();
+  // ring
+  ctx.strokeStyle='rgba(255,255,255,.9)'; ctx.lineWidth=3; ctx.beginPath(); ctx.arc(px,py,10,0,Math.PI*2); ctx.stroke();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,5,0,Math.PI*2); ctx.fill();
+
+  // small legend
+  ctx.font='13px system-ui'; ctx.textAlign='left'; ctx.fillText('Your position', px+14, py-10);
 }
 
-takeBtn.addEventListener('click', ()=>{ runShortTest(); takeBtn.setAttribute('aria-expanded','true'); });
-
-document.getElementById('authBtn').addEventListener('click', ()=>{
-  alert('Connect this to your auth flow when ready.');
-});
+/* Auth placeholder */
+document.getElementById('authBtn').addEventListener('click', ()=> alert('Hook up your auth flow here.'));
 </script>
 </body>
 </html>
+
 
 
 
