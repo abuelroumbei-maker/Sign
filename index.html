@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Today Is The Day I… — Home</title>
+<title>Home — Today Is The Day I…</title>
 <meta name="theme-color" content="#0b0d12" />
 
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,154 +11,179 @@
 
 <style>
   :root{
-    --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
-    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf;
+    --fg:#e5e7eb; --muted:#9aa4b2; --card:#111827cc;
+    --accent:#6d5efc; --accent2:#00c2ff; --accent3:#2dd4bf; --warn:#f59e0b;
     --bg1:#0b0d12; --bg2:#0e1320;
-    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Robito, Arial, sans-serif;
+    --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{ margin:0; font-family: var(--body-font); color:var(--fg); background:#0b0d12; overflow:hidden; }
 
-  /* Subtle animated gradient background */
+  /* Animated gradient + visible stars */
   .bg{
-    position:fixed; inset:0; z-index:-4;
+    position:fixed; inset:0; z-index:-3;
     background:
-      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
-      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
-      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 30%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 30%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 25%, transparent), transparent 60%),
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
-    filter:saturate(1.1) brightness(1.05);
-    animation:bgDrift 20s ease-in-out infinite alternate;
+    animation:bgDrift 22s ease-in-out infinite alternate;
+    filter:saturate(1.05) brightness(1.03);
   }
   @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
 
-  /* Layout */
-  .wrap{height:100%; display:grid; grid-template-rows:auto 1fr; padding:18px}
-  header{
-    display:flex; align-items:center; justify-content:space-between; gap:12px;
-    background:var(--card); border-radius:16px; padding:10px 12px;
-    box-shadow: 0 14px 40px rgba(3,7,18,.35); backdrop-filter: blur(8px);
+  #stars{ position:fixed; inset:0; z-index:-2; pointer-events:none }
+  #trail{ position:fixed; inset:0; z-index:-1; pointer-events:none }
+
+  /* Center cluster */
+  .center{
+    position:fixed; left:50%; top:50%; transform:translate(-50%,-56%);
+    display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center;
+    padding:12px; width:min(92vw, 720px);
   }
-  .brand{ display:flex; align-items:center; gap:10px; }
-  .brand h1{
-    margin:0; font-size:clamp(20px,5vw,30px); font-family: var(--title-font);
-    background:linear-gradient(90deg,#fff,#dbeafe,#fff);
-    -webkit-background-clip:text; background-clip:text; color:transparent;
-    filter:drop-shadow(0 6px 16px rgba(255,255,255,.1));
+  .hero-btn{
+    appearance:none; border:0; cursor:pointer; font-weight:900; font-size:clamp(20px,5vw,32px);
+    padding:16px 22px; border-radius:18px; color:#0a0b0f; text-decoration:none;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    box-shadow:0 16px 42px rgba(13,148,255,.35);
   }
-  .head-actions{ display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  .auth-btn{ appearance:none; border:0; cursor:pointer; font-weight:800; font-size:16px; color:#0a0b0f;
+    padding:12px 16px; border-radius:14px; background:#ffffff; box-shadow:0 10px 28px rgba(0,0,0,.25); }
+  .inline-links{ display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
 
-  .btn{ position:relative; appearance:none; border:0; cursor:pointer; font-weight:900; color:#0a0b0f;
-        padding:10px 12px; border-radius:12px; background:linear-gradient(135deg, var(--accent), var(--accent2));
-        box-shadow:0 10px 24px rgba(13,148,255,.25); font-size:14px; text-decoration:none; display:inline-flex; align-items:center; gap:8px; }
-  .btn:hover{ filter:brightness(1.06); box-shadow:0 14px 32px rgba(13,148,255,.35) }
-  .btn.ghost{ background:#ffffff; color:var(--accent); border:2px solid rgba(109,94,252,.35); box-shadow:0 8px 22px rgba(2,6,23,.08) }
-  .btn.subtle{ background:#ffffff; color:#0a0b0f; border:1px solid rgba(2,6,23,.12); box-shadow:0 6px 18px rgba(2,6,23,.06) }
-
-  main.app{ display:grid; grid-template-columns: 1fr minmax(280px, 360px); gap:14px; height:calc(100% - 12px); }
-
-  /* Feed */
-  .feed{
-    background: var(--card); border-radius:16px; height:100%; overflow:auto; padding:14px 14px 18px;
-    box-shadow: 0 18px 50px rgba(3,7,18,.35); backdrop-filter: blur(8px);
+  /* Side anchors for the four main buttons */
+  .edge-btn{ position:fixed; transform:translate(-50%,-50%); z-index:5; white-space:nowrap;
+    appearance:none; border:0; cursor:pointer; font-weight:900; font-size:clamp(16px,2.6vw,22px); color:#0a0b0f;
+    padding:16px 20px; border-radius:16px; box-shadow:0 14px 36px rgba(0,0,0,.35);
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
   }
-  .feed .placeholder{
-    color:#334155; font-size:15px; line-height:1.55; background:#f8fafc; border:1px dashed #cbd5e1;
-    padding:16px; border-radius:12px;
+  #btnTop{ left:50%; top:6.5%; }
+  #btnRight{ left:93.5%; top:50%; }
+  #btnBottom{ left:50%; top:93.5%; }
+  #btnLeft{ left:6.5%; top:50%; }
+
+  /* Personal Compass (appears after test) */
+  .compass{ position:fixed; left:50%; top:58%; transform:translate(-50%,-50%);
+    width:min(86vw, 560px); height:min(86vw, 560px); max-height:64vh; display:none;
+    background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:16px; padding:10px; backdrop-filter: blur(6px);
   }
+  .compass.show{ display:block; }
+  #compCanvas{ width:100%; height:100%; display:block; }
+  .test-btn{ appearance:none; border:0; cursor:pointer; font-weight:900; font-size:16px; color:#0a0b0f;
+    padding:12px 14px; border-radius:14px; background:linear-gradient(135deg,#a78bfa,#c4b5fd); box-shadow:0 12px 30px rgba(0,0,0,.25); }
 
-  /* Actions column */
-  .actions{
-    display:flex; flex-direction:column; gap:12px; height:100%;
-  }
-  .card{ background: var(--card); border-radius:16px; padding:14px; box-shadow: 0 18px 50px rgba(3,7,18,.35); backdrop-filter: blur(8px); }
-  .tabs{ display:grid; gap:10px; }
-  .tabLink{
-    --halo: #93c5fd; position:relative; overflow:hidden; outline:none; text-decoration:none; text-align:center;
-    color:#0a0b0f; font-weight:900; padding:16px 18px; border-radius:14px; font-size:18px;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    box-shadow: 0 12px 28px rgba(13,148,255,.28);
-  }
-  .tabLink:hover{ filter:brightness(1.06); box-shadow: 0 14px 36px rgba(13,148,255,.36) }
-
-  .aside-links{ display:flex; gap:10px; flex-wrap:wrap; }
-  .muted{ color:#475569; font-size:12px; }
-
-  /* Canvas layer: Rainbow trail only */
-  #trail{ position:fixed; inset:0; pointer-events:none; z-index:-2 }
-
-  @media (max-width: 860px){
-    main.app{ grid-template-columns:1fr; }
+  /* Mobile tweaks */
+  @media (max-width: 720px){
+    #btnTop{ top:10%; }
+    #btnBottom{ top:90%; }
+    #btnLeft{ left:10%; }
+    #btnRight{ left:90%; }
   }
 </style>
 </head>
 <body>
   <div class="bg"></div>
+  <canvas id="stars"></canvas>
   <canvas id="trail"></canvas>
 
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div style="font-size:22px">🌈</div>
-        <h1>Today Is The Day I…</h1>
-      </div>
-      <div class="head-actions">
-        <!-- "Today" moved aside as a small button -->
-        <a class="btn ghost" href="#" id="todayBtn" title="Today">Today</a>
-        <!-- Optional auth button -->
-        <a class="btn subtle" href="#" id="authBtn">Log in / Sign up</a>
-      </div>
-    </header>
+  <!-- Four main edges (no emojis) -->
+  <a id="btnTop" class="edge-btn" href="body.html"  style="background:linear-gradient(135deg,#22c55e,#a7f3d0)">Body</a>
+  <a id="btnRight" class="edge-btn" href="mind.html"  style="background:linear-gradient(135deg,#3b82f6,#bfdbfe)">Mind</a>
+  <a id="btnBottom" class="edge-btn" href="soul.html"  style="background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">Soul</a>
+  <a id="btnLeft" class="edge-btn" href="heart.html" style="background:linear-gradient(135deg,#ef4444,#fecaca)">Heart</a>
 
-    <main class="app">
-      <!-- Potential social feed (empty for now) -->
-      <section class="feed" aria-label="Feed">
-        <div class="placeholder">
-          <strong>Future social feed lives here.</strong><br>
-          You can stream posts, streaks, or community prompts. For now this area is intentionally empty.
-        </div>
-      </section>
+  <!-- Center cluster: Today CTA + Auth + Personality Test -->
+  <section class="center">
+    <a id="todayBtn" class="hero-btn" href="today.html">Today is the day I…</a>
+    <button id="authBtn" class="auth-btn">Log in / Sign up</button>
+    <div class="inline-links">
+      <button class="test-btn" id="takeTestBtn" aria-controls="compWrap" aria-expanded="false">Take short personality test</button>
+    </div>
+  </section>
 
-      <!-- Main actions column: the four buttons are the star of the page -->
-      <aside class="actions" aria-label="Main actions">
-        <div class="card">
-          <div class="tabs" id="tabs">
-            <a class="tabLink" href="body.html"  style="--halo:#86efac;background:linear-gradient(135deg,#22c55e,#a7f3d0)">🫀 Body</a>
-            <a class="tabLink" href="heart.html" style="--halo:#fca5a5;background:linear-gradient(135deg,#ef4444,#fecaca)">💖 Heart</a>
-            <a class="tabLink" href="mind.html"  style="--halo:#93c5fd;background:linear-gradient(135deg,#3b82f6,#bfdbfe)">🧠 Mind</a>
-            <a class="tabLink" href="soul.html"  style="--halo:#c4b5fd;background:linear-gradient(135deg,#8b5cf6,#ddd6fe)">✨ Soul</a>
-          </div>
-          <div class="muted" style="margin-top:10px">These are the primary destinations. "Today" has been moved to the header.</div>
-        </div>
-
-        <div class="card">
-          <div class="aside-links">
-            <a class="btn ghost" href="#">Browse</a>
-            <a class="btn ghost" href="#">Explore</a>
-          </div>
-          <div class="muted" style="margin-top:10px">Add more quick links or stats here later.</div>
-        </div>
-      </aside>
-    </main>
+  <!-- Personalized Compass (political-compass-like) -->
+  <div id="compWrap" class="compass" aria-hidden="true">
+    <canvas id="compCanvas" width="800" height="800"></canvas>
   </div>
 
 <script>
-/* ====== RAINBOW MOUSE TRAIL ONLY ====== */
-const trail = document.getElementById("trail"), tctx = trail.getContext("2d");
-function size(){ trail.width=innerWidth; trail.height=innerHeight; } size(); addEventListener('resize', size);
+/* ====== Stars (subtle parallax) ====== */
+const stars = document.getElementById('stars'); const sctx = stars.getContext('2d');
+function sizeStars(){ stars.width = innerWidth; stars.height = innerHeight; } sizeStars(); addEventListener('resize', sizeStars);
+const STARS = Array.from({length: 180}).map(()=>({ x: Math.random()*innerWidth, y: Math.random()*innerHeight, z: Math.random()*1.6 + 0.3 }));
+let mpX=.5, mpY=.5; addEventListener('pointermove', e=>{ mpX=e.clientX/innerWidth; mpY=e.clientY/innerHeight; });
+(function drawStars(){ requestAnimationFrame(drawStars); sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{ s.x += (mpX - .5) * s.z * .25; s.y += (mpY - .5) * s.z * .25; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height; sctx.fillStyle = `rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x, s.y, 1.2*s.z, 1.2*s.z); });
+})();
+
+/* ====== Rainbow Mouse Trail ====== */
+const trail = document.getElementById('trail'); const tctx = trail.getContext('2d');
+function sizeTrail(){ trail.width=innerWidth; trail.height=innerHeight; } sizeTrail(); addEventListener('resize', sizeTrail);
 let points=[]; addEventListener('pointermove', e=>{ points.push({x:e.clientX, y:e.clientY, t:Date.now()}); if(points.length>160) points.shift(); });
-(function draw(){ requestAnimationFrame(draw); const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height); if(points.length<2) return; tctx.lineCap="round"; tctx.lineJoin="round"; tctx.globalCompositeOperation="lighter";
+(function drawTrail(){ requestAnimationFrame(drawTrail); const now=Date.now(); tctx.clearRect(0,0,trail.width,trail.height); if(points.length<2) return; tctx.lineCap='round'; tctx.lineJoin='round'; tctx.globalCompositeOperation='lighter';
   for(let i=1;i<points.length;i++){ const p0=points[i-1], p1=points[i]; const age=now-p1.t; if(age>1600) continue; const life=1-age/1600, w=2+life*6, hue=(p1.t/12)%360; tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`; tctx.lineWidth=w; tctx.beginPath(); tctx.moveTo(p0.x,p0.y); tctx.lineTo(p1.x,p1.y); tctx.stroke(); }
 })();
 
-/* ====== PLACEHOLDER HANDLERS ====== */
-document.getElementById('todayBtn').addEventListener('click', (e)=>{ e.preventDefault(); alert('Today view is tucked away for now. Hook this to your Today page or modal later.'); });
-document.getElementById('authBtn').addEventListener('click', (e)=>{ e.preventDefault(); alert('Auth is optional. Wire this up to your login/signup flow when ready.'); });
+/* ====== Personality Test (very short) ====== */
+const takeBtn = document.getElementById('takeTestBtn'); const comp = document.getElementById('compWrap'); const canvas = document.getElementById('compCanvas'); const ctx = canvas.getContext('2d');
+let answers = null; // store last run
+
+function runShortTest(){
+  // 6 quick sliders via prompt() for simplicity; replace with real UI later
+  const qs = [
+    {k:'analytical', q:'Prefer structured plans over improvisation? (0 improv … 10 structured)', axis:'x', weight:+1},
+    {k:'intuitive',  q:'Trust your gut over data? (0 data … 10 gut)',          axis:'x', weight:-1},
+    {k:'mind',       q:'Solve via thinking not feelings? (0 feeling … 10 thinking)', axis:'y', weight:+1},
+    {k:'heart',      q:'Value empathy over logic? (0 logic … 10 empathy)',          axis:'y', weight:-1},
+    {k:'solo',       q:'Work solo rather than with people? (0 team … 10 solo)',      axis:'y', weight:+0.4},
+    {k:'spont',      q:'Enjoy spontaneity? (0 rigid … 10 spontaneous)',              axis:'x', weight:-0.4},
+  ];
+  let x=0,y=0, count=0; answers={};
+  for(const item of qs){
+    let v = prompt(item.q, '5');
+    if(v===null) return; // cancelled
+    v = Math.max(0, Math.min(10, Number(v)));
+    answers[item.k]=v; count++;
+    const norm = (v-5)/5; // -1..+1
+    if(item.axis==='x') x += norm * item.weight; else y += norm * item.weight;
+  }
+  // clamp
+  x=Math.max(-2,Math.min(2,x)); y=Math.max(-2,Math.min(2,y));
+  showCompass(x,y);
+}
+
+function showCompass(x,y){
+  comp.classList.add('show'); comp.setAttribute('aria-hidden','false');
+  // draw axes
+  const w=canvas.width, h=canvas.height; ctx.clearRect(0,0,w,h);
+  ctx.fillStyle='rgba(17,24,39,.85)'; ctx.fillRect(0,0,w,h);
+  // grid
+  ctx.strokeStyle='rgba(255,255,255,.08)'; ctx.lineWidth=1; for(let i=1;i<8;i++){ const gx=i*(w/8); ctx.beginPath(); ctx.moveTo(gx,0); ctx.lineTo(gx,h); ctx.stroke(); const gy=i*(h/8); ctx.beginPath(); ctx.moveTo(0,gy); ctx.lineTo(w,gy); ctx.stroke(); }
+  // axes
+  ctx.strokeStyle='rgba(255,255,255,.35)'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(w/2,0); ctx.lineTo(w/2,h); ctx.stroke(); ctx.beginPath(); ctx.moveTo(0,h/2); ctx.lineTo(w,h/2); ctx.stroke();
+  // labels
+  ctx.fillStyle='#e5e7eb'; ctx.font='16px system-ui'; ctx.fillText('Analytical', 18, h/2-10); ctx.fillText('Intuitive', w-110, h/2-10);
+  ctx.save(); ctx.translate(w/2+10, 22); ctx.rotate(-Math.PI/2); ctx.fillText('Mind (Thinking)', 0,0); ctx.restore();
+  ctx.save(); ctx.translate(w/2+10, h-12); ctx.rotate(-Math.PI/2); ctx.fillText('Heart (Feeling)', 0,0); ctx.restore();
+  // point
+  const px = (x/2)* (w/2) + w/2; const py = h/2 - (y/2)*(h/2);
+  const grad = ctx.createRadialGradient(px,py,0, px,py, 60); grad.addColorStop(0,'rgba(99,102,241,.95)'); grad.addColorStop(1,'rgba(99,102,241,0)');
+  ctx.fillStyle=grad; ctx.beginPath(); ctx.arc(px,py,60,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill();
+  ctx.font='14px system-ui'; ctx.fillText(`You`, px+10, py-10);
+}
+
+takeBtn.addEventListener('click', ()=>{ runShortTest(); takeBtn.setAttribute('aria-expanded','true'); });
+
+document.getElementById('authBtn').addEventListener('click', ()=>{
+  alert('Connect this to your auth flow when ready.');
+});
 </script>
 </body>
 </html>
+
 
 
 
