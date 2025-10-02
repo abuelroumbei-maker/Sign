@@ -15,6 +15,7 @@
     --bg1:#0b0d12; --bg2:#0e1320;
     --title-font:"Pacifico",ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
     --body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --ring:#fff;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -23,6 +24,8 @@
     background:var(--bg1); overflow:hidden;
     -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   }
+
+  /* Background */
   .bg{
     position:fixed; inset:0; z-index:-4;
     background:
@@ -36,6 +39,28 @@
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
   @media (prefers-reduced-motion: reduce){ .bg{ animation:none } }
 
+  /* Top navigation (Home only) */
+  nav.nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap;z-index:2}
+  .pill{
+    display:inline-block;padding:8px 12px;border-radius:999px;
+    background:var(--card);color:#0a0b0f;font-weight:800;text-decoration:none;
+    box-shadow:0 6px 16px rgba(0,0,0,.16);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .pill:hover{transform:translateY(-1px); box-shadow:0 10px 22px rgba(0,0,0,.22)}
+
+  /* RIF button pinned top-right */
+  .rif-wrap{
+    position:fixed; right:18px; top:18px; z-index:2;
+  }
+  .rif-btn{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:10px 14px; border-radius:12px; border:0; cursor:pointer;
+    background:linear-gradient(90deg,#f9fafb,#e5e7eb);
+    color:#0a0b0f; font-weight:900; box-shadow:0 8px 20px rgba(0,0,0,.22);
+  }
+
+  /* Main */
   .wrap{height:100%;display:grid;place-items:center;padding:22px;text-align:center}
   .title{
     margin:0; font-size:clamp(40px,10vw,86px); line-height:1.02;
@@ -46,25 +71,23 @@
     font-weight:900; letter-spacing:.2px;
   }
 
+  /* Button grid */
   .grid{
     margin-top:18px;
-    display:flex; flex-wrap:wrap; gap:12px; justify-content:center;
+    display:grid; gap:12px;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    width:min(720px, 92vw);
   }
   .cta{
-    display:inline-flex; align-items:center; gap:10px;
+    display:inline-flex; align-items:center; justify-content:center;
     padding:12px 16px; border-radius:14px; border:0; cursor:pointer;
     background:linear-gradient(90deg,var(--accent),var(--accent3));
-    color:#0a0b0f; font-weight:900; box-shadow:0 10px 28px rgba(0,0,0,.25);
+    color:#0a0b0f; font-weight:900; text-decoration:none;
+    box-shadow:0 10px 28px rgba(0,0,0,.25);
     transition:transform .12s ease, box-shadow .12s ease;
-    text-decoration:none;
   }
   .cta.secondary{ background:linear-gradient(90deg,#f9fafb,#e5e7eb); }
   .cta:hover{ transform:translateY(-1px); box-shadow:0 16px 34px rgba(0,0,0,.33) }
-  .cta:active{ transform:translateY(0) }
-  .cta[aria-disabled="true"]{ opacity:.6; pointer-events:none }
-
-  nav.nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--card);color:#0a0b0f;font-weight:800;text-decoration:none;box-shadow:0 6px 16px rgba(0,0,0,.16)}
 
   .hint{ font-size:12px; opacity:.75; margin-top:10px }
 </style>
@@ -72,28 +95,33 @@
 <body>
   <div class="bg" aria-hidden="true"></div>
 
-  <!-- Keep your existing nav links if you had them -->
+  <!-- Home only (Body/Mind/Soul removed) -->
   <nav class="nav" aria-label="Site">
-    <a class="pill" href="index.html">← Home</a>
-    <a class="pill" href="body.html">Body</a>
-    <a class="pill" href="mind.html">Mind</a>
-    <a class="pill" href="soul.html">Soul</a>
+    <a class="pill" href="index.html" title="Go to Home">← Home</a>
   </nav>
 
-  <div class="wrap" role="main">
-    <h1 class="title">Heart</h1>
+  <!-- Real Imaginary Friends pinned top-right -->
+  <div class="rif-wrap">
+    <button class="rif-btn" type="button" title="Coming soon" disabled>Real Imaginary Friends</button>
+  </div>
 
-    <div class="grid">
-      <a class="cta" href="studio.html" title="Open drawing panel">❤️ Pour your heart out</a>
-      <a class="cta secondary" href="poems.html" title="Open poems hub">📝 Poems</a>
-      <a class="cta secondary" href="jokes.html" title="Go to jokes">😂 Jokes</a>
-      <a class="cta secondary" href="#" aria-disabled="true" title="Coming soon">🧸 Real Imaginary Friends</a>
+  <div class="wrap" role="main">
+    <header>
+      <h1 class="title">Heart</h1>
+    </header>
+
+    <!-- Organized buttons without emojis -->
+    <div class="grid" aria-label="Heart actions">
+      <a class="cta" href="studio.html" title="Open drawing panel">Pour your heart out</a>
+      <a class="cta secondary" href="poems.html" title="Open poems hub">Poems</a>
+      <a class="cta secondary" href="jokes.html" title="Go to jokes">Jokes</a>
     </div>
 
-    <p class="hint">Draw/write from the heart, craft/read poems, or laugh a little.</p>
+    <p class="hint">Create, write, or laugh. More magic coming soon.</p>
   </div>
 </body>
 </html>
+
 
 
 
