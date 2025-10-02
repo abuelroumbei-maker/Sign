@@ -1,0 +1,275 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Poems</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Naskh+Arabic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#e5e7eb; --card:#ffffff0f; --stroke:#ffffff22; --bg1:#0b0d12; --bg2:#0e1320; --ring:#fff;
+    --title-font:"Pacifico",ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:var(--body-font);color:var(--fg);background:var(--bg1)}
+  .bg{position:fixed;inset:0;z-index:-1;background:
+      radial-gradient(1100px 700px at 85% 30%, rgba(254,202,202,.35), transparent 60%),
+      radial-gradient(900px 700px at 30% 80%, rgba(244,114,182,.25), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1))}
+  nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+  .frame{max-width:1100px;margin:90px auto 32px;padding:0 16px}
+  h1{margin:0 0 12px;font-family:var(--title-font);font-size:clamp(36px,6vw,68px);
+     background:linear-gradient(90deg,#fff,#fecaca);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+  .btn{appearance:none;border:1px solid var(--stroke);background:var(--card);color:#fff;border-radius:12px;padding:8px 12px;font-weight:800;cursor:pointer}
+  .btn.primary{border-color:#fff}
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));align-items:start}
+  .card{background:var(--card);border:1px solid var(--stroke);border-radius:16px;padding:14px}
+  .list{display:grid;gap:8px;max-height:min(50vh,50dvh);overflow:auto;padding-right:4px}
+  .list-item{display:flex;justify-content:space-between;align-items:center;gap:10px;background:#ffffff08;border:1px solid var(--stroke);border-radius:12px;padding:10px 12px;cursor:pointer}
+  .list-item:hover{background:#ffffff12}
+  .poem-view{display:grid;gap:12px}
+  .poem-title{font-weight:900}
+  .poem-text{white-space:pre-wrap;line-height:1.6}
+  .muted{opacity:.8;font-size:12px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .rtl{direction:rtl;font-family:"Noto Naskh Arabic", serif;}
+  .rtl .poem-title{font-weight:700}
+  .rtl .poem-text{font-size:1.05rem;letter-spacing:.1px}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<nav aria-label="Site">
+  <a class="pill" href="heart.html">← Back to Heart</a>
+</nav>
+
+<div class="frame">
+  <h1>Poems</h1>
+
+  <div class="tabs">
+    <button id="tabWrite" class="btn primary" type="button">Write a poem</button>
+    <button id="tabRead" class="btn" type="button">Read a poem</button>
+    <button id="tabArabic" class="btn" type="button">Arabic poems</button>
+  </div>
+
+  <!-- Write -->
+  <section id="writePanel" class="card">
+    <div style="display:grid;gap:12px;grid-template-columns:1fr">
+      <label>
+        <div class="muted" style="margin-bottom:6px">Title</div>
+        <input id="poemTitleInput" class="btn" style="width:100%;text-align:left;font-weight:600" placeholder="Untitled poem" />
+      </label>
+      <label>
+        <div class="muted" style="margin-bottom:6px">Your poem</div>
+        <textarea id="poemBodyInput" class="btn" style="width:100%;min-height:220px;resize:vertical;text-align:left" placeholder="Write from the heart..."></textarea>
+      </label>
+      <div class="actions" style="justify-content:flex-end">
+        <button id="poemSaveBtn" class="btn" type="button">Save</button>
+        <button id="poemShareBtn" class="btn" type="button">Share</button>
+      </div>
+      <div class="muted">Your saved poems are kept locally on this device.</div>
+    </div>
+  </section>
+
+  <!-- Read (English) -->
+  <section id="readPanel" class="card" hidden>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="list" id="poemList" aria-label="Poem list"></div>
+      <div id="poemViewer" class="poem-view" hidden>
+        <div class="poem-title" id="pvTitle"></div>
+        <div class="muted" id="pvAuthor"></div>
+        <div class="poem-text" id="pvText"></div>
+        <div class="actions">
+          <button id="pvExpand" class="btn" type="button">Expand</button>
+          <button id="pvClose" class="btn" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Arabic -->
+  <section id="arabicPanel" class="card" hidden>
+    <div class="grid" style="grid-template-columns:1fr">
+      <div class="list" id="arabicList" aria-label="Arabic poem list"></div>
+      <div id="arabicViewer" class="poem-view rtl" hidden>
+        <div class="poem-title" id="apvTitle"></div>
+        <div class="muted" id="apvAuthor"></div>
+        <div class="poem-text" id="apvText" lang="ar" dir="rtl"></div>
+        <div class="muted" id="apvExplain" dir="ltr" style="margin-top:4px"></div>
+        <div class="actions" dir="ltr">
+          <button id="apvExpand" class="btn" type="button">Expand</button>
+          <button id="apvClose" class="btn" type="button">Close</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  // Tabs
+  const writePanel = document.getElementById('writePanel');
+  const readPanel = document.getElementById('readPanel');
+  const arabicPanel = document.getElementById('arabicPanel');
+  function showWrite(){ writePanel.hidden=false; readPanel.hidden=true; arabicPanel.hidden=true; }
+  function showRead(){ writePanel.hidden=true; readPanel.hidden=false; arabicPanel.hidden=true; document.getElementById('poemViewer').hidden=true; }
+  function showArabic(){ writePanel.hidden=true; readPanel.hidden=true; arabicPanel.hidden=false; document.getElementById('arabicViewer').hidden=true; }
+  document.getElementById('tabWrite').addEventListener('click', ()=>{ setActive(0); showWrite(); });
+  document.getElementById('tabRead').addEventListener('click', ()=>{ setActive(1); showRead(); });
+  document.getElementById('tabArabic').addEventListener('click', ()=>{ setActive(2); showArabic(); });
+  function setActive(i){
+    [ 'tabWrite','tabRead','tabArabic' ].forEach((id,idx)=>{
+      const el=document.getElementById(id);
+      if(idx===i){ el.classList.add('primary'); } else { el.classList.remove('primary'); }
+    });
+  }
+  showRead(); setActive(1);
+
+  // Poems data
+  const PD_POEMS = [
+    { id:'if-kipling', title:'If—', author:'Rudyard Kipling (1910)', lines:[
+      'If you can keep your head when all about you','  Are losing theirs and blaming it on you,',
+      'If you can trust yourself when all men doubt you,','  But make allowance for their doubting too;',
+      'If you can wait and not be tired by waiting,','  Or being lied about, don’t deal in lies,',
+      'Or being hated, don’t give way to hating,','  And yet don’t look too good, nor talk too wise:','',
+      'If you can dream—and not make dreams your master;','If you can think—and not make thoughts your aim;',
+      'If you can meet with Triumph and Disaster','  And treat those two impostors just the same;',
+      'If you can bear to hear the truth you’ve spoken','  Twisted by knaves to make a trap for fools,',
+      'Or watch the things you gave your life to, broken,','  And stoop and build ’em up with worn-out tools:','',
+      'If you can talk with crowds and keep your virtue,','  Or walk with Kings—nor lose the common touch,',
+      'If neither foes nor loving friends can hurt you,','  If all men count with you, but none too much;',
+      'If you can fill the unforgiving minute','  With sixty seconds’ worth of distance run,',
+      'Yours is the Earth and everything that’s in it,','  And—which is more—you’ll be a Man, my son!'
+    ]},
+    { id:'hope-dickinson', title:'“Hope” is the thing with feathers', author:'Emily Dickinson (c. 1861)', lines:[
+      '“Hope” is the thing with feathers —','That perches in the soul —',
+      'And sings the tune without the words —','And never stops — at all —','','And sweetest — in the Gale — is heard —',
+      'And sore must be the storm —','That could abash the little Bird','That kept so many warm —'
+    ]},
+    { id:'road-not-taken-frost', title:'The Road Not Taken', author:'Robert Frost (1916)', lines:[
+      'Two roads diverged in a yellow wood,','And sorry I could not travel both',
+      'And be one traveler, long I stood','And looked down one as far as I could',
+      'To where it bent in the undergrowth;'
+    ]},
+    { id:'ozymandias-shelley', title:'Ozymandias', author:'Percy Bysshe Shelley (1818)', lines:[
+      'I met a traveller from an antique land,','Who said—“Two vast and trunkless legs of stone',
+      'Stand in the desert. . . . Near them, on the sand,','Half sunk a shattered visage lies…”'
+    ]},
+    { id:'a-red-red-rose-burns', title:'A Red, Red Rose', author:'Robert Burns (1794)', lines:[
+      'O my Luve is like a red, red rose','  That’s newly sprung in June;',
+      'O my Luve is like the melody','  That’s sweetly played in tune.'
+    ]},
+  ];
+  const ARABIC_POEMS = [
+    { id:'mutanabbi', title:'الخيلُ واللَّيلُ', author:'أبو الطيب المتنبي (915–965)',
+      explain:'Mutanabbī boasts of his courage and fame—“The horses, night, and desert know me…”—a classic voice of pride and resilience.',
+      lines:['الخيلُ واللَّيلُ والبيداءُ تَعرِفني','والسَّيفُ والرُّمحُ والقِرطاسُ والقَلَمُ','صحِبتُ في الفَلواتِ الوَحشَ منفَرِدًا','حَتّى تَعَجَّبَ منّي القُورُ والأكمُ'] },
+    { id:'ibn-zaydun', title:'أضحى التّنائي بديلًا', author:'ابن زيدون (1003–1071)',
+      explain:'Ibn Zaydūn writes to Wallādah about separation replacing closeness—longing refined into music.',
+      lines:['أضحى التّنائي بديلاً من تدانينا','ونابَ عن طيبِ لُقيانا تجافينا','ألا وقد حانَ صُبحُ البَيْنِ صَبّحَنا','حينٌ فقامَ بنا للحينِ ناعينا'] },
+    { id:'abu-al-atâhiya', title:'ألا ليتَ الشَّبابَ يعودُ يومًا', author:'أبو العتاهية (748–828)',
+      explain:'A wistful wish for youth’s return—a reminder to live wisely and value the passing days.',
+      lines:['بكيتُ على الشَّبابِ بدمعِ عيني','فلم يُغنِ البُكاءُ ولا النَّحيبُ','فيا أسَفي على الشَّبابِ ولمَّا','يمُتْ قلبي بحُبِّهِ يَغتَصِبُ','ألا ليتَ الشَّبابَ يعودُ يومًا','فأُخبِرَهُ بما فعَلَ المشيبُ'] },
+    { id:'ma\'arri', title:'تعبٌ كلُّها الحياةُ', author:'أبو العلاء المعري (973–1057)',
+      explain:'Al-Maʿarrī’s philosophical sigh: “Life is all toil; astonishing is whoever seeks more of it.”',
+      lines:['تعبٌ كلُّها الحياةُ فما','أعجبُ إلّا من راغبٍ في ازديادِ'] },
+    { id:'shafii', title:'دعِ الأيّامَ تفعلُ ما تشاءُ', author:'الإمام الشافعي (767–820)',
+      explain:'A call to patience and trust: let days do as they will; hardships will ease.',
+      lines:['دعِ الأيّامَ تفعلُ ما تشاءُ','وطِبْ نفسًا إذا حكمَ القضاءُ','ولا تجزعْ لحادثةِ الليالي','فما لحوادثِ الدنيا بقاءُ'] },
+  ];
+
+  // English list & viewer
+  const poemList = document.getElementById('poemList');
+  const poemViewer = document.getElementById('poemViewer');
+  const pvTitle = document.getElementById('pvTitle');
+  const pvAuthor = document.getElementById('pvAuthor');
+  const pvText = document.getElementById('pvText');
+  const pvExpand = document.getElementById('pvExpand');
+  const pvClose = document.getElementById('pvClose');
+
+  function renderPoemList(){
+    poemList.innerHTML = '';
+    PD_POEMS.forEach(p=>{
+      const item=document.createElement('div');
+      item.className='list-item';
+      const left=document.createElement('div');
+      left.innerHTML=`<div style="font-weight:800">${p.title}</div><div class="muted">${p.author}</div>`;
+      const right=document.createElement('div'); right.textContent='▶️';
+      item.appendChild(left); item.appendChild(right);
+      item.addEventListener('click', ()=>openPoem(p));
+      poemList.appendChild(item);
+    });
+  }
+  let currentPoem=null, revealed=0; const STEP=4;
+  function openPoem(p){ currentPoem=p; revealed=0; pvTitle.textContent=p.title; pvAuthor.textContent=p.author; pvText.textContent=''; poemViewer.hidden=false; revealMore(); }
+  function revealMore(){ if(!currentPoem) return; const next=Math.min(currentPoem.lines.length, revealed+STEP);
+    pvText.textContent=currentPoem.lines.slice(0,next).join('\n'); revealed=next; pvExpand.disabled=revealed>=currentPoem.lines.length; pvExpand.textContent = (pvExpand.disabled?'Expanded':'Expand'); }
+  pvExpand.addEventListener('click', revealMore);
+  pvClose.addEventListener('click', ()=>{ poemViewer.hidden=true; currentPoem=null; revealed=0; });
+  renderPoemList();
+
+  // Arabic list & viewer
+  const arabicList=document.getElementById('arabicList');
+  const arabicViewer=document.getElementById('arabicViewer');
+  const apvTitle=document.getElementById('apvTitle');
+  const apvAuthor=document.getElementById('apvAuthor');
+  const apvText=document.getElementById('apvText');
+  const apvExplain=document.getElementById('apvExplain');
+  const apvExpand=document.getElementById('apvExpand');
+  const apvClose=document.getElementById('apvClose');
+
+  function renderArabicList(){
+    arabicList.innerHTML='';
+    ARABIC_POEMS.forEach(p=>{
+      const item=document.createElement('div');
+      item.className='list-item';
+      const left=document.createElement('div');
+      left.innerHTML=`<div style="font-weight:800" class="rtl">${p.title}</div><div class="muted">${p.author}</div>`;
+      const right=document.createElement('div'); right.textContent='▶️';
+      item.appendChild(left); item.appendChild(right);
+      item.addEventListener('click', ()=>openArabicPoem(p));
+      arabicList.appendChild(item);
+    });
+  }
+  let currentArabic=null, revealedAr=0; const STEP_AR=4;
+  function openArabicPoem(p){ currentArabic=p; revealedAr=0; apvTitle.textContent=p.title; apvAuthor.textContent=p.author; apvText.textContent=''; apvExplain.textContent=p.explain; arabicViewer.hidden=false; revealArabicMore(); }
+  function revealArabicMore(){ if(!currentArabic) return; const next=Math.min(currentArabic.lines.length, revealedAr+STEP_AR);
+    apvText.textContent=currentArabic.lines.slice(0,next).join('\n'); revealedAr=next; apvExpand.disabled=revealedAr>=currentArabic.lines.length; apvExpand.textContent=(apvExpand.disabled?'Expanded':'Expand'); }
+  apvExpand.addEventListener('click', revealArabicMore);
+  apvClose.addEventListener('click', ()=>{ arabicViewer.hidden=true; currentArabic=null; revealedAr=0; });
+  renderArabicList();
+
+  // Save / Share
+  const poemTitleInput=document.getElementById('poemTitleInput');
+  const poemBodyInput=document.getElementById('poemBodyInput');
+  function downloadText(filename, text){
+    const blob=new Blob([text],{type:'text/plain;charset=utf-8'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+  document.getElementById('poemSaveBtn').addEventListener('click', ()=>{
+    const title=(poemTitleInput.value||'Untitled poem').trim();
+    const body=(poemBodyInput.value||'').trim();
+    const ts=new Date().toISOString().slice(0,19).replace('T',' ');
+    downloadText(`${title.replace(/\s+/g,'_')}-${ts}.txt`, `${title}\n\n${body}\n`);
+  });
+  document.getElementById('poemShareBtn').addEventListener('click', ()=>{
+    const title=(poemTitleInput.value||'Untitled poem').trim();
+    const body=(poemBodyInput.value||'').trim();
+    const file=new File([`${title}\n\n${body}\n`], `${title}.txt`, {type:'text/plain', lastModified:Date.now()});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ navigator.share({files:[file], title, text:'A poem from my Heart page'}).catch(()=>{}); }
+    else{ downloadText(`${title}.txt`, `${title}\n\n${body}\n`); }
+  });
+})();
+</script>
+</body>
+</html>
