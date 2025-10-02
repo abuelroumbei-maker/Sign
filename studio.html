@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Pour your heart out</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#e5e7eb; --card:#ffffffdd; --bg1:#0b0d12; --bg2:#0e1320;
+    --accent:#ef4444; --accent2:#fecaca; --accent3:#f472b6; --ring:#fff;
+    --title-font:"Pacifico",ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:var(--body-font);color:var(--fg);background:var(--bg1)}
+  .bg{position:fixed;inset:0;z-index:-1;background:
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1))}
+  nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:var(--card);color:#0a0b0f;font-weight:800;text-decoration:none;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+  .frame{max-width:1200px;margin:90px auto 32px; padding:0 16px}
+  h1{margin:0 0 12px;font-family:var(--title-font);font-size:clamp(36px,6vw,68px);
+     background:linear-gradient(90deg,#fff,#fecaca);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .panel{
+    display:grid; grid-template-rows:auto auto 1fr auto; gap:0;
+    background:#0c1120; border-radius:20px; box-shadow:0 30px 80px rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.08); min-height:65vh;
+  }
+  .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px}
+  .tool{appearance:none;border:0;padding:8px 10px;border-radius:12px;cursor:pointer;background:rgba(255,255,255,.12);color:#fff;font-weight:800}
+  .tool[aria-pressed="true"]{outline:2px solid #fff; outline-offset:2px; background:rgba(255,255,255,.22)}
+  .color-swatch{width:28px;height:28px;border-radius:999px;border:2px solid rgba(255,255,255,.65);display:inline-block;cursor:pointer}
+  .slider{width:150px}
+  .canvas-wrap{position:relative;background:#0a0f1a;display:grid;place-items:center;padding:14px;min-height:280px;height:clamp(360px,56vh,1000px)}
+  canvas#draw{background:#0b0f18;border-radius:12px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08);touch-action:none;width:100%;height:100%;display:block;max-width:100%;max-height:100%}
+  .bottom{display:flex;gap:10px;align-items:center;justify-content:flex-end;padding:12px 14px;background:linear-gradient(0deg, rgba(12,17,32,1), rgba(12,17,32,.85));border-top:1px solid rgba(255,255,255,.06)}
+  .btn{appearance:none;border:0;padding:10px 14px;border-radius:14px;cursor:pointer;font-weight:900;background:var(--card);color:#0a0b0f}
+  .btn.danger{background:#fecaca;color:#7f1d1d}
+  .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0a0b0f}
+  .hint{font-size:12px;opacity:.8;margin-right:auto}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<nav aria-label="Site">
+  <a class="pill" href="heart.html">← Back to Heart</a>
+</nav>
+
+<div class="frame">
+  <h1>Pour your heart out</h1>
+  <section class="panel" aria-label="Drawing and writing studio">
+    <div class="toolbar" role="group" aria-label="Tools">
+      <button id="penTool" class="tool" aria-pressed="true" title="Pen">Pen</button>
+      <button id="eraserTool" class="tool" aria-pressed="false" title="Eraser">Eraser</button>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-left:12px">
+        <span class="color-swatch" data-color="#ffffff" style="background:#ffffff"></span>
+        <span class="color-swatch" data-color="#ef4444" style="background:#ef4444"></span>
+        <span class="color-swatch" data-color="#22c55e" style="background:#22c55e"></span>
+        <span class="color-swatch" data-color="#3b82f6" style="background:#3b82f6"></span>
+        <span class="color-swatch" data-color="#f59e0b" style="background:#f59e0b"></span>
+        <label class="tool" style="display:inline-flex;align-items:center;gap:8px">
+          <span style="opacity:.85">Pick</span>
+          <input id="colorPicker" type="color" value="#ffffff" style="width:28px;height:28px;border:0;background:transparent;padding:0">
+        </label>
+      </div>
+
+      <div style="display:flex;gap:10px;align-items:center;margin-left:12px">
+        <label class="tool" for="size">Size</label>
+        <input id="size" class="slider" type="range" min="1" max="48" value="8">
+      </div>
+
+      <div style="margin-left:auto;display:flex;gap:10px">
+        <button id="undoBtn" class="tool" title="Undo">Undo</button>
+        <button id="redoBtn" class="tool" title="Redo">Redo</button>
+      </div>
+    </div>
+
+    <div class="canvas-wrap">
+      <canvas id="draw" width="1280" height="720" aria-label="Drawing canvas"></canvas>
+    </div>
+
+    <div class="bottom">
+      <span class="hint">Tip: Use a stylus on touch devices for smoother handwriting.</span>
+      <button id="deleteBtn" class="btn danger" type="button" title="Clear drawing">Delete</button>
+      <button id="saveBtn" class="btn" type="button" title="Save PNG">Save</button>
+      <button id="shareBtn" class="btn primary" type="button" title="Share">Share</button>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+  const draw = document.getElementById('draw');
+  const dctx = draw.getContext('2d');
+  const hostResize = () => {
+    const rect = draw.getBoundingClientRect();
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2));
+    const cssW = Math.max(1, Math.floor(rect.width));
+    const cssH = Math.max(1, Math.floor(rect.height));
+    const needW = Math.floor(cssW * dpr);
+    const needH = Math.floor(cssH * dpr);
+    if(draw.width !== needW || draw.height !== needH){
+      let snapshot = null;
+      try { snapshot = dctx.getImageData(0,0,draw.width,draw.height); } catch(e){}
+      draw.width = needW; draw.height = needH;
+      dctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      dctx.lineCap = dctx.lineJoin = 'round';
+      if(snapshot){
+        const tmp = document.createElement('canvas');
+        tmp.width = snapshot.width; tmp.height = snapshot.height;
+        const tctx = tmp.getContext('2d'); tctx.putImageData(snapshot, 0, 0);
+        dctx.save(); dctx.setTransform(1,0,0,1,0,0);
+        dctx.drawImage(tmp, 0, 0, needW, needH);
+        dctx.restore();
+      }
+    }
+  };
+  const ro = new ResizeObserver(hostResize);
+  ro.observe(document.querySelector('.canvas-wrap'));
+  addEventListener('resize', hostResize);
+  hostResize();
+
+  let drawing=false, brushColor='#ffffff', brushSize=8, mode='pen';
+  const MAX_UNDO=30, undoStack=[], redoStack=[];
+
+  function pushUndo(){ try{
+    if(undoStack.length>=MAX_UNDO) undoStack.shift();
+    undoStack.push(dctx.getImageData(0,0,draw.width,draw.height));
+    redoStack.length=0;
+  }catch(e){} }
+  function restore(img){
+    if(!img) return;
+    draw.width=img.width; draw.height=img.height;
+    dctx.setTransform(1,0,0,1,0,0); dctx.putImageData(img,0,0);
+    const dpr = Math.max(1, Math.min(window.devicePixelRatio||1,2));
+    dctx.setTransform(dpr,0,0,dpr,0,0); dctx.lineCap=dctx.lineJoin='round';
+  }
+  function pos(evt){
+    const r = draw.getBoundingClientRect();
+    if(evt.touches && evt.touches[0]) return {x:evt.touches[0].clientX-r.left, y:evt.touches[0].clientY-r.top};
+    return {x:evt.clientX-r.left, y:evt.clientY-r.top};
+  }
+  function start(p){ drawing=true; dctx.beginPath(); dctx.moveTo(p.x,p.y); }
+  function move(p){
+    if(!drawing) return;
+    dctx.globalCompositeOperation = (mode==='pen') ? 'source-over' : 'destination-out';
+    dctx.strokeStyle = (mode==='pen') ? brushColor : 'rgba(0,0,0,1)';
+    dctx.lineWidth = brushSize; dctx.lineTo(p.x,p.y); dctx.stroke();
+  }
+  function end(){ if(!drawing) return; drawing=false; dctx.closePath(); pushUndo(); dctx.globalCompositeOperation='source-over'; }
+  draw.addEventListener('mousedown', e=>start(pos(e)));
+  draw.addEventListener('mousemove', e=>move(pos(e)));
+  addEventListener('mouseup', end);
+  draw.addEventListener('touchstart', e=>{e.preventDefault(); start(pos(e));},{passive:false});
+  draw.addEventListener('touchmove', e=>{e.preventDefault(); move(pos(e));},{passive:false});
+  draw.addEventListener('touchend', e=>{e.preventDefault(); end();},{passive:false});
+
+  const penTool=document.getElementById('penTool'), eraserTool=document.getElementById('eraserTool');
+  function setMode(m){ mode=m; penTool.setAttribute('aria-pressed', String(m==='pen')); eraserTool.setAttribute('aria-pressed', String(m==='eraser')); }
+  penTool.addEventListener('click', ()=>setMode('pen'));
+  eraserTool.addEventListener('click', ()=>setMode('eraser'));
+
+  const sizeInput=document.getElementById('size');
+  sizeInput.addEventListener('input', ()=>{ brushSize=parseInt(sizeInput.value,10)||8; });
+
+  const colorPicker=document.getElementById('colorPicker');
+  colorPicker.addEventListener('input', ()=>{ brushColor=colorPicker.value; setMode('pen'); });
+  document.querySelectorAll('.color-swatch').forEach(el=>{
+    el.addEventListener('click', ()=>{ const c=el.getAttribute('data-color'); brushColor=c; colorPicker.value=c; setMode('pen'); });
+  });
+
+  const undoBtn=document.getElementById('undoBtn'), redoBtn=document.getElementById('redoBtn');
+  undoBtn.addEventListener('click', ()=>{
+    if(undoStack.length>1){ const current=undoStack.pop(); redoStack.push(current); restore(undoStack[undoStack.length-1]); }
+  });
+  redoBtn.addEventListener('click', ()=>{
+    if(redoStack.length){ const next=redoStack.pop(); undoStack.push(next); restore(next); }
+  });
+
+  const saveBtn=document.getElementById('saveBtn'), shareBtn=document.getElementById('shareBtn'), deleteBtn=document.getElementById('deleteBtn');
+  function download(filename, blob){
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  }
+  function canvasToBlob(){ return new Promise(res=> draw.toBlob(b=>res(b),'image/png',1)); }
+  saveBtn.addEventListener('click', async ()=>{
+    const blob=await canvasToBlob(); const ts=new Date().toISOString().replace(/[:.]/g,'-');
+    download(`heart-out-${ts}.png`, blob);
+  });
+  shareBtn.addEventListener('click', async ()=>{
+    const blob=await canvasToBlob(); const file=new File([blob],'heart-out.png',{type:'image/png',lastModified:Date.now()});
+    if(navigator.canShare && navigator.canShare({files:[file]})){ try{ await navigator.share({files:[file], title:'My heart on canvas'});}catch(e){} }
+    else{ download('heart-out.png', blob); }
+  });
+  deleteBtn.addEventListener('click', ()=>{
+    if(!confirm('Delete your current drawing? This cannot be undone.')) return;
+    dctx.setTransform(1,0,0,1,0,0); dctx.clearRect(0,0,draw.width,draw.height);
+    const dpr=Math.max(1, Math.min(window.devicePixelRatio||1,2));
+    dctx.setTransform(dpr,0,0,dpr,0,0); dctx.lineCap=dctx.lineJoin='round'; pushUndo();
+  });
+
+  // seed undo once
+  pushUndo();
+})();
+</script>
+</body>
+</html>
