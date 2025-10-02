@@ -64,17 +64,13 @@
     }
     .btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.28)}
     .btn:active{transform:translateY(0);box-shadow:0 8px 20px rgba(0,0,0,.2)}
-    .btn.primary{
-      background:linear-gradient(90deg,var(--accent),var(--accent3));color:#fff
-    }
+    .btn.primary{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#fff}
 
-    /* Strength dock on the right side */
+    /* Strength: fixed in the upper-right, neon-lit (no movement) */
     .strengthDock{
-      position:fixed; right:24px; top:50%; transform:translateY(-50%);
-      display:flex; flex-direction:column; align-items:flex-end; gap:12px; z-index:4;
+      position:fixed; right:24px; top:18px; z-index:6;
+      display:flex; align-items:flex-end;
     }
-
-    /* Neon magical Strength button */
     .btn.neon{
       position:relative;
       padding:16px 22px;
@@ -89,7 +85,6 @@
         inset 0 0 18px rgba(99,102,241,.25);
       overflow:hidden;
     }
-    /* animated outer glow pulse */
     .btn.neon::before{
       content:"";
       position:absolute; inset:-2px;
@@ -99,7 +94,6 @@
       animation: spinGlow 6s linear infinite;
       z-index:-1;
     }
-    /* diagonal shimmer */
     .btn.neon::after{
       content:"";
       position:absolute; top:-120%; left:-30%;
@@ -113,11 +107,10 @@
     .btn.neon:hover::after{opacity:.7; left:120%}
     @keyframes spinGlow { to { transform: rotate(360deg) } }
 
-    /* Magic particle styles (spawned on click) */
-    #magicLayer{position:fixed; inset:0; pointer-events:none; z-index:6}
+    /* Magic particle styles (click burst) */
+    #magicLayer{position:fixed; inset:0; pointer-events:none; z-index:7}
     .particle{
-      position: absolute;
-      width:10px; height:10px; border-radius:50%;
+      position:absolute; width:10px; height:10px; border-radius:50%;
       transform: translate(-50%, -50%) scale(0.6);
       opacity:.95; will-change: transform, opacity;
       filter: drop-shadow(0 0 6px currentColor);
@@ -128,7 +121,6 @@
       to{   transform: translate(var(--x1), var(--y1)) scale(1) rotate(var(--rot)) }
     }
     @keyframes fadeOut{ to { opacity:0 } }
-
   </style>
 </head>
 <body>
@@ -140,7 +132,7 @@
     <a class="pill" href="index.html">← Home</a>
   </div>
 
-  <!-- Right side Strength button -->
+  <!-- Upper-right Strength button -->
   <div class="strengthDock">
     <button class="btn neon" id="btnStrength">Strength</button>
   </div>
@@ -151,7 +143,7 @@
     <h1 class="title">Soul</h1>
 
     <div class="actions" aria-label="Soul actions">
-      <!-- ONLY one middle button: Spirit -->
+      <!-- Single centered button: Spirit -->
       <a class="btn primary" href="spirit.html" id="btnSpirit">Spirit</a>
     </div>
   </div>
@@ -176,7 +168,7 @@
       });
     })();
 
-    /* ===== Strength button: neon click magic ===== */
+    /* ===== Strength button: neon click magic (no movement) ===== */
     const strengthBtn = document.getElementById('btnStrength');
     const magicLayer = document.getElementById('magicLayer');
 
@@ -184,21 +176,16 @@
       for(let i=0;i<count;i++){
         const p = document.createElement('span');
         p.className = 'particle';
-        // Random color via HSL
         const hue = Math.floor(Math.random()*360);
         p.style.color = `hsl(${hue} 90% 60%)`;
         p.style.background = 'currentColor';
 
-        // Random polar offset
         const angle = Math.random() * Math.PI * 2;
-        const radius = 80 + Math.random()*120; // distance
+        const radius = 80 + Math.random()*120;
         const endX = Math.cos(angle) * radius;
         const endY = Math.sin(angle) * radius;
-
-        // Random spin
         const rot = (Math.random()*720 - 360) + 'deg';
 
-        // Set CSS custom properties for the animation
         p.style.setProperty('--x0', x+'px');
         p.style.setProperty('--y0', y+'px');
         p.style.setProperty('--x1', (x+endX)+'px');
@@ -206,45 +193,29 @@
         p.style.setProperty('--rot', rot);
 
         magicLayer.appendChild(p);
-        // Cleanup after animation
         setTimeout(()=> p.remove(), 1200);
       }
     }
 
-    function flashNeon(btn){
-      // brief intense glow pulse
-      const orig = btn.style.boxShadow;
-      btn.style.boxShadow =
-        '0 0 16px rgba(168,85,247,.9), 0 0 36px rgba(59,130,246,.8), inset 0 0 22px rgba(99,102,241,.6)';
-      setTimeout(()=>{ btn.style.boxShadow = ''; btn.offsetHeight; btn.style.boxShadow = orig; }, 140);
-    }
-
-    function handleStrengthClick(e){
+    function handleStrengthClick(){
       const rect = strengthBtn.getBoundingClientRect();
       const cx = rect.left + rect.width/2;
       const cy = rect.top + rect.height/2;
 
-      flashNeon(strengthBtn);
-      spawnParticles(cx, cy, 42);
-      // subtle shake
-      strengthBtn.animate(
-        [{ transform:'translateY(-50%) translateX(0)' },
-         { transform:'translateY(-50%) translateX(2px)' },
-         { transform:'translateY(-50%) translateX(-2px)' },
-         { transform:'translateY(-50%) translateX(0)' }],
-        { duration:220, iterations:1 }
-      );
-    }
+      // Brief glow intensification (but no positional movement)
+      const prev = strengthBtn.style.boxShadow;
+      strengthBtn.style.boxShadow =
+        '0 0 16px rgba(168,85,247,.9), 0 0 36px rgba(59,130,246,.8), inset 0 0 22px rgba(99,102,241,.6)';
+      setTimeout(()=>{ strengthBtn.style.boxShadow = prev; }, 160);
 
-    // Keep right-docked button vertically centered even on resize
-    const dock = document.querySelector('.strengthDock');
-    function keepDockCenter(){ dock.style.top = '50%'; dock.style.transform = 'translateY(-50%)'; }
-    keepDockCenter(); addEventListener('resize', keepDockCenter);
+      spawnParticles(cx, cy, 42);
+    }
 
     strengthBtn.addEventListener('click', handleStrengthClick);
   </script>
 </body>
 </html>
+
 
 
 
