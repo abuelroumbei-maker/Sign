@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Explore</title>
+<meta name="theme-color" content="#0b0d12" />
+
+<style>
+  :root{
+    --bg1:#0b0d12; --bg2:#0e1320;
+    --card:#111827cc;
+    --bar-bg:#1f2937;      /* track */
+    --bar-fill:#93c5fd;    /* fill (pastel sky blue) */
+    --bar-glow:rgba(147,197,253,.35);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0b0d12; overflow:hidden;}
+
+  .bg{ position:fixed; inset:0; z-index:-3; background:
+    radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, #6d5efc 30%, transparent), transparent 60%),
+    radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, #00c2ff 30%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, #2dd4bf 25%, transparent), transparent 60%),
+    linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    animation:bgDrift 22s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03);
+  }
+  @keyframes bgDrift{from{transform:translateX(0)}to{transform:translateX(-1.6%)}}
+
+  #stars, #trail{position:fixed; inset:0; z-index:-2; pointer-events:none;}
+
+  .wrap{ position:relative; height:100%; display:grid; place-items:center; padding:18px; }
+  .panel{ width:min(900px, 94vw); background:var(--card); border:1px solid rgba(255,255,255,.1); border-radius:16px; padding:16px;
+          backdrop-filter: blur(8px); box-shadow:0 24px 60px rgba(0,0,0,.45); }
+  h1{ margin:0 0 10px; font-size:clamp(20px,5vw,28px); }
+  p.sub{ margin:0 0 16px; color:#cbd5e1; opacity:.9; }
+
+  /* Level bar (visual only) */
+  .level-wrap{ background:var(--bar-bg); border:1px solid rgba(255,255,255,.12); border-radius:12px; padding:8px; }
+  .meter{ position:relative; height:14px; background:rgba(255,255,255,.06); border-radius:999px; overflow:hidden; }
+  .fill{ position:absolute; left:0; top:0; bottom:0; width:38%;
+         background:linear-gradient(90deg, var(--bar-fill), #60a5fa);
+         box-shadow:0 0 24px var(--bar-glow); }
+  .meta{ margin-top:8px; font-size:13px; color:#9aa4b2; }
+
+  .top-row{ position:absolute; left:12px; top:12px; display:flex; gap:8px; }
+  .btn{ appearance:none; border:0; border-radius:12px; padding:8px 12px; font-weight:800; cursor:pointer; text-decoration:none; color:#0b0d12;
+        background:#fff; box-shadow:0 10px 24px rgba(0,0,0,.28); }
+
+  @media (max-width: 480px){
+    .panel{ padding:14px; }
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <canvas id="stars"></canvas>
+  <canvas id="trail"></canvas>
+
+  <div class="top-row">
+    <a class="btn" href="index.html">⟵ Home</a>
+  </div>
+
+  <div class="wrap">
+    <section class="panel" aria-live="polite">
+      <h1>Explore</h1>
+      <p class="sub">This page is empty for now. Here’s a placeholder level bar (non-functional).</p>
+      <div class="level-wrap">
+        <div class="meter"><div class="fill"></div></div>
+        <div class="meta">Level 1 • 38% toward next level</div>
+      </div>
+    </section>
+  </div>
+
+<script>
+// ==== Stars ====
+const stars=document.getElementById('stars');const sctx=stars.getContext('2d');
+function sizeStars(){stars.width=innerWidth;stars.height=innerHeight;}sizeStars();addEventListener('resize',sizeStars);
+const STARS=Array.from({length:180}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3}));
+let mpX=.5,mpY=.5;addEventListener('pointermove',e=>{mpX=e.clientX/innerWidth;mpY=e.clientY/innerHeight;});
+(function drawStars(){requestAnimationFrame(drawStars);sctx.clearRect(0,0,stars.width,stars.height);STARS.forEach(s=>{s.x+=(mpX-.5)*s.z*.25;s.y+=(mpY-.5)*s.z*.25;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+
+// ==== Rainbow Trail ====
+const trail=document.getElementById('trail');const tctx=trail.getContext('2d');
+function sizeTrail(){trail.width=innerWidth;trail.height=innerHeight;}sizeTrail();addEventListener('resize',sizeTrail);
+let points=[];addEventListener('pointermove',e=>{points.push({x:e.clientX,y:e.clientY,t:Date.now()});if(points.length>150)points.shift();});
+(function drawTrail(){requestAnimationFrame(drawTrail);const now=Date.now();tctx.clearRect(0,0,trail.width,trail.height);if(points.length<2)return;tctx.lineCap='round';tctx.lineJoin='round';tctx.globalCompositeOperation='lighter';
+for(let i=1;i<points.length;i++){const p0=points[i-1],p1=points[i];const age=now-p1.t;if(age>1600)continue;const life=1-age/1600,w=2+life*6,hue=(p1.t/12)%360;tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`;tctx.lineWidth=w;tctx.beginPath();tctx.moveTo(p0.x,p0.y);tctx.lineTo(p1.x,p1.y);tctx.stroke();}})();
+</script>
+</body>
+</html>
