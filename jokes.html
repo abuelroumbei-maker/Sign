@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Jokes</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#e5e7eb; --card:#ffffff0f; --stroke:#ffffff22; --bg1:#0b0d12; --bg2:#0e1320;
+    --title-font:"Pacifico",ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  }
+  *{box-sizing:border-box} html,body{height:100%}
+  body{margin:0;font-family:var(--body-font);color:var(--fg);background:var(--bg1)}
+  .bg{position:fixed;inset:0;z-index:-1;background:
+      radial-gradient(1100px 700px at 15% 20%, rgba(34,197,94,.30), transparent 60%),
+      radial-gradient(900px 700px at 85% 70%, rgba(59,130,246,.25), transparent 60%),
+      linear-gradient(120deg,var(--bg1),var(--bg2) 50%, var(--bg1))}
+  nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none;box-shadow:0 6px 16px rgba(0,0,0,.16)}
+  .frame{max-width:900px;margin:90px auto 32px;padding:0 16px}
+  h1{margin:0 0 12px;font-family:var(--title-font);font-size:clamp(36px,6vw,68px);
+     background:linear-gradient(90deg,#fff,#bbf7d0);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .list{list-style:none;padding:0;margin:0;display:grid;gap:12px}
+  .item{background:var(--card);border:1px solid var(--stroke);border-radius:14px;padding:14px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="bg" aria-hidden="true"></div>
+
+<nav aria-label="Site">
+  <a class="pill" href="heart.html">← Back to Heart</a>
+</nav>
+
+<div class="frame">
+  <h1>Jokes</h1>
+  <ul class="list">
+    <li class="item">Why did the scarecrow win an award? Because he was outstanding in his field.</li>
+    <li class="item">I tried to catch fog yesterday. Mist.</li>
+    <li class="item">Why don’t skeletons fight each other? They don’t have the guts.</li>
+    <li class="item">What do you call cheese that isn’t yours? Nacho cheese.</li>
+    <li class="item">I’m reading a book about anti-gravity. It’s impossible to put down.</li>
+    <li class="item">Why did the math book look sad? It had too many problems.</li>
+    <li class="item">I told my computer I needed a break — now it keeps sending me KitKats.</li>
+    <li class="item">Parallel lines have so much in common. It’s a shame they’ll never meet.</li>
+  </ul>
+</div>
+</body>
+</html>
