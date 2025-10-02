@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spirit</title>
+  <meta name="theme-color" content="#0b0d12" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --fg:#0f172a; --muted:#5b6476; --card:#ffffffdd;
+      --accent:#8b5cf6; --accent2:#ddd6fe; --accent3:#c084fc;
+      --bg1:#0b0d12; --bg2:#0e1320;
+      --title-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --body-font:  ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --gold1:#d4af37; --gold2:#f6e27a; --gold3:#b88910;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:hidden}
+
+    .bg{
+      position:fixed; inset:0; z-index:-4;
+      background:
+        radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+        radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+        radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+        linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+      animation:bgDrift 20s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03);
+    }
+    @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
+
+    #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
+
+    .wrap{min-height:100%;display:grid;place-items:center;padding:22px}
+    .title{
+      margin:0 0 20px 0;
+      font-size:clamp(40px,10vw,86px);
+      background:linear-gradient(90deg,#fff,color-mix(in srgb,var(--accent2) 35%,#fff));
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      filter:drop-shadow(0 8px 24px color-mix(in srgb, var(--accent) 22%, transparent));
+      font-weight:900; letter-spacing:.5px; text-align:center
+    }
+
+    .nav{position:fixed;left:18px;top:18px;display:flex;gap:10px;flex-wrap:wrap}
+    .pill{
+      display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none
+    }
+
+    .xpWrap{position:fixed; right:18px; top:18px; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw);}
+    .xp-badge{background:#ffffffdd;color:#0a0b0f;border-radius:12px;padding:6px 10px;font-size:13px;font-weight:800;box-shadow:0 8px 18px rgba(0,0,0,.15)}
+    .xp-bar{flex:1;height:10px;border-radius:999px;background:rgba(255,255,255,.22);overflow:hidden;position:relative;box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
+    .xp-fill{position:absolute;left:0;top:0;bottom:0;width:0%;background:linear-gradient(90deg,var(--accent),var(--accent2));box-shadow:0 6px 20px rgba(13,148,255,.35);transition:width .45s ease}
+    .xp-meta{position:fixed;right:18px;top:52px;font-size:12px;color:#cbd5e1;opacity:.9}
+
+    .actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:6px}
+    .btn{
+      appearance:none;border:0;cursor:pointer;
+      padding:14px 18px;border-radius:14px;
+      font-weight:900;letter-spacing:.4px;
+      color:#0a0b0f;background:var(--card);
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      transition:transform .08s ease, box-shadow .12s ease, background .2s ease, opacity .2s ease;
+      user-select:none;text-decoration:none;display:inline-block;
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 14px 30px rgba(0,0,0,.28)}
+    .btn:active{transform:translateY(0);box-shadow:0 8px 20px rgba(0,0,0,.2)}
+
+    .btn.gold{
+      color:#1a1200;
+      background:linear-gradient(180deg, var(--gold2), var(--gold1) 55%, var(--gold3));
+      border:1px solid rgba(255,255,255,.35);
+      position:relative; overflow:hidden;
+      font-family:'Cinzel', serif; letter-spacing:.6px; text-transform:uppercase;
+    }
+    .btn.gold::before{
+      content:""; position:absolute; inset:-1px;
+      background:conic-gradient(from 210deg, rgba(255,255,255,.6), transparent 40%, rgba(255,255,255,.25), transparent 80%, rgba(255,255,255,.6));
+      filter:blur(6px); opacity:.35; pointer-events:none; transition:opacity .25s ease;
+    }
+    .btn.gold::after{
+      content:""; position:absolute; top:-120%; left:-20%;
+      width:40%; height:300%; transform:rotate(25deg);
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.9), transparent);
+      mix-blend-mode:soft-light; opacity:.0; transition:opacity .25s ease, left .8s ease;
+    }
+    .btn.gold:hover::after{opacity:.6; left:120%}
+
+    .hint{opacity:.8;font-size:13px;margin-top:10px;text-align:center;color:#d1d5db}
+
+    /* Modal */
+    .overlay{
+      position:fixed; inset:0; display:none; align-items:center; justify-content:center;
+      background:rgba(2,6,23,.55); backdrop-filter:blur(6px); z-index:30; padding:22px;
+    }
+    .overlay.show{display:flex}
+    .card{
+      width:min(820px, 95vw);
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.14);
+      border-radius:18px;
+      box-shadow:0 30px 80px rgba(0,0,0,.45), inset 0 1px 0 rgba(255,255,255,.12);
+      padding:18px 18px 16px 18px;
+      color:#e5e7eb;
+      animation:pop .18s ease-out;
+      position:relative;
+    }
+    @keyframes pop{from{transform:scale(.985);opacity:0} to{transform:scale(1);opacity:1}}
+
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      font-size:12px;font-weight:900;
+      color:#111827;background:#ffffff; padding:6px 10px;border-radius:999px;
+      box-shadow:0 8px 18px rgba(0,0,0,.26);
+    }
+    .verse-ref{margin:12px 0 6px 0; color:#c7d2fe; font-weight:800; letter-spacing:.3px}
+    .verse-text{font-size:clamp(18px,2.2vw,22px); line-height:1.5; color:#f8fafc; margin:0 0 10px 0; text-wrap:pretty;}
+    .evolved{margin-top:10px; padding:12px; border-radius:12px; background:rgba(255,255,255,.06); border:1px dashed rgba(255,255,255,.18); color:#e2e8f0; font-size:15px}
+    .row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:flex-end;margin-top:10px}
+    .row .left{margin-right:auto}
+
+    .thank-top{
+      position:absolute; top:12px; right:12px;
+      padding:8px 12px; border-radius:999px;
+      background:linear-gradient(180deg, var(--gold2), var(--gold1) 60%, var(--gold3));
+      color:#1a1200; border:1px solid rgba(255,255,255,.35);
+      font-family:'Cinzel', serif; letter-spacing:.4px; font-weight:900;
+      text-transform:uppercase;
+      box-shadow:0 10px 26px rgba(0,0,0,.25);
+      cursor:pointer;
+    }
+    .thank-top:hover{transform:translateY(-1px)}
+    .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;border:0;clip:rect(0,0,0,0);overflow:hidden}
+
+    .topSpacer{height:10vh}
+  </style>
+</head>
+<body>
+  <div class="bg"></div>
+  <canvas id="stars"></canvas>
+
+  <div class="nav">
+    <a class="pill" href="index.html">← Home</a>
+    <a class="pill" href="soul.html">Soul</a>
+  </div>
+
+  <div class="xpWrap">
+    <div class="xp-badge" id="xpBadge">Level 0</div>
+    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
+  </div>
+  <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
+
+  <div class="wrap">
+    <div class="topSpacer" aria-hidden="true"></div>
+    <h1 class="title">Spirit</h1>
+
+    <div class="actions" aria-label="Spirit games">
+      <button class="btn gold" id="btnBible">Biblical Verses</button>
+      <button class="btn gold" id="btnQuran">Quran Verses</button>
+    </div>
+    <div class="hint">Pick one, then EVOLVE for context or tap Another for a new verse. “Thank you” closes the game.</div>
+  </div>
+
+  <!-- Verse Modal -->
+  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="gameLabel">
+    <div class="card">
+      <button class="thank-top" id="thankTopBtn" aria-label="Close dialog and return">Thank you</button>
+
+      <div class="row">
+        <div class="left">
+          <span class="badge" id="gameBadge">
+            <span id="gameLabel">Verses</span>
+          </span>
+        </div>
+      </div>
+
+      <div class="verse-ref" id="verseRef">—</div>
+      <p class="verse-text" id="verseText">—</p>
+      <div class="evolved" id="evolveBox" hidden>—</div>
+
+      <div class="row" style="margin-top:14px">
+        <button class="btn" id="anotherBtn">Another</button>
+        <button class="btn gold" id="evolveBtn" style="text-transform:none;font-family:inherit;">EVOLVE</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ===== Background stars ===== */
+    const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+    function resize(){ stars.width=innerWidth; stars.height=innerHeight; }
+    resize(); addEventListener('resize',resize);
+    const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
+    (function draw(){ requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
+      STARS.forEach(s=>{ s.x+=s.dx*s.z; s.y+=s.dy*s.z;
+        if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
+        sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);
+      });
+    })();
+
+    /* ===== XP (unchanged) ===== */
+    function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
+    const MAX_LEVEL=100;
+    function xpForNext(level){ if(level>=MAX_LEVEL)return Infinity; const base=200,growth=1.12; return Math.round(base*Math.pow(growth,level)); }
+    function updateXPUI(){
+      const xp=loadXP(); const need=xpForNext(xp.level);
+      document.getElementById('xpBadge').textContent=`Level ${xp.level}`;
+      document.getElementById('xpFill').style.width=(xp.level>=MAX_LEVEL?100:Math.round(100*(xp.xp/need)))+"%";
+      document.getElementById('xpMeta').textContent=xp.level>=MAX_LEVEL?`MAX • Level ${MAX_LEVEL}`:`${xp.xp} / ${need} XP`;
+    }
+    updateXPUI();
+    document.addEventListener('visibilitychange',()=>{ if(!document.hidden) updateXPUI(); });
+
+    /* ===== Verses (moved here from Soul) ===== */
+    const BIBLE = [
+      { ref:"Psalm 23:1", text:"The Lord is my shepherd; I shall not want.", evolve:"A line from a shepherd psalm about guidance and provision. The image of a shepherd suggests protection, steady care, and leading through uncertain places." },
+      { ref:"Proverbs 3:5–6", text:"Trust in the Lord with all your heart, and do not lean on your own understanding. In all your ways acknowledge him, and he will make straight your paths.", evolve:"Wisdom literature encouraging trust over self-reliance. “Straight paths” is a Hebrew picture for clear direction through life’s complications." },
+      { ref:"Isaiah 41:10", text:"Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you; I will uphold you with my righteous right hand.", evolve:"Spoken to a people under pressure, this reassures presence and help. The ‘right hand’ symbolizes power, steadiness, and rescue." },
+      { ref:"Philippians 4:6–7", text:"Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God… will guard your hearts and your minds.", evolve:"A pastoral practice: pray honestly + give thanks. The result is pictured as a guard standing watch over inner life." },
+      { ref:"Matthew 11:28", text:"Come to me, all who labor and are heavy laden, and I will give you rest.", evolve:"An invitation to the overburdened. In the next lines, the ‘yoke’ is described as easy—sharing weight rather than adding more." },
+      { ref:"Romans 8:28", text:"…for those who love God all things work together for good…", evolve:"Not that all things are good, but that God can weave even hardship toward a redemptive end in the larger story." },
+      { ref:"Jeremiah 29:11", text:"…plans for welfare and not for evil, to give you a future and a hope.", evolve:"Originally sent to exiles with a long timeline: settle, plant, seek the city’s good—hope grows within patience." },
+      { ref:"John 3:16", text:"For God so loved the world, that he gave his only Son, that whoever believes in him should not perish but have eternal life.", evolve:"A compact summary of gift-love and trust leading to life—part of a night conversation about new birth and Spirit." },
+      { ref:"Psalm 27:1", text:"The Lord is my light and my salvation; whom shall I fear?", evolve:"Light here means clarity and safety. It counters fear by reframing who ultimately secures the path." },
+      { ref:"1 Corinthians 13:4–5", text:"Love is patient and kind… it does not insist on its own way…", evolve:"From a chapter centering love as the durable way to use any gift. Patience and kindness are the first markers." }
+    ];
+
+    const QURAN = [
+      { ref:"Al-Inshirah (94:5)", text:"For indeed, with hardship comes ease.", evolve:"This is repeated in 94:6 as emphasis. The pairing suggests that relief accompanies difficulty, not merely follows it far later." },
+      { ref:"Al-Baqarah (2:286)", text:"Allah does not burden a soul beyond what it can bear.", evolve:"A reassurance at the close of the surah’s long guidance: accountability is matched with mercy and proportion." },
+      { ref:"Ar-Ra’d (13:28)", text:"Surely, in the remembrance of Allah do hearts find rest.", evolve:"Remembrance (dhikr) is an inner posture and a practice—returning attention to the One brings steadiness." },
+      { ref:"Al-Ikhlas (112:1-4)", text:"Say: He is Allah, One; Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.", evolve:"A concise declaration of absolute oneness and uniqueness—often recited for its clarity and weight." },
+      { ref:"Ad-Duha (93:11)", text:"And as for the favor of your Lord—proclaim it.", evolve:"Within a surah that comforts after a pause in revelation: remember past care, and let gratitude become speech." },
+      { ref:"Al-Baqarah (2:152)", text:"So remember Me; I will remember you. And be grateful to Me and do not deny Me.", evolve:"Links remembrance with gratitude—two core movements of the faithful life." },
+      { ref:"Ash-Shu’ara (26:80)", text:"And when I am ill, it is He who cures me.", evolve:"Part of Abraham’s words recounting providence—sustenance, guidance, and healing are traced back to the Source." },
+      { ref:"Az-Zumar (39:53)", text:"O My servants who have transgressed against themselves, do not despair of the mercy of Allah…", evolve:"A wide-open door of return (tawbah): despair is replaced by hope in expansive mercy." },
+      { ref:"Al-Asr (103:1-3)", text:"By time, indeed mankind is in loss, except those who believe and do righteous deeds and advise each other to truth and patience.", evolve:"A compact map: faith, action, truth, and mutual patience counter the drift of time." },
+      { ref:"Al-Baqarah (2:255)", text:"Allah—there is no deity except Him, the Ever-Living, Sustainer of [all] existence…", evolve:"Known as Ayat al-Kursi. It magnifies divine knowledge and care; often recited for protection and confidence." }
+    ];
+
+    function createPicker(list){
+      let pool = list.slice();
+      return function next(){
+        if(pool.length===0) pool = list.slice();
+        const i = Math.floor(Math.random()*pool.length);
+        return pool.splice(i,1)[0];
+      }
+    }
+    const pickBible = createPicker(BIBLE);
+    const pickQuran = createPicker(QURAN);
+
+    const overlay = document.getElementById('overlay');
+    const verseRef = document.getElementById('verseRef');
+    const verseText = document.getElementById('verseText');
+    const evolveBox = document.getElementById('evolveBox');
+    const gameBadge = document.getElementById('gameBadge');
+    const evolveBtn = document.getElementById('evolveBtn');
+    const anotherBtn = document.getElementById('anotherBtn');
+    const thankTopBtn = document.getElementById('thankTopBtn');
+    const btnBible = document.getElementById('btnBible');
+    const btnQuran = document.getElementById('btnQuran');
+
+    let currentGame = null; // 'bible' | 'quran'
+    let currentVerse = null;
+
+    /* ===== Soft chime on clicks (Web Audio, no files) ===== */
+    let audioCtx = null;
+    function initAudio(){ if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    function playMajestic(){
+      initAudio();
+      const ctx = audioCtx, now = ctx.currentTime, dur = 1.6;
+      const freqs = [261.63, 329.63, 392.00, 523.25];
+      const gain = ctx.createGain(); gain.gain.setValueAtTime(0.0001, now);
+
+      const delay = ctx.createDelay(); delay.delayTime.setValueAtTime(0.22, now);
+      const fb = ctx.createGain(); fb.gain.value = 0.28; delay.connect(fb).connect(delay);
+
+      const lpf = ctx.createBiquadFilter(); lpf.type='lowpass'; lpf.frequency.value=2600;
+      gain.connect(delay); gain.connect(lpf); delay.connect(lpf);
+      const out = ctx.createGain(); out.gain.value=0.9; lpf.connect(out).connect(ctx.destination);
+
+      freqs.forEach((f,i)=>{
+        const o=ctx.createOscillator(), g=ctx.createGain();
+        o.type = i%2? 'sine' : 'triangle';
+        o.frequency.setValueAtTime(f, now);
+        o.detune.setValueAtTime((i-1.5)*4, now);
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.5/(i+1), now+0.08);
+        g.gain.exponentialRampToValueAtTime(0.0001, now+dur);
+        o.connect(g).connect(gain); o.start(now); o.stop(now+dur+0.2);
+      });
+      gain.gain.exponentialRampToValueAtTime(0.75, now+0.12);
+      gain.gain.exponentialRampToValueAtTime(0.001, now+dur);
+    }
+
+    function openOverlay(){ overlay.classList.add('show'); setTimeout(()=>evolveBtn.focus(), 0); document.body.style.overflow='hidden'; }
+    function closeOverlay(){ overlay.classList.remove('show'); document.body.style.overflow=''; }
+
+    function showVerse(v){
+      currentVerse = v;
+      verseRef.textContent = v.ref;
+      verseText.textContent = v.text;
+      evolveBox.hidden = true;
+      evolveBox.textContent = v.evolve || '';
+    }
+
+    function nextVerse(){
+      const v = currentGame==='bible' ? pickBible() : pickQuran();
+      showVerse(v);
+    }
+
+    function startGame(kind){
+      currentGame = kind;
+      gameBadge.querySelector('#gameLabel').textContent = kind==='bible' ? 'Biblical Verses' : 'Quran Verses';
+      nextVerse();
+      openOverlay();
+    }
+
+    function withSound(handler){ return (e)=>{ playMajestic(); handler && handler(e); }; }
+
+    btnBible.addEventListener('click', withSound(()=>startGame('bible')));
+    btnQuran.addEventListener('click', withSound(()=>startGame('quran')));
+    anotherBtn.addEventListener('click', withSound(()=>nextVerse()));
+    evolveBtn.addEventListener('click', withSound(()=>{ if(currentVerse && currentVerse.evolve){ evolveBox.hidden=false; } }));
+    thankTopBtn.addEventListener('click', withSound(()=>closeOverlay()));
+    overlay.addEventListener('click', (e)=>{ if(e.target===overlay){ playMajestic(); closeOverlay(); }});
+    document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && overlay.classList.contains('show')){ playMajestic(); closeOverlay(); }});
+
+    // add sound to any .btn click
+    document.addEventListener('click', (e)=>{ const t=e.target.closest('.btn'); if(t) playMajestic(); });
+  </script>
+</body>
+</html>
