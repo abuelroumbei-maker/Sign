@@ -17,7 +17,7 @@
     --pastel-brown:#d6ccc2; /* Who am I */
     --tyrian-purple:#66023c;/* Plus */
   }
-  *{box-sizing:border-box} 
+  *{box-sizing:border-box}
   html,body{height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; background:#0b0d12; overflow:hidden;}
 
   .bg{ position:fixed; inset:0; z-index:-3; background:
@@ -39,8 +39,9 @@
   .login-btn{ background:#fff; }
   .whoami-btn{ background:var(--pastel-brown); color:#000; }
 
-  nav{ position:fixed; bottom:0; left:0; right:0; height:60px; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px); display:flex; justify-content:space-around; align-items:center; }
-  nav a, nav button{ flex:1; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:900; margin:0 6px; text-decoration:none; background:none; border:none; }
+  nav{ position:fixed; bottom:0; left:0; right:0; height:60px; background:rgba(0,0,0,0.4); backdrop-filter:blur(8px);
+       display:flex; justify-content:space-around; align-items:center; }
+  nav a{ flex:1; display:flex; justify-content:center; align-items:center; font-size:24px; font-weight:900; margin:0 6px; text-decoration:none; background:none; border:none; }
   nav .b{ color:var(--pastel-green); }
   nav .h{ color:var(--pastel-red); }
   nav .m{ color:var(--pastel-blue); }
@@ -48,7 +49,7 @@
   nav .plus{ background:var(--tyrian-purple); color:#fff; border-radius:50%; width:42px; height:42px; font-size:26px; }
 
   @media (max-width: 480px){
-    nav a, nav button{ font-size:20px; }
+    nav a{ font-size:20px; }
     .btn{ padding:8px 10px; font-size:14px; }
   }
 </style>
@@ -68,11 +69,11 @@
   </div>
 
   <nav>
-    <a href="body.html" class="b">B</a>
-    <a href="heart.html" class="h">H</a>
-    <button class="plus">+</button>
-    <a href="mind.html" class="m">M</a>
-    <a href="soul.html" class="s">S</a>
+    <a href="body.html" class="b" aria-label="Body">B</a>
+    <a href="heart.html" class="h" aria-label="Heart">H</a>
+    <a href="explore.html" class="plus" aria-label="Explore">+</a>
+    <a href="mind.html" class="m" aria-label="Mind">M</a>
+    <a href="soul.html" class="s" aria-label="Soul">S</a>
   </nav>
 
 <script>
@@ -87,11 +88,11 @@ let mpX=.5,mpY=.5;addEventListener('pointermove',e=>{mpX=e.clientX/innerWidth;mp
 const trail=document.getElementById('trail');const tctx=trail.getContext('2d');
 function sizeTrail(){trail.width=innerWidth;trail.height=innerHeight;}sizeTrail();addEventListener('resize',sizeTrail);
 let points=[];addEventListener('pointermove',e=>{points.push({x:e.clientX,y:e.clientY,t:Date.now()});if(points.length>150)points.shift();});
-(function drawTrail(){requestAnimationFrame(drawTrail);const now=Date.now();tctx.clearRect(0,0,trail.width,trail.height);if(points.length<2)return;tctx.lineCap='round';tctx.lineJoin='round';tctx.globalCompositeOperation='lighter';for(let i=1;i<points.length;i++){const p0=points[i-1],p1=points[i];const age=now-p1.t;if(age>1600)continue;const life=1-age/1600,w=2+life*6,hue=(p1.t/12)%360;tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`;tctx.lineWidth=w;tctx.beginPath();tctx.moveTo(p0.x,p0.y);tctx.lineTo(p1.x,p1.y);tctx.stroke();}})();
+(function drawTrail(){requestAnimationFrame(drawTrail);const now=Date.now();tctx.clearRect(0,0,trail.width,trail.height);if(points.length<2)return;tctx.lineCap='round';tctx.lineJoin='round';tctx.globalCompositeOperation='lighter';
+for(let i=1;i<points.length;i++){const p0=points[i-1],p1=points[i];const age=now-p1.t;if(age>1600)continue;const life=1-age/1600,w=2+life*6,hue=(p1.t/12)%360;tctx.strokeStyle=`hsla(${hue},85%,60%,${0.12+life*0.28})`;tctx.lineWidth=w;tctx.beginPath();tctx.moveTo(p0.x,p0.y);tctx.lineTo(p1.x,p1.y);tctx.stroke();}})();
 </script>
 </body>
 </html>
-
 
 
 
