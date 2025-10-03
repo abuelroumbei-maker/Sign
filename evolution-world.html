@@ -1,87 +1,162 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Evolution • The World</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="theme-color" content="#0b0d12" />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{--accent:#3b82f6;--bg1:#0b0d12;--bg2:#0e1320;--outline:#FFD700;--tyrian:#66023C;--body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;--title-font:"Press Start 2P",system-ui}
-  *{box-sizing:border-box}body{margin:0;color:#fff;background:#0b0d12;font-family:var(--body-font);overflow:auto;min-height:100dvh}
+  :root{
+    --accent:#3b82f6;--info1:#a78bfa;--info2:#7dd3fc;--bg1:#0b0d12;--bg2:#0e1320;--tyrian:#66023C;--outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;--body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
   .bg{position:fixed;inset:0;z-index:-4;background:
     radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
-    radial-gradient(900px 700px at 85% 30%, color-mix(in oklab, #7dd3fc 35%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 85% 30%, color-mix(in oklab, var(--info2) 35%, transparent), transparent 60%),
     linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
-  #stars{position:fixed;inset:0;z-index:-3;pointer-events:none}
-  .nav{position:sticky;top:0;z-index:50;display:flex;gap:10px;padding:12px 14px;background:linear-gradient(180deg, rgba(11,13,18,.85), rgba(11,13,18,0))}
-  .pill{display:inline-block;padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-  .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:22px}
-  .title{margin:0;text-align:center;font:900 clamp(28px,8.5vw,60px)/1.1 var(--title-font);color:var(--tyrian);-webkit-text-stroke:2px var(--outline)}
-  .panel{max-width:980px;margin:16px auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px;backdrop-filter:blur(8px);display:grid;gap:12px}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:-3}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:10px 0 16px}
+  .row{display:flex;gap:10px;align-items:center;max-width:980px;margin:0 auto 12px}
   .input{flex:1;min-width:220px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:12px;font:600 14px/1.4 var(--body-font);outline:none}
-  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;max-height:45vh;overflow:auto}
-  .item{padding:10px 12px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.06);cursor:pointer;text-align:left}
-  .badge{display:inline-block;font-size:11px;padding:4px 8px;border-radius:999px;background:#93c5fd;color:#0b0d12;font-weight:900;margin-right:8px}
+  .btn{appearance:none;border:none;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer;background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  .list{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;max-height:44vh;overflow:auto}
+  .item{padding:10px 12px;border:1px solid rgba(255,255,255,.14);border-radius:12px;background:rgba(255,255,255,.06);cursor:pointer;text-align:left}
+  .item b{display:block}
+  .panel{max-width:980px;margin:12px auto 8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:16px;display:none}
   .actions{display:flex;gap:10px;align-items:center}.spacer{flex:1}
-  .btn{appearance:none;border:none;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer}
-  .btn-primary{color:#0b0d12;background:linear-gradient(90deg,#3b82f6,#60a5fa)}
+  .btn-primary{background:linear-gradient(90deg,#3b82f6,#60a5fa);color:#0b0d12;border:none}
   .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  @media (max-width:520px){.row{flex-wrap:wrap}}
 </style>
 </head>
 <body>
 <div class="bg"></div><canvas id="stars"></canvas>
-<div class="nav">
-  <a class="pill" href="evolution.html">← Evolution</a>
-  <a class="pill" href="index.html">Home</a>
-</div>
+<div class="nav"><a class="pill" href="evolution.html">← Evolution</a></div>
+
 <div class="wrap">
   <h1 class="title">The World</h1>
-  <div class="panel">
-    <div class="row">
-      <input id="q" class="input" placeholder="Search country by name…">
-      <span class="spacer"></span>
-      <button class="btn btn-ghost" onclick="location.href='evolution.html'">Back</button>
-    </div>
-    <div id="list" class="list"></div>
 
-    <div id="detail" class="panel" style="display:none;margin:0">
-      <div id="meta" style="font-size:12px;color:#cbd5e1"></div>
-      <p id="text" style="font-size:18px;margin:0"></p>
-      <div class="actions">
-        <button class="btn btn-primary" id="evolve">EVOLVE</button>
-        <span class="spacer"></span>
-        <button class="btn btn-ghost" id="close">Close</button>
-      </div>
+  <div class="row">
+    <input id="q" class="input" placeholder="Search country by name…" />
+    <button class="btn" id="btnClear">Clear</button>
+  </div>
+
+  <div id="list" class="list"></div>
+
+  <div id="detail" class="panel">
+    <div id="meta" style="font-size:12px;color:#cbd5e1"></div>
+    <p id="text" style="font-size:18px;margin:.2rem 0 0"></p>
+    <div class="actions" style="margin-top:10px">
+      <button id="btnNext" class="btn btn-primary">EVOLVE</button>
+      <span class="spacer"></span>
+      <button id="btnClose" class="btn btn-ghost">Close</button>
     </div>
   </div>
 </div>
-<script>
-const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
-function resize(){ stars.width=innerWidth; stars.height=innerHeight; } resize(); addEventListener('resize',resize);
-const STARS=Array.from({length:130}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
-(function draw(){ requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
-  STARS.forEach(s=>{ s.x+=s.dx*s.z; s.y+=s.dy*s.z; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
-    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);})})();
 
-const COUNTRIES = [
-  {id:'us', name:'United States', region:'Americas', capital:'Washington, D.C.', pop:'~331M', layers:[
+<script>
+/* stars */
+const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+function resize(){stars.width=innerWidth;stars.height=innerHeight;} resize(); addEventListener('resize',resize);
+const STARS=Array.from({length:140}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
+(function draw(){requestAnimationFrame(draw);sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{s.x+=s.dx*s.z;s.y+=s.dy*s.z;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+
+/* sample dataset */
+const COUNTRIES=[
+  {id:'us',name:'United States',region:'Americas',capital:'Washington, D.C.',pop:'~331M',layers:[
     'The U.S. is a federal republic with 50 states and a capital district.',
     'Largest economy by nominal GDP; diverse geography across 6 time zones.',
     'Federal system balances national and state powers; two major parties dominate.',
-    'Cultural exports in film, music, and tech have global influence.' ]},
-  {id:'jp', name:'Japan', region:'Asia', capital:'Tokyo', pop:'~125M', layers:[
+    'Cultural exports in film, music, and tech have global influence.'
+  ]},
+  {id:'jp',name:'Japan',region:'Asia',capital:'Tokyo',pop:'~125M',layers:[
     'An island nation in the Pacific with four main islands.',
     'High life expectancy; advanced manufacturing and robotics.',
     'Shinkansen network pioneered high-speed rail.',
-    'Cultural blend of tradition (Shinto/Buddhism) and modern media.' ]},
-  {id:'fr', name:'France', region:'Europe', capital:'Paris', pop:'~68M', layers:[
+    'Cultural blend of tradition (Shinto/Buddhism) and modern media.'
+  ]},
+  {id:'fr',name:'France',region:'Europe',capital:'Paris',pop:'~68M',layers:[
     'A unitary semi-presidential republic in Western Europe.',
     'Economy mixes industry, agriculture, luxury goods, and tourism.',
     'Known for cuisine, wine, fashion, and philosophy.',
-    'Hosts global institutions and is a nuclear power.' ]},
-  {id:'br', name:'Brazil', region:'Americas', capital:'Brasília', pop:'~214M', layers:[
+    'Hosts global institutions and is a nuclear power.'
+  ]},
+  {id:'br',name:'Brazil',region:'Americas',capital:'Brasília',pop:'~214M',layers:[
     'Largest country in South America by area and population.',
     'Amazon Basin contains vast biodiversity and rainforest.',
-    'Major exporter of soy, iron
+    'Major exporter of soy, iron ore, and oil; vibrant culture (music/football).',
+    'Urban centers like São Paulo and Rio drive industry and services.'
+  ]},
+  {id:'in',name:'India',region:'Asia',capital:'New Delhi',pop:'~1.4B',layers:[
+    'World’s most populous country; a federal parliamentary republic.',
+    'IT services and startups are major growth engines.',
+    'Rich linguistic and cultural diversity across states/UTs.',
+    'Space program (ISRO) advances planetary and lunar missions.'
+  ]},
+  {id:'eg',name:'Egypt',region:'Africa',capital:'Cairo',pop:'~110M',layers:[
+    'A transcontinental country linking North Africa and the Middle East.',
+    'The Nile sustains agriculture; ancient civilization left monumental heritage.',
+    'Suez Canal is a vital global shipping route.',
+    'Tourism and energy are key sectors.'
+  ]},
+  {id:'au',name:'Australia',region:'Oceania',capital:'Canberra',pop:'~26M',layers:[
+    'A continent-country with unique biodiversity.',
+    'Major exports include minerals and agricultural products.',
+    'High urbanization; cities clustered on coasts.',
+    'Indigenous cultures date back tens of thousands of years.'
+  ]},
+  {id:'de',name:'Germany',region:'Europe',capital:'Berlin',pop:'~83M',layers:[
+    'A federal parliamentary republic with 16 states (Länder).',
+    'Export-oriented economy; engineering and autos are strong.',
+    'Energy transition (Energiewende) reshapes power mix.',
+    'Central role in the EU’s economy and policy.'
+  ]},
+  {id:'mx',name:'Mexico',region:'Americas',capital:'Mexico City',pop:'~128M',layers:[
+    'Federal republic bordered by U.S., Guatemala, and Belize.',
+    'Manufacturing hub integrated into North American supply chains.',
+    'Ancient civilizations (Maya/Aztec) and rich culinary traditions.',
+    'Tourism spans beaches, colonial towns, and archaeological sites.'
+  ]},
+  {id:'ng',name:'Nigeria',region:'Africa',capital:'Abuja',pop:'~225M',layers:[
+    'Africa’s most populous country with diverse ethnic groups.',
+    'Oil and gas are major exports; tech hubs are growing.',
+    'Nollywood is among the world’s largest film industries.',
+    'Rapid urbanization shapes megacities like Lagos.'
+  ]}
+];
+
+/* render list */
+const list=document.getElementById('list');
+COUNTRIES.forEach(c=>{
+  const el=document.createElement('button'); el.className='item';
+  el.innerHTML=`<b>${c.name}</b><span style="opacity:.9">${c.region} • Capital: ${c.capital} • Pop: ${c.pop}</span>`;
+  el.onclick=()=>openCountry(c.id); list.appendChild(el);
+});
+/* search */
+const q=document.getElementById('q'); q.addEventListener('input',()=>{
+  const term=q.value.trim().toLowerCase();
+  [...list.children].forEach(ch=>{
+    const name=ch.querySelector('b').textContent.toLowerCase();
+    ch.style.display=name.includes(term)?'':'none';
+  });
+});
+document.getElementById('btnClear').onclick=()=>{q.value='';q.dispatchEvent(new Event('input'));};
+
+/* detail + evolve */
+let cur=null, idx=0; const detail=document.getElementById('detail'), meta=document.getElementById('meta'), text=document.getElementById('text');
+function openCountry(id){cur=COUNTRIES.find(x=>x.id===id);idx=0;render();detail.style.display='block';}
+function render(){meta.textContent=`Layer ${idx+1} of ${cur.layers.length} • ${cur.name}`;text.textContent=cur.layers[idx];
+  document.getElementById('btnNext').disabled=(idx>=cur.layers.length-1);}
+document.getElementById('btnNext').onclick=()=>{if(idx<cur.layers.length-1){idx++;render();}};
+document.getElementById('btnClose').onclick=()=>{detail.style.display='none';};
+</script>
+</body>
+</html>
