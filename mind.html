@@ -21,7 +21,6 @@
   }
   *{box-sizing:border-box}
   html,body{height:100%}
-  /* allow scrolling on small screens */
   body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:auto;min-height:100dvh}
 
   .bg{
@@ -34,22 +33,21 @@
     animation:bgDrift 20s ease-in-out infinite alternate; filter:saturate(1.05) brightness(1.03);
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
-  @media (prefers-reduced-motion: reduce){
-    .bg{animation:none}
-  }
+  @media (prefers-reduced-motion: reduce){ .bg{animation:none} }
 
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
 
+  /* Header with left + right clusters */
   .nav{
-    position:sticky; top:0; left:0;
-    display:flex; gap:10px; flex-wrap:wrap; padding:16px 18px;
-    z-index:50; background:linear-gradient(180deg, rgba(11,13,18,.85), rgba(11,13,18,0));
+    position:sticky; top:0; left:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; padding:12px 14px 16px;
+    background:linear-gradient(180deg, rgba(11,13,18,.85), rgba(11,13,18,0));
     backdrop-filter:saturate(1.05) blur(2px)
   }
-  .pill{
-    display:inline-block; padding:10px 14px; border-radius:999px;
-    background:#ffffffdd; color:#0a0b0f; font-weight:800; text-decoration:none
-  }
+  .nav-left,.nav-right{display:flex; gap:10px; flex-wrap:wrap}
+  .pill{display:inline-block;padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .pill-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
 
   .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:22px}
   .title{
@@ -61,20 +59,20 @@
     text-shadow:0 0 10px rgba(255,215,0,.25), 0 10px 28px rgba(0,0,0,.35), 0 0 28px rgba(102,2,60,.25)
   }
 
-  /* responsive grid that breathes on mobile */
   .grid{
     max-width:1100px; margin:26px auto 26px;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:14px
+    display:grid; gap:14px;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
   }
-  @media (max-width: 520px){
+  @media (max-width:520px){
     .grid{grid-template-columns:1fr; gap:12px}
   }
 
   .card{
-    background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.14);
-    border-radius:16px; padding:14px; backdrop-filter:blur(8px);
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:16px; padding:14px;
+    backdrop-filter:blur(8px);
     box-shadow:0 12px 28px rgba(0,0,0,.25)
   }
   .btn{
@@ -87,12 +85,9 @@
   .btn-primary{ color:#0b0d12; background:linear-gradient(90deg,var(--accent),var(--accent3)); box-shadow:0 14px 28px rgba(59,130,246,.38), inset 0 -2px 0 rgba(255,255,255,.25) }
   .btn-success{ color:#052e24; background:linear-gradient(90deg,var(--success1),var(--success2)); box-shadow:0 14px 28px rgba(16,185,129,.38), inset 0 -2px 0 rgba(255,255,255,.25) }
   .btn-warn{ color:#251a00; background:linear-gradient(90deg,var(--warn1),var(--warn2)); box-shadow:0 14px 28px rgba(245,158,11,.38), inset 0 -2px 0 rgba(255,255,255,.25) }
-  .btn-info{ color:#0b0b12; background:linear-gradient(90deg,var(--info1),var(--info2)); box-shadow:0 14px 28px rgba(167,139,250,.38), inset 0 -2px 0 rgba(255,255,255,.25) }
-
   .cta{display:grid;gap:10px}
   .cta a{text-decoration:none}
 
-  /* mobile polish */
   @media (max-width:480px){
     .wrap{padding:86px 14px 18px}
     .title{font-size:clamp(26px, 9.5vw, 44px); -webkit-text-stroke:1px var(--outline)}
@@ -105,23 +100,32 @@
   <div class="bg"></div>
   <canvas id="stars"></canvas>
 
+  <!-- Header: Home on the left, Mind Games on the top-right -->
   <div class="nav">
-    <a class="pill" href="index.html">← Home</a>
-    <!-- Body/Heart/Soul removed as requested -->
+    <div class="nav-left">
+      <a class="pill" href="index.html">← Home</a>
+    </div>
+    <div class="nav-right">
+      <a class="pill pill-ghost" href="mind-games.html">Mind Games</a>
+    </div>
   </div>
 
   <div class="wrap">
     <h1 class="title">Mind</h1>
 
     <div class="grid">
-      <div class="card cta"><a href="mind-fact-evolution.html"><button class="btn btn-primary">Fact Evolution</button></a></div>
-      <div class="card cta"><a href="mind-fact-checker.html"><button class="btn btn-success">Fact checker</button></a></div>
-      <div class="card cta"><a href="mind-conspiracies.html"><button class="btn btn-warn">Fun Conspiracy Theories</button></a></div>
-      <div class="card cta"><a href="mind-history.html"><button class="btn btn-primary">Entire History of the World</button></a></div>
-      <div class="card cta"><a href="mind-dictionary.html"><button class="btn btn-info">Dictionary of the World</button></a></div>
-      <div class="card cta"><a href="mind-countries.html"><button class="btn btn-primary">Countries of the World</button></a></div>
-      <div class="card cta"><a href="mind-markets.html"><button class="btn btn-success">What to buy/sell</button></a></div>
-      <div class="card cta"><a href="mind-games.html"><button class="btn btn-warn">Mind Games</button></a></div>
+      <div class="card cta">
+        <a href="mind-fact-evolution.html"><button class="btn btn-primary">Fact Evolution</button></a>
+      </div>
+
+      <div class="card cta">
+        <a href="mind-fact-checker.html"><button class="btn btn-success">Fact checker</button></a>
+      </div>
+
+      <div class="card cta">
+        <!-- “What to buy/sell” replaced with this -->
+        <a href="mind-grownup.html"><button class="btn btn-warn">Grown up responsibility</button></a>
+      </div>
     </div>
   </div>
 
