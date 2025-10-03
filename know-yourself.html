@@ -7,133 +7,35 @@
 <meta name="theme-color" content="#0b0d12" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
-    --play4:#a78bfa;
-    --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --play3:#f59e0b; --play4:#a78bfa;
+    --title-font:"Anton",sans-serif; --body-font:"Inter",system-ui,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
     margin:0; font-family:var(--body-font); color:#fff;
-    background:
-      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--play4) 22%, transparent), transparent 60%),
-      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
-    overflow:auto;
+    background:linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
   }
-  .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-  .wrap{min-height:100dvh; padding:96px 18px 28px; max-width:1100px; margin:0 auto;}
-  .title{
-    margin:0 0 8px 0; font-family:var(--title-font);
-    font-size:clamp(36px, 9vw, 72px); line-height:0.95; letter-spacing:1px;
-    background: linear-gradient(180deg, #fff 0%, #f5f5f5 40%, #d6d6ff 75%, #bfbfff 100%);
+  .wrap{min-height:100dvh; display:grid; place-items:center; padding:96px 18px 28px}
+  h1{
+    margin:0 0 18px 0; font-family:var(--title-font);
+    font-size:clamp(44px, 11vw, 96px); letter-spacing:1px;
+    background: linear-gradient(180deg, #fff 0%, #f5f5f5 40%, var(--play3) 70%, var(--play4) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
-    text-shadow:0 2px 0 rgba(0,0,0,.25), 0 8px 24px rgba(30,41,59,.35);
   }
-  .subtitle{ margin:0 0 14px 0; color:#e2e8f0; font-weight:600; }
-
-  .ky-section{display:grid; gap:14px}
-  .ky-note{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px}
-  .ky-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px}
-  .ky-card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px}
-  .ky-card h3{margin:0 0 6px 0}
-  .ky-card figure{margin:0}
-  .ky-card img{width:100%; height:auto; border-radius:10px; display:block; background:#0a0f1d}
-  .ky-cap{font-size:12px; color:#d1d5db}
-  .ky-cap a{color:#e5e7eb}
-  ul{margin:.4em 0 .2em 1.1em}
-  li{margin:.2em 0}
+  p{max-width:720px; margin:0 auto 24px; text-align:center; color:#e2e8f0; font-weight:500}
 </style>
 </head>
 <body>
-  <div class="nav">
-    <a class="pill" href="body.html">← Back to Body</a>
-    <a class="pill" href="index.html">Home</a>
-    <a class="pill" href="heart.html">Heart</a>
-    <a class="pill" href="mind.html">Mind</a>
-    <a class="pill" href="soul.html">Soul</a>
-  </div>
-
   <main class="wrap">
-    <h1 class="title">Know Yourself</h1>
-    <p class="subtitle"><strong>Realistic, kid-friendly diagrams</strong>—clear labels, bright but calm colors, no animations.</p>
-
-    <section class="ky-section">
-      <div class="ky-note">
-        Want front/back full-body views (with modesty/age-appropriate styling) or a labeled skeleton/muscle set? Say the word and I’ll add them next.
-      </div>
-
-      <div class="ky-grid">
-        <article class="ky-card">
-          <h3>Heart & Blood (Circulatory System)</h3>
-          <figure>
-            <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Circulatory_System_en_rendersvg.png"
-              alt="Front view diagram of major arteries and veins across the body"
-              loading="lazy" decoding="async">
-          </figure>
-          <div class="ky-cap">Image: Wikimedia Commons, “Circulatory System” (PNG render). CC-compatible; vector version available. Attribution via page history.</div>
-          <ul>
-            <li>Your heart is a tireless muscle that pushes blood everywhere.</li>
-            <li>Arteries carry blood away from the heart; veins bring it back.</li>
-            <li>Capillaries are tiny bridges where oxygen & nutrients swap.</li>
-          </ul>
-        </article>
-
-        <article class="ky-card">
-          <h3>Food to Fuel (Digestive System)</h3>
-          <figure>
-            <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Adult_Digestive_System.png"
-              alt="Digestive system illustration showing stomach, liver, intestines"
-              loading="lazy" decoding="async">
-          </figure>
-          <div class="ky-cap">Image: BruceBlaus, “Adult Digestive System”. CC BY-SA 4.0 (Wikimedia Commons).</div>
-          <ul>
-            <li>Your stomach squeezes; your intestines absorb nutrients.</li>
-            <li>The small intestine is over 6 meters long—coiled like a hose!</li>
-            <li>Friendly gut bacteria help make vitamins.</li>
-          </ul>
-        </article>
-
-        <article class="ky-card">
-          <h3>Where Are My Organs?</h3>
-          <figure>
-            <img
-              src="https://commons.wikimedia.org/wiki/Special:FilePath/Surface_projections_of_the_organs_of_the_trunk.png"
-              alt="Surface projections of major trunk organs relative to ribs and spine"
-              loading="lazy" decoding="async">
-          </figure>
-          <div class="ky-cap">Image: “Surface projections of the organs of the trunk”. Wikimedia Commons. Public domain/CC per file page.</div>
-          <ul>
-            <li>Doctors use landmarks (ribs, belly button) to find organs.</li>
-            <li>Right side: liver sits high; left side: stomach and spleen.</li>
-            <li>The appendix lives low on the right (McBurney’s point).</li>
-          </ul>
-        </article>
-
-        <article class="ky-card">
-          <h3>Body Map (Brain & Kidneys)</h3>
-          <figure>
-            <img
-              src="https://niddk.nih.gov/-/media/Images/News/Media-Library/18227/18227.jpg"
-              alt="Human body outline showing brain and kidneys highlights"
-              loading="lazy" decoding="async">
-          </figure>
-          <div class="ky-cap">Image: NIDDK/NIH media asset. Credit: National Institute of Diabetes and Digestive and Kidney Diseases (NIH).</div>
-          <ul>
-            <li>Your brain is the control room; kidneys filter your blood.</li>
-            <li>Kidneys balance water, minerals, and remove wastes.</li>
-            <li>Drink water and move often—your organs love it.</li>
-          </ul>
-        </article>
-      </div>
-    </section>
+    <div>
+      <h1>Know Yourself</h1>
+      <p>Clear, simple body diagrams and systems overview. (Content cards go here…)</p>
+    </div>
   </main>
 </body>
 </html>
