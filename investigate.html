@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Investigate / Solve a World Problem</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#3b82f6; --accent3:#60a5fa;
+    --success1:#10b981; --success2:#34d399;
+    --warn1:#f59e0b; --warn2:#fbbf24;
+    --bg1:#0b0d12; --bg2:#0e1320; --card:rgba(255,255,255,.08); --bdr:rgba(255,255,255,.14);
+    --title-font:"Press Start 2P",system-ui,sans-serif; --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px;max-width:1150px;margin:auto;display:grid;gap:16px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(26px,7.5vw,56px);color:#60a5fa;-webkit-text-stroke:2px #FFD700;margin:6px 0 4px}
+  .panel{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .field{flex:1;min-width:220px;display:grid;gap:6px}
+  label{font-size:12px;color:#cbd5e1}
+  input,textarea,select{width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:10px 12px;font:600 14px/1.35 var(--body-font);outline:none}
+  textarea{min-height:80px}
+  .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-accent{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
+  .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
+  .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  .cols{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}
+  @media (max-width:980px){.cols{grid-template-columns:1fr}}
+  h2{margin:.2rem 0 .8rem;font-size:18px}
+  .list{display:grid;gap:10px}
+  .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px}
+  .muted{font-size:13px;color:#cbd5e1}
+  .pill-tag{display:inline-block;padding:4px 8px;border-radius:999px;background:#1f2937;color:#cfe2ff;border:1px solid rgba(255,255,255,.18);font-size:11px;font-weight:900}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+  @media (max-width:860px){.grid3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="nav"><a class="pill" href="grownup.html">← Grown up</a></div>
+
+<div class="wrap">
+  <h1 class="title">Investigate / Solve a World Problem</h1>
+
+  <!-- Project picker -->
+  <div class="panel">
+    <div class="row">
+      <div class="field" style="min-width:260px">
+        <label for="projectSel">Project</label>
+        <select id="projectSel"></select>
+      </div>
+      <div class="field">
+        <label for="newProjectName">New project name</label>
+        <input id="newProjectName" placeholder="e.g., Reduce urban food waste in Beirut">
+      </div>
+      <button id="createProject" class="btn btn-success">Create</button>
+      <button id="renameProject" class="btn btn-ghost">Rename</button>
+      <button id="deleteProject" class="btn btn-warn">Delete</button>
+      <span style="flex:1"></span>
+      <button id="exportBtn" class="btn btn-accent">Export JSON</button>
+      <button id="importBtn" class="btn btn-warn">Import JSON</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none">
+    </div>
+  </div>
+
+  <div class="cols">
+    <!-- Problem framing -->
+    <div class="panel">
+      <h2>Problem Framing</h2>
+      <div class="grid3">
+        <div class="field">
+          <label for="problem">Problem</label>
+          <textarea id="problem" placeholder="Describe the problem, who it affects, where/when it occurs…"></textarea>
+        </div>
+        <div class="field">
+          <label for="goal">Goal / Success Metric</label>
+          <textarea id="goal" placeholder="What outcome proves success? (KPIs, timelines)"></textarea>
+        </div>
+        <div class="field">
+          <label for="stakeholders">Stakeholders</label>
+          <textarea id="stakeholders" placeholder="Who’s involved? Beneficiaries, partners, regulators, funders…"></textarea>
+        </div>
+      </div>
+      <div class="row" style="justify-content:flex-end;margin-top:10px">
+        <button id="saveFrame" class="btn btn-success">Save framing</button>
+      </div>
+    </div>
+
+    <!-- Quick snapshot -->
+    <div class="panel">
+      <h2>Snapshot</h2>
+      <div id="snapshot" class="list">
+        <div class="muted">No snapshot yet — fill Problem/Goal/Stakeholders and click “Save framing”.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hypotheses / Evidence / Actions -->
+  <div class="cols">
+    <div class="panel">
+      <h2>Hypotheses</h2>
+      <div class="row">
+        <div class="field"><label for="hypText">New hypothesis</label><input id="hypText" placeholder="If we … then … because …"></div>
+        <button id="addHyp" class="btn btn-accent">Add</button>
+      </div>
+      <div id="hypList" class="list" style="margin-top:10px"></div>
+    </div>
+
+    <div class="panel">
+      <h2>Evidence / Sources</h2>
+      <div class="row">
+        <div class="field"><label for="evDesc">Description</label><input id="evDesc" placeholder="What does this evidence show?"></div>
+        <div class="field"><label for="evUrl">Link (optional)</label><input id="evUrl" placeholder="https://"></div>
+        <button id="addEv" class="btn btn-accent">Add</button>
+      </div>
+      <div id="evList" class="list" style="margin-top:10px"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Action Items</h2>
+    <div class="row">
+      <div class="field"><label for="taskText">New action</label><input id="taskText" placeholder="e.g., Map stakeholders and interview 5"></div>
+      <div class="field" style="max-width:220px"><label for="taskOwner">Owner</label><input id="taskOwner" placeholder="Name/role"></div>
+      <div class="field" style="max-width:220px">
+        <label for="taskStatus">Status</label>
+        <select id="taskStatus">
+          <option value="todo">To Do</option>
+          <option value="doing">Doing</option>
+          <option value="done">Done</option>
+        </select>
+      </div>
+      <button id="addTask" class="btn btn-success">Add</button>
+    </div>
+    <div id="taskLists" class="row" style="gap:14px;margin-top:10px;flex-wrap:wrap">
+      <div class="field" style="min-width:260px;flex:1">
+        <label>To Do</label>
+        <div id="todoCol" class="list panel" style="padding:10px"></div>
+      </div>
+      <div class="field" style="min-width:260px;flex:1">
+        <label>Doing</label>
+        <div id="doingCol" class="list panel" style="padding:10px"></div>
+      </div>
+      <div class="field" style="min-width:260px;flex:1">
+        <label>Done</label>
+        <div id="doneCol" class="list panel" style="padding:10px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='investigate_projects_v1';
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[] }catch{ return [] } }
+function save(p){ localStorage.setItem(KEY, JSON.stringify(p)); }
+
+function ensureDefault(){
+  const all=load();
+  if(all.length===0){
+    all.push({
+      id:crypto.randomUUID(),
+      name:'My first investigation',
+      framing:{problem:'',goal:'',stakeholders:''},
+      hypotheses:[],
+      evidence:[],
+      tasks:[]
+    });
+    save(all);
+  }
+}
+ensureDefault();
+
+const sel=document.getElementById('projectSel');
+function refreshSelect(){
+  const all=load(); sel.innerHTML=''; all.forEach((p,i)=>{ const o=document.createElement('option'); o.value=p.id; o.textContent=p.name; sel.appendChild(o); });
+  if(!sel.value && all[0]) sel.value=all[0].id;
+}
+function current(){ return load().find(p=>p.id===sel.value); }
+function updateProject(mutator){
+  const all=load(); const idx=all.findIndex(p=>p.id===sel.value); if(idx<0)return;
+  mutator(all[idx]); save(all); render();
+}
+
+function render(){
+  refreshSelect();
+  const p=current(); if(!p) return;
+  // framing fields
+  problem.value=p.framing.problem||''; goal.value=p.framing.goal||''; stakeholders.value=p.framing.stakeholders||'';
+  renderSnapshot(p);
+  renderHyp(p);
+  renderEv(p);
+  renderTasks(p);
+}
+function renderSnapshot(p){
+  const s=document.getElementById('snapshot'); s.innerHTML='';
+  if(!(p.framing.problem||p.framing.goal||p.framing.stakeholders)){
+    s.innerHTML='<div class="muted">No snapshot yet — fill Problem/Goal/Stakeholders and click “Save framing”.</div>'; return;
+  }
+  const card=document.createElement('div'); card.className='card';
+  card.innerHTML=`<div><strong>Problem</strong><div class="muted">${escapeHTML(p.framing.problem||'-')}</div></div>
+  <div style="height:6px"></div>
+  <div><strong>Goal / Success</strong><div class="muted">${escapeHTML(p.framing.goal||'-')}</div></div>
+  <div style="height:6px"></div>
+  <div><strong>Stakeholders</strong><div class="muted">${escapeHTML(p.framing.stakeholders||'-')}</div></div>`;
+  s.appendChild(card);
+}
+function renderHyp(p){
+  const root=document.getElementById('hypList'); root.innerHTML='';
+  p.hypotheses.forEach(h=>{
+    const d=document.createElement('div'); d.className='card';
+    d.innerHTML=`<div>${escapeHTML(h.text)}</div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn btn-ghost" data-act="del">Delete</button>
+      </div>`;
+    d.querySelector('[data-act="del"]').onclick=()=>updateProject(pp=>{ pp.hypotheses=pp.hypotheses.filter(x=>x.id!==h.id); });
+    root.appendChild(d);
+  });
+}
+function renderEv(p){
+  const root=document.getElementById('evList'); root.innerHTML='';
+  p.evidence.forEach(e=>{
+    const d=document.createElement('div'); d.className='card';
+    const link = e.url ? `<a class="pill-tag" href="${escapeAttr(e.url)}" target="_blank" rel="noopener">link</a>` : '';
+    d.innerHTML=`<div>${escapeHTML(e.desc)} ${link}</div>
+      <div class="row" style="margin-top:6px">
+        <button class="btn btn-ghost" data-act="del">Delete</button>
+      </div>`;
+    d.querySelector('[data-act="del"]').onclick=()=>updateProject(pp=>{ pp.evidence=pp.evidence.filter(x=>x.id!==e.id); });
+    root.appendChild(d);
+  });
+}
+function renderTasks(p){
+  const cols={todo:document.getElementById('todoCol'), doing:document.getElementById('doingCol'), done:document.getElementById('doneCol')};
+  Object.values(cols).forEach(c=>c.innerHTML='');
+  p.tasks.forEach(t=>{
+    const d=document.createElement('div'); d.className='card';
+    d.innerHTML=`<div><strong>${escapeHTML(t.text)}</strong> ${t.owner?`<span class="pill-tag">${escapeHTML(t.owner)}</span>`:''}</div>
+      <div class="row" style="margin-top:6px">
+        <select class="btn-ghost" data-act="status" style="padding:8px 10px;border-radius:10px">
+          <option value="todo">To Do</option>
+          <option value="doing">Doing</option>
+          <option value="done">Done</option>
+        </select>
+        <span style="flex:1"></span>
+        <button class="btn btn-ghost" data-act="del">Delete</button>
+      </div>`;
+    const sel=d.querySelector('[data-act="status"]'); sel.value=t.status;
+    sel.onchange=(e)=>updateProject(pp=>{ const it=pp.tasks.find(x=>x.id===t.id); if(it) it.status=e.target.value; });
+    d.querySelector('[data-act="del"]').onclick=()=>updateProject(pp=>{ pp.tasks=pp.tasks.filter(x=>x.id!==t.id); });
+    cols[t.status].appendChild(d);
+  });
+}
+
+function escapeHTML(s){return String(s??'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));}
+function escapeAttr(s){return String(s??'').replace(/"/g,'&quot;');}
+
+// Hooks
+document.getElementById('createProject').onclick=()=>{
+  const name=newProjectName.value.trim(); if(!name){ newProjectName.focus(); return; }
+  const all=load(); const p={ id:crypto.randomUUID(), name, framing:{problem:'',goal:'',stakeholders:''}, hypotheses:[], evidence:[], tasks:[] };
+  all.push(p); save(all); newProjectName.value=''; render(); sel.value=p.id; render();
+};
+document.getElementById('renameProject').onclick=()=>{
+  const all=load(); const idx=all.findIndex(p=>p.id===sel.value); if(idx<0)return;
+  const name=prompt('Rename project:', all[idx].name); if(name && name.trim()){ all[idx].name=name.trim(); save(all); render(); }
+};
+document.getElementById('deleteProject').onclick=()=>{
+  if(!confirm('Delete this project?')) return;
+  let all=load().filter(p=>p.id!==sel.value); save(all); ensureDefault(); render();
+};
+sel.onchange=render;
+
+document.getElementById('saveFrame').onclick=()=>updateProject(p=>{
+  p.framing.problem=problem.value.trim();
+  p.framing.goal=goal.value.trim();
+  p.framing.stakeholders=stakeholders.value.trim();
+});
+
+document.getElementById('addHyp').onclick=()=>{
+  const t=hypText.value.trim(); if(!t) return;
+  updateProject(p=>{ p.hypotheses.push({id:crypto.randomUUID(), text:t}); }); hypText.value='';
+};
+document.getElementById('addEv').onclick=()=>{
+  const d=evDesc.value.trim(), u=evUrl.value.trim(); if(!d && !u) return;
+  updateProject(p=>{ p.evidence.push({id:crypto.randomUUID(), desc:d, url:u}); }); evDesc.value=''; evUrl.value='';
+};
+document.getElementById('addTask').onclick=()=>{
+  const txt=taskText.value.trim(); if(!txt) return;
+  const owner=taskOwner.value.trim(), status=taskStatus.value;
+  updateProject(p=>{ p.tasks.push({id:crypto.randomUUID(), text:txt, owner, status}); });
+  taskText.value=''; taskOwner.value=''; taskStatus.value='todo';
+};
+
+// Export/Import
+document.getElementById('exportBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(load(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`investigate-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href);
+};
+const importFile=document.getElementById('importFile');
+document.getElementById('importBtn').onclick=()=>importFile.click();
+importFile.onchange=(e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ try{ const data=JSON.parse(reader.result); if(Array.isArray(data)){ save(data); ensureDefault(); render(); } }catch{} };
+  reader.readAsText(f);
+};
+
+render();
+</script>
+</body>
+</html>
