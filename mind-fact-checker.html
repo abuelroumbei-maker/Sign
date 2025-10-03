@@ -8,38 +8,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
   :root{
-    --accent:#10b981;--accent2:#34d399;--info1:#a78bfa;--info2:#7dd3fc;--warn1:#f59e0b;--warn2:#fbbf24;
-    --bg1:#0b0d12;--bg2:#0e1320;--tyrian:#66023C;--outline:#FFD700;
-    --title-font:"Press Start 2P",system-ui,sans-serif;--body-font:ui-rounded,system-ui,sans-serif;
+    --accent:#10b981; --accent2:#34d399;
+    --bg1:#0b0d12; --bg2:#0e1320;
+    --tyrian:#66023C; --outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;
+    --body-font:ui-rounded,system-ui,sans-serif;
   }
-  *{box-sizing:border-box} body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
   .bg{position:fixed;inset:0;z-index:-4;background:
     radial-gradient(1000px 700px at 18% 22%, color-mix(in oklab, var(--accent) 40%, transparent), transparent 60%),
-    radial-gradient(900px 650px at 80% 28%, color-mix(in oklab, var(--info2) 35%, transparent), transparent 60%),
     linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
   .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
   .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+
   .wrap{padding:22px;display:grid;gap:16px}
   .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:8px 0}
-  .grid{max-width:980px;margin:0 auto;display:grid;gap:12px;grid-template-columns:1fr}
-  .panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px}
-  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-  .area{flex:1;min-width:240px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:12px;font:600 14px/1.4 var(--body-font);outline:none}
+  .panel{max-width:980px;margin:0 auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px}
+
+  .muted{font-size:12px;color:#cbd5e1;margin-bottom:8px}
+  .row{display:flex;gap:10px;align-items:stretch;flex-wrap:wrap}
+  .area{flex:1;min-width:240px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:12px;font:600 14px/1.4 var(--body-font);outline:none;min-height:120px}
   .btn{appearance:none;border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
   .btn-success{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#052e24}
-  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+
   .badge{font-size:12px;font-weight:900;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.2)}
   .badge-true{background:#10b98122;border-color:#10b981}
   .badge-false{background:#ef444422;border-color:#ef4444}
   .badge-unknown{background:#94a3b822;border-color:#94a3b8}
-  .muted{font-size:12px;color:#cbd5e1}
-  .actions{display:flex;gap:10px;align-items:center;margin-top:10px}
-  .spacer{flex:1}
-  .cta-grid{max-width:980px;margin:0 auto;display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
-  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px}
-  .btn-info{background:linear-gradient(90deg,var(--info1),var(--info2));color:#0b0b12}
-  .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
-  .hidden{display:none !important}
+
+  .actions{display:flex;gap:10px;align-items:center;margin-top:10px;flex-wrap:wrap}
+  .explain{display:none;margin-top:12px}
+  @media (max-width:480px){
+    .wrap{padding:86px 14px 18px}
+  }
 </style>
 </head>
 <body>
@@ -49,28 +51,22 @@
 <div class="wrap">
   <h1 class="title">Fact Checker</h1>
 
-  <!-- Fact checker panel -->
-  <div class="grid">
-    <div class="panel">
-      <div class="muted" style="margin-bottom:6px">Type a fact to check (offline heuristic). You can add a real API later.</div>
-      <div class="row">
-        <textarea id="fcInput" class="area" placeholder='e.g., "The Sahara is the largest hot desert."'></textarea>
-        <button id="btnFcCheck" class="btn btn-success">Check</button>
-        <button id="btnFcEvolve" class="btn btn-ghost hidden">EVOLVE</button>
-      </div>
-      <div class="actions">
-        <span id="fcBadge" class="badge badge-unknown hidden">UNKNOWN</span>
-        <span id="fcMsg" class="muted"></span>
-        <span class="spacer"></span>
-      </div>
-      <div id="fcExplanation" class="panel hidden" style="margin-top:12px"></div>
-    </div>
-  </div>
+  <div class="panel">
+    <div class="muted">Type a fact to check (offline heuristic). You can wire a real API later.</div>
 
-  <!-- Shortcuts to the old features -->
-  <div class="cta-grid">
-    <div class="card"><a href="fact-dictionary.html"><button class="btn btn-info" style="width:100%">Dictionary of the World</button></a></div>
-    <div class="card"><a href="fact-conspiracies.html"><button class="btn btn-warn" style="width:100%">Fun Conspiracy Theories</button></a></div>
+    <div class="row">
+      <textarea id="fcInput" class="area" placeholder='e.g., "The Sahara is the largest hot desert."'></textarea>
+      <button id="btnFcCheck" class="btn btn-success">Check</button>
+    </div>
+
+    <div class="actions">
+      <span id="fcBadge" class="badge badge-unknown" style="display:none">UNKNOWN</span>
+      <span id="fcMsg" class="muted"></span>
+      <span style="flex:1"></span>
+      <button id="btnFcEvolve" class="btn" style="display:none;background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)">EVOLVE</button>
+    </div>
+
+    <div id="fcExplanation" class="panel explain"></div>
   </div>
 </div>
 
@@ -85,16 +81,22 @@ const fcExplain=document.getElementById('fcExplanation');
 
 btnCheck.addEventListener('click',()=>{
   const text=(fcInput.value||'').trim();
-  if(!text){ fcMsg.textContent='Type a fact to check.'; fcBadge.classList.add('hidden'); btnEvolve.classList.add('hidden'); fcExplain.classList.add('hidden'); return; }
+  if(!text){
+    fcMsg.textContent='Type a fact to check.';
+    fcBadge.style.display='none';
+    btnEvolve.style.display='none';
+    fcExplain.style.display='none';
+    return;
+  }
   const { verdict, message, explanation } = check(text);
   fcBadge.textContent = verdict.toUpperCase();
   fcBadge.className = 'badge ' + (verdict==='true' ? 'badge-true' : verdict==='false' ? 'badge-false' : 'badge-unknown');
-  fcBadge.classList.remove('hidden');
+  fcBadge.style.display='inline-block';
   fcMsg.textContent = message;
-  btnEvolve.classList.remove('hidden');
+  btnEvolve.style.display='inline-block';
   btnEvolve.onclick = ()=>{
-    fcExplain.innerHTML = `<div style="font-size:12px;color:#cbd5e1;margin-bottom:6px">Explanation</div><div style="font-size:16px;line-height:1.5">${escapeHTML(explanation)}</div>`;
-    fcExplain.classList.remove('hidden');
+    fcExplain.innerHTML = `<div class="muted" style="margin:0 0 6px">Explanation</div><div style="font-size:16px;line-height:1.5">${escapeHTML(explanation)}</div>`;
+    fcExplain.style.display='block';
   };
 });
 
