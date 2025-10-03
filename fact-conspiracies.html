@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Fact Checker • Fun Conspiracy Theories</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --warn1:#f59e0b;--warn2:#fbbf24;--bg1:#0b0d12;--bg2:#0e1320;--tyrian:#66023C;--outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;--body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .bg{position:fixed;inset:0;z-index:-4;background:
+    radial-gradient(1000px 700px at 18% 24%, color-mix(in oklab, var(--warn1) 35%, transparent), transparent 60%),
+    linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,56px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:8px 0 10px}
+  .panel{max-width:880px;margin:0 auto;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .btn{appearance:none;border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-next{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  .stars{display:flex;gap:6px;align-items:center}
+  .star{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;background:transparent;border:none;cursor:pointer}
+  .muted{font-size:12px;color:#cbd5e1}
+  h3{margin:.2rem 0 .4rem}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="nav"><a class="pill" href="mind-fact-checker.html">← Fact Checker</a></div>
+
+<div class="wrap">
+  <h1 class="title">Fun Conspiracy Theories</h1>
+  <div class="panel">
+    <h3 id="ctTitle"></h3>
+    <p id="ctText" style="margin:.2rem 0 10px"></p>
+
+    <div class="row" style="justify-content:space-between">
+      <div class="stars" aria-label="Rate this theory">
+        <span class="muted" id="ctAvg" style="margin-right:6px">—</span>
+        <button class="star" data-star="1" aria-label="1 star"></button>
+        <button class="star" data-star="2" aria-label="2 stars"></button>
+        <button class="star" data-star="3" aria-label="3 stars"></button>
+        <button class="star" data-star="4" aria-label="4 stars"></button>
+        <button class="star" data-star="5" aria-label="5 stars"></button>
+      </div>
+      <div class="row">
+        <button id="btnNext" class="btn btn-next">Another one</button>
+        <a href="mind-fact-checker.html"><button class="btn btn-ghost">Back</button></a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const THEORIES=[
+  {id:'bielefeld', title:'The Bielefeld Conspiracy', text:'A long-running German in-joke claims the city of Bielefeld doesn’t exist.'},
+  {id:'birds', title:'Birds Aren’t Real (satire)', text:'Satirical movement joking birds were replaced by drones.'},
+  {id:'mandela', title:'The Mandela Effect', text:'Mass misremembering; “parallel timelines” is the playful angle.'},
+  {id:'wow', title:'The “Wow!” Signal', text:'1977 narrowband signal once detected; origin unknown.'},
+  {id:'oak', title:'Oak Island Mystery', text:'Tales of booby-trapped treasure pits in Nova Scotia.'},
+  {id:'shakespeare', title:'Who Wrote Shakespeare?', text:'Minority proposes alternative authors; mainstream credits Shakespeare.'}
+];
+const KEY='ct_ratings_v1';
+function loadRatings(){ try{return JSON.parse(localStorage.getItem(KEY))||{}}catch{return{}} }
+function saveRatings(r){ localStorage.setItem(KEY, JSON.stringify(r)); }
+
+const titleEl=document.getElementById('ctTitle'), textEl=document.getElementById('ctText'), avgEl=document.getElementById('ctAvg');
+let cur=null;
+
+function starSVG(filled){return `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2.2l2.89 5.85 6.46.94-4.67 4.55 1.1 6.43L12 17.77 6.22 19.97l1.1-6.43L2.65 8.99l6.46-.94L12 2.2z" ${filled?'fill="#ffd54f"':'fill="none"'} stroke="#ffd54f" stroke-width="1.6" /></svg>`;}
+function highlight(n){ document.querySelectorAll('.star').forEach((b,i)=>{ b.innerHTML=starSVG(i<n); }); }
+function updateAvg(){
+  const r=loadRatings(); const rec=r[cur.id]||{count:0,sum:0};
+  const avg = rec.count ? (rec.sum/rec.count).toFixed(1) : '—';
+  avgEl.textContent = rec.count ? `Avg ${avg}★ • ${rec.count} rating${rec.count>1?'s':''}` : 'No ratings yet';
+}
+function rate(n){
+  const r=loadRatings(); const rec=r[cur.id]||{count:0,sum:0}; rec.count++; rec.sum+=n; r[cur.id]=rec; saveRatings(r); updateAvg();
+}
+
+function pick(){
+  cur = THEORIES[Math.floor(Math.random()*THEORIES.length)];
+  titleEl.textContent = cur.title; textEl.textContent = cur.text; updateAvg(); highlight(0);
+}
+document.getElementById('btnNext').onclick=pick;
+document.querySelectorAll('.star').forEach(btn=>{
+  btn.onmouseenter=()=>highlight(+btn.dataset.star);
+  btn.onmouseleave=()=>highlight(0);
+  btn.onclick=()=>rate(+btn.dataset.star);
+  btn.innerHTML = starSVG(false);
+});
+pick();
+</script>
+</body>
+</html>
