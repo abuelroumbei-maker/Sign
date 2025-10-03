@@ -29,17 +29,27 @@
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
+
   .nav{display:flex;justify-content:space-between;padding:12px 14px;position:sticky;top:0;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
   .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
   .pill-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+
   .wrap{padding:22px}
   .title{text-align:center;font-family:var(--title-font);font-size:clamp(32px,8vw,72px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:20px 0}
   .grid{max-width:1000px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
   .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px}
-  .btn{width:100%;padding:18px;font-weight:900;border:none;border-radius:16px;cursor:pointer}
+
+  /* anchor-as-button */
+  .btn{display:inline-block;width:100%;text-align:center;padding:18px;font-weight:900;border:none;border-radius:16px;cursor:pointer;text-decoration:none}
   .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
   .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
   .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+
+  @media (max-width:480px){
+    .wrap{padding:86px 14px 18px}
+    .title{-webkit-text-stroke:1px var(--outline);font-size:clamp(26px,9.5vw,44px)}
+    .btn{padding:16px 18px;font-size:15px}
+  }
 </style>
 </head>
 <body>
@@ -54,20 +64,34 @@
 <div class="wrap">
   <h1 class="title">Mind</h1>
   <div class="grid">
-    <div class="card"><a href="evolution.html"><button class="btn btn-primary">Evolution</button></a></div>
-    <!-- Renamed + linked to check.html -->
-    <div class="card"><a href="check.html"><button class="btn btn-success">Check</button></a></div>
-    <div class="card"><a href="mind-grownup.html"><button class="btn btn-warn">Grown up responsibility</button></a></div>
+    <div class="card"><a class="btn btn-primary" href="evolution.html">Evolution</a></div>
+    <div class="card"><a class="btn btn-success" href="check.html">Check</a></div>
+    <div class="card"><a class="btn btn-warn" href="mind-grownup.html">Grown up responsibility</a></div>
   </div>
 </div>
 
 <script>
-const stars=document.getElementById('stars'),sctx=stars.getContext('2d');
-function resize(){stars.width=innerWidth;stars.height=innerHeight;}resize();addEventListener('resize',resize);
-const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
-(function draw(){requestAnimationFrame(draw);sctx.clearRect(0,0,stars.width,stars.height);
-  STARS.forEach(s=>{s.x+=s.dx*s.z;s.y+=s.dy*s.z;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
-    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);})(); 
+const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+function resize(){ stars.width=innerWidth; stars.height=innerHeight; }
+resize(); addEventListener('resize',resize);
+const STARS=Array.from({length:160}).map(()=>({
+  x:Math.random()*innerWidth,
+  y:Math.random()*innerHeight,
+  z:Math.random()*1.5+.3,
+  dx:(Math.random()-.5)*0.15,
+  dy:(Math.random()-.5)*0.15
+}));
+(function draw(){
+  requestAnimationFrame(draw);
+  sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{
+    s.x+=s.dx*s.z; s.y+=s.dy*s.z;
+    if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width;
+    if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;
+    sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);
+  });
+})();
 </script>
 </body>
 </html>
