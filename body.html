@@ -7,16 +7,16 @@
 <meta name="theme-color" content="#0b0d12" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
+    --fg:#eef2ff; --card:#ffffffee;
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
     --ink:#0a0b0f;
-    --muscle1:#8b1d2c; --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
+    --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
     --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
-    --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-    --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --title-font: "Anton", sans-serif;
+    --body-font: "Inter", system-ui, sans-serif;
     --safe-bottom: env(safe-area-inset-bottom, 16px);
     --safe-top: env(safe-area-inset-top, 16px);
   }
@@ -31,23 +31,37 @@
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
     overflow:auto;
   }
-  .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-  .xpWrap{position:fixed; right:16px; top:16px; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw); z-index:5}
-  .xp-badge{background:#ffffffdd; color:#0a0b0f; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.15)}
-  .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
-  .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--muscle2), var(--muscle3)); }
-  .xp-meta{ position:fixed; right:16px; top:50px; font-size:12px; color:#cbd5e1; opacity:.9; z-index:5 }
-  .wrap{ min-height:100dvh; display:grid; place-items:center; padding:calc(60px + var(--safe-top)) 18px calc(160px + var(--safe-bottom)); }
+
+  /* Top-left nav */
+  .nav{position:fixed;left:16px;top:16px;z-index:5}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:700;text-decoration:none;font-family:var(--body-font)}
+
+  /* Tried & Liked (top-right) */
+  .tryBtn{
+    position:fixed; right:16px; top:16px; z-index:7;
+    display:inline-block; padding:10px 14px; border-radius:999px;
+    background:linear-gradient(90deg, var(--play3), var(--play4));
+    color:#0a0b0f; font-weight:800; letter-spacing:.2px; text-decoration:none;
+    box-shadow:0 10px 22px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.6);
+    font-family:var(--body-font);
+  }
+
+  /* Page */
+  .wrap{
+    min-height:100dvh;
+    display:grid; place-items:center;
+    padding:calc(60px + var(--safe-top)) 18px calc(160px + var(--safe-bottom));
+  }
   .title{
     margin:0; font-family:var(--title-font);
-    font-size:clamp(48px, 12vw, 112px); line-height:0.95; text-align:center; letter-spacing:1px;
+    font-size:clamp(56px, 14vw, 124px); line-height:0.95; text-align:center; letter-spacing:1px;
     background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     border-bottom: 6px solid color-mix(in oklab, var(--muscle2) 60%, transparent);
     padding-bottom:10px; text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
   }
-  .subtitle{ margin:14px 0 0; text-align:center; max-width:900px; color:#e2e8f0; font-weight:600; }
+
+  /* Bottom action buttons */
   .ctaRow{
     position:fixed; left:50%; transform:translateX(-50%);
     bottom:calc(18px + var(--safe-bottom)); z-index:4;
@@ -56,55 +70,34 @@
   }
   @media (max-width:560px){ .ctaRow{grid-template-columns:1fr} }
   .cta{
-    background:
-      linear-gradient(90deg, var(--play2), var(--play1)),
-      linear-gradient(90deg, var(--muscle2), var(--muscle3));
-    color:var(--ink); border:none; padding:16px 18px; font-weight:900;
+    background:linear-gradient(90deg, var(--play2), var(--play1));
+    color:var(--ink); border:none; padding:16px 18px; font-weight:800;
     border-radius:18px; box-shadow:0 12px 28px rgba(0,0,0,.35);
     cursor:pointer; letter-spacing:.4px; text-decoration:none; text-align:center;
+    font-family:var(--body-font);
   }
 </style>
 </head>
 <body>
+  <!-- Top-left nav -->
   <div class="nav">
     <a class="pill" href="index.html">← Home</a>
-    <a class="pill" href="heart.html">Heart</a>
-    <a class="pill" href="mind.html">Mind</a>
-    <a class="pill" href="soul.html">Soul</a>
   </div>
 
-  <div class="xpWrap">
-    <div class="xp-badge" id="xpBadge">Level 0</div>
-    <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
-  </div>
-  <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
+  <!-- Tried & Liked -->
+  <a class="tryBtn" href="tried-and-liked.html">Tried and Liked</a>
 
+  <!-- Page -->
   <main class="wrap">
     <header style="text-align:center">
       <h1 class="title">BODY</h1>
-      <p class="subtitle">Organized training choices—clear technique, real-world sets & reps.</p>
-      <p class="subtitle"><strong>Open a section:</strong> Exercises • Know Yourself</p>
     </header>
   </main>
 
+  <!-- Bottom action buttons -->
   <div class="ctaRow">
     <a class="cta" href="exercises.html">Exercises</a>
     <a class="cta" href="know-yourself.html">Know Yourself</a>
   </div>
-
-<script>
-function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
-const MAX_LEVEL = 100;
-function xpForNext(level){ if(level>=MAX_LEVEL) return Infinity; const base=200, growth=1.12; return Math.round(base * Math.pow(growth, level)); }
-function updateXPUI(){
-  const xpState = loadXP(); const need = xpForNext(xpState.level);
-  document.getElementById('xpBadge').textContent = `Level ${xpState.level}`;
-  document.getElementById('xpFill').style.width = (xpState.level>=MAX_LEVEL ? 100 : Math.round(100 * (xpState.xp / need))) + "%";
-  document.getElementById('xpMeta').textContent = xpState.level>=MAX_LEVEL ? `MAX • Level ${MAX_LEVEL}` : `${xpState.xp} / ${need} XP`;
-}
-updateXPUI();
-document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
-</script>
 </body>
 </html>
-
