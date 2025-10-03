@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Windows</title>
+  <meta name="theme-color" content="#0b0d12" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&display=swap" rel="stylesheet">
+
+  <style>
+    body{margin:0;font-family:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+         background:#0b0d12;color:#fff;display:grid;place-items:center;height:100vh;text-align:center}
+    .title{
+      font-size:clamp(40px,10vw,86px);
+      background:linear-gradient(90deg,#fff,#c084fc);
+      -webkit-background-clip:text;background-clip:text;color:transparent;
+      font-weight:900;margin-bottom:28px
+    }
+    .actions{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+    .btn{
+      display:inline-block;padding:14px 20px;border-radius:14px;
+      background:#ffffffdd;color:#0a0b0f;font-weight:800;
+      text-decoration:none;box-shadow:0 10px 24px rgba(0,0,0,.25);
+      transition:transform .1s ease, box-shadow .15s ease
+    }
+    .btn:hover{transform:translateY(-2px);box-shadow:0 14px 28px rgba(0,0,0,.28)}
+    .nav{position:fixed;top:20px;left:20px}
+    .pill{padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;
+          font-weight:800;text-decoration:none}
+  </style>
+</head>
+<body>
+  <div class="nav">
+    <a class="pill" href="soul.html">← Back</a>
+  </div>
+
+  <h1 class="title">Windows</h1>
+
+  <div class="actions">
+    <a class="btn" href="#">Worldviews</a>
+    <a class="btn" href="#">Eyes</a>
+  </div>
+</body>
+</html>
