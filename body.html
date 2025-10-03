@@ -10,17 +10,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <style>
   :root{
-    /* Refreshed, kid-friendly palette (still professional) */
     --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
     --ink:#0a0b0f;
-    /* Muscle accents kept, add playful helpers */
     --muscle1:#8b1d2c; --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
     --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
-
     --title-font: "Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-
     --safe-bottom: env(safe-area-inset-bottom, 16px);
     --safe-top: env(safe-area-inset-top, 16px);
   }
@@ -28,7 +24,6 @@
   html,body{height:100%}
   body{
     margin:0; font-family:var(--body-font); color:#fff;
-    /* more colorful but calm background (no animation) */
     background:
       radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--play2) 35%, transparent), transparent 60%),
       radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--play1) 28%, transparent), transparent 60%),
@@ -36,23 +31,14 @@
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
     overflow:auto;
   }
-
   .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap;z-index:5}
   .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-
-  /* XP strip (read-only) */
   .xpWrap{position:fixed; right:16px; top:16px; display:flex; align-items:center; gap:12px; max-width:min(520px, 70vw); z-index:5}
   .xp-badge{background:#ffffffdd; color:#0a0b0f; border-radius:12px; padding:6px 10px; font-size:13px; font-weight:800; box-shadow:0 8px 18px rgba(0,0,0,.15)}
   .xp-bar{ flex:1; height:10px; border-radius:999px; background:rgba(255,255,255,.22); overflow:hidden; position:relative; box-shadow:inset 0 2px 6px rgba(0,0,0,.25)}
   .xp-fill{ position:absolute; left:0; top:0; bottom:0; width:0%; background:linear-gradient(90deg, var(--muscle2), var(--muscle3)); }
   .xp-meta{ position:fixed; right:16px; top:50px; font-size:12px; color:#cbd5e1; opacity:.9; z-index:5 }
-
-  /* Page */
-  .wrap{
-    min-height:100dvh;
-    display:grid; place-items:center;
-    padding:calc(60px + var(--safe-top)) 18px calc(160px + var(--safe-bottom));
-  }
+  .wrap{ min-height:100dvh; display:grid; place-items:center; padding:calc(60px + var(--safe-top)) 18px calc(160px + var(--safe-bottom)); }
   .title{
     margin:0; font-family:var(--title-font);
     font-size:clamp(48px, 12vw, 112px); line-height:0.95; text-align:center; letter-spacing:1px;
@@ -62,8 +48,6 @@
     padding-bottom:10px; text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
   }
   .subtitle{ margin:14px 0 0; text-align:center; max-width:900px; color:#e2e8f0; font-weight:600; }
-
-  /* Bottom actions (two buttons) */
   .ctaRow{
     position:fixed; left:50%; transform:translateX(-50%);
     bottom:calc(18px + var(--safe-bottom)); z-index:4;
@@ -77,77 +61,11 @@
       linear-gradient(90deg, var(--muscle2), var(--muscle3));
     color:var(--ink); border:none; padding:16px 18px; font-weight:900;
     border-radius:18px; box-shadow:0 12px 28px rgba(0,0,0,.35);
-    cursor:pointer; letter-spacing:.4px;
+    cursor:pointer; letter-spacing:.4px; text-decoration:none; text-align:center;
   }
-
-  /* Drawer base */
-  .scrim{position:fixed; inset:0; background:rgba(3,6,16,.6); opacity:0; pointer-events:none; z-index:6}
-  .scrim.show{opacity:1; pointer-events:auto}
-  .drawer{
-    position:fixed; inset:auto 0 0 0; height:min(90dvh, 900px);
-    background:rgba(15,18,28,.9); backdrop-filter: blur(8px) saturate(1.2);
-    border-top:2px solid rgba(255,255,255,.25);
-    display:none; z-index:7; box-shadow: 0 -30px 60px rgba(0,0,0,.45);
-  }
-  .drawer.show{display:block}
-  .drawer-head{ display:flex; align-items:center; justify-content:space-between; gap:12px;
-    padding:14px 16px; border-bottom:1px solid rgba(255,255,255,.18) }
-  .drawer-title{font-weight:900; letter-spacing:.3px}
-  .closeX{ background:#ffffff; color:#0a0b0f; border:none; border-radius:10px; font-weight:900; cursor:pointer; padding:6px 10px; line-height:1; }
-  .drawer-body{padding:14px 16px 20px; overflow:auto; height:calc(100% - 56px)}
-
-  /* Tabs + search (Exercises) */
-  .lib-top{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px}
-  .seg{display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;}
-  .seg button{border:none; background:transparent; color:#e2e8f0; padding:10px 14px; border-radius:10px; font-weight:900; cursor:pointer}
-  .seg button.active{background:#ffffff; color:#0a0b0f}
-  .search{flex:1; min-width:220px; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.14); border-radius:12px; padding:8px 12px}
-  .search input{flex:1; background:transparent; border:none; color:#fff; outline:none; font-weight:700; font-size:14px}
-
-  /* Cards grid */
-  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px}
-  @media (max-width:380px){ .grid{grid-template-columns:1fr} }
-  .card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px;}
-  .card h3{margin:0; font-size:18px; letter-spacing:.2px}
-  .meta{font-size:12px; color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
-  .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:11px}
-  details{border-top:1px dashed rgba(255,255,255,.2); padding-top:8px}
-  details > summary{cursor:pointer; font-weight:800; list-style:none}
-  details > summary::-webkit-details-marker{display:none}
-  ul{margin:.4em 0 .2em 1.1em}
-  li{margin:.2em 0}
-
-  /* Games */
-  .gamesHub{display:grid; grid-template-columns:1fr 1fr; gap:12px}
-  @media (max-width:700px){ .gamesHub{grid-template-columns:1fr} }
-  .gamePick{background:linear-gradient(90deg, var(--play3), var(--play4)); color:#0a0b0f; border:none; border-radius:18px; padding:16px; font-weight:900; cursor:pointer}
-  .gamePane{display:none}
-  .gamePane.active{display:block}
-  .gameCard{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px;}
-  .controlsRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
-  .btn{border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer}
-  .stat{font-weight:800; color:#e2e8f0; margin-left:auto}
-  .arena{position:relative; width:100%; height:420px; background:#0b1220; border:2px solid rgba(255,255,255,.25); border-radius:14px; touch-action:none; user-select:none}
-  .target{position:absolute; width:54px; height:54px; border-radius:999px; background:linear-gradient(180deg, var(--muscle3), var(--muscle2)); border:2px solid #fff; display:grid; place-items:center; font-weight:900; color:#0a0b0f}
-  .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
-  .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
-  .swipeNote{font-size:12px; color:#cbd5e1}
-  .flashBad{background:#4a0a14 !important;}
-
-  /* Know Yourself content */
-  .ky-section{display:grid; gap:14px}
-  .ky-note{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px}
-  .ky-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:14px}
-  .ky-card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:14px; padding:12px; display:flex; flex-direction:column; gap:10px}
-  .ky-card h3{margin:0 0 6px 0}
-  .ky-card figure{margin:0}
-  .ky-card img{width:100%; height:auto; border-radius:10px; display:block; background:#0a0f1d}
-  .ky-cap{font-size:12px; color:#d1d5db}
-  .ky-cap a{color:#e5e7eb}
 </style>
 </head>
 <body>
-  <!-- Nav -->
   <div class="nav">
     <a class="pill" href="index.html">← Home</a>
     <a class="pill" href="heart.html">Heart</a>
@@ -155,186 +73,26 @@
     <a class="pill" href="soul.html">Soul</a>
   </div>
 
-  <!-- Level/XP (display only) -->
   <div class="xpWrap">
     <div class="xp-badge" id="xpBadge">Level 0</div>
     <div class="xp-bar"><div class="xp-fill" id="xpFill"></div></div>
   </div>
   <div class="xp-meta" id="xpMeta">0 / 200 XP</div>
 
-  <!-- Page -->
   <main class="wrap">
     <header style="text-align:center">
       <h1 class="title">BODY</h1>
-      <p class="subtitle">Organized training choices—clear technique, real-world sets & reps. Tabs: <strong>At Home</strong>, <strong>At the Gym</strong>, <strong>Lazy Gains</strong>, and <strong>Games</strong>.</p>
+      <p class="subtitle">Organized training choices—clear technique, real-world sets & reps.</p>
+      <p class="subtitle"><strong>Open a section:</strong> Exercises • Know Yourself</p>
     </header>
   </main>
 
-  <!-- Bottom action buttons -->
   <div class="ctaRow">
-    <button class="cta" id="openExercises" aria-haspopup="dialog" aria-controls="drawerExercises">Exercises</button>
-    <button class="cta" id="openKnow" aria-haspopup="dialog" aria-controls="drawerKnow">Know Yourself</button>
+    <a class="cta" href="exercises.html">Exercises</a>
+    <a class="cta" href="know-yourself.html">Know Yourself</a>
   </div>
 
-  <!-- SCRIMS -->
-  <div class="scrim" id="scrimExercises" aria-hidden="true"></div>
-  <div class="scrim" id="scrimKnow" aria-hidden="true"></div>
-
-  <!-- Drawer: Exercises -->
-  <section class="drawer" id="drawerExercises" role="dialog" aria-label="Exercises Library" aria-modal="true" aria-hidden="true">
-    <header class="drawer-head">
-      <div class="drawer-title">Exercises</div>
-      <button class="closeX" id="closeExercises" aria-label="Close exercises">×</button>
-    </header>
-    <div class="drawer-body">
-      <div class="lib-top">
-        <div class="seg" role="tablist" aria-label="Sections">
-          <button class="active" id="tabHome" role="tab" aria-selected="true">At Home</button>
-          <button id="tabGym" role="tab" aria-selected="false">At the Gym</button>
-          <button id="tabLazy" role="tab" aria-selected="false">Lazy Gains</button>
-          <button id="tabGames" role="tab" aria-selected="false">Games</button>
-        </div>
-        <label class="search" aria-label="Search exercises">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/></svg>
-          <input id="q" placeholder="Search movement, muscle, equipment…" />
-        </label>
-      </div>
-
-      <!-- Exercise lists -->
-      <div class="grid" id="cards" aria-live="polite"></div>
-
-      <!-- Games: Hub & Single-game panes -->
-      <div id="gamesHub" class="gamesHub" style="display:none" aria-live="polite">
-        <button class="gamePick" id="pickTap">▶ Tap Sprint</button>
-        <button class="gamePick" id="pickReflex">▶ Reflex Sprint</button>
-      </div>
-
-      <!-- Tap game (single pane) -->
-      <div id="tapPane" class="gamePane">
-        <section class="gameCard">
-          <div class="controlsRow">
-            <button class="btn" id="tapBack">← Back to Games</button>
-            <button class="btn" id="tapStart">Start</button>
-            <button class="btn" id="tapStop">Stop</button>
-            <button class="btn" id="tapReset">Reset</button>
-            <span class="stat" id="tapStat">Score: 0</span>
-          </div>
-          <div class="arena" id="tapArena" aria-label="Tap arena"></div>
-          <p class="swipeNote">Tap all circles. New circles only appear after you clear the current wave. Max 5 per wave.</p>
-        </section>
-      </div>
-
-      <!-- Reflex game (single pane) -->
-      <div id="reflexPane" class="gamePane">
-        <section class="gameCard">
-          <div class="controlsRow">
-            <button class="btn" id="reflexBack">← Back to Games</button>
-            <button class="btn" id="reflexStart">Start</button>
-            <button class="btn" id="reflexStop">Stop</button>
-            <button class="btn" id="reflexReset">Reset</button>
-            <span class="stat" id="reflexStat">Score: 0</span>
-          </div>
-          <div class="controlsRow">
-            <span class="dirHint">Do this now → <span class="arrow" id="reflexAction">—</span></span>
-          </div>
-          <div class="arena" id="reflexArena" aria-label="Reflex arena"></div>
-          <p class="swipeNote">Respond fast: TAP or SWIPE ← → ↑ ↓. Wrong move resets your Score to 0.</p>
-        </section>
-      </div>
-    </div>
-  </section>
-
-  <!-- Drawer: Know Yourself -->
-  <section class="drawer" id="drawerKnow" role="dialog" aria-label="Know Yourself" aria-modal="true" aria-hidden="true">
-    <header class="drawer-head">
-      <div class="drawer-title">Know Yourself</div>
-      <button class="closeX" id="closeKnow" aria-label="Close know yourself">×</button>
-    </header>
-    <div class="drawer-body">
-      <div class="ky-section">
-        <div class="ky-note">
-          <strong>Realistic, kid-friendly diagrams</strong>—clear labels, bright but calm colors, no animations. <em>More views coming soon.</em>
-        </div>
-
-        <div class="ky-grid">
-          <!-- Circulatory System -->
-          <article class="ky-card">
-            <h3>Heart & Blood (Circulatory System)</h3>
-            <figure>
-              <img
-                src="https://commons.wikimedia.org/wiki/Special:FilePath/Circulatory_System_en_rendersvg.png"
-                alt="Front view diagram of major arteries and veins across the body"
-                loading="lazy" decoding="async">
-            </figure>
-            <div class="ky-cap">Image: Wikimedia Commons, “Circulatory System” (PNG render). CC-compatible; vector version available. Attribution via page history.</div>
-            <ul>
-              <li>Your heart is a tireless muscle that pushes blood everywhere.</li>
-              <li>Arteries carry blood away from the heart; veins bring it back.</li>
-              <li>Capillaries are tiny bridges where oxygen & nutrients swap.</li>
-            </ul>
-          </article>
-
-          <!-- Digestive System -->
-          <article class="ky-card">
-            <h3>Food to Fuel (Digestive System)</h3>
-            <figure>
-              <img
-                src="https://commons.wikimedia.org/wiki/Special:FilePath/Adult_Digestive_System.png"
-                alt="Digestive system illustration showing stomach, liver, intestines"
-                loading="lazy" decoding="async">
-            </figure>
-            <div class="ky-cap">Image: BruceBlaus, “Adult Digestive System”. CC BY-SA 4.0 (Wikimedia Commons).</div>
-            <ul>
-              <li>Your stomach squeezes; your intestines absorb nutrients.</li>
-              <li>The small intestine is over 6 meters long—coiled like a hose!</li>
-              <li>Friendly gut bacteria help make vitamins.</li>
-            </ul>
-          </article>
-
-          <!-- Internal Organs (overview) -->
-          <article class="ky-card">
-            <h3>Where Are My Organs?</h3>
-            <figure>
-              <img
-                src="https://commons.wikimedia.org/wiki/Special:FilePath/Surface_projections_of_the_organs_of_the_trunk.png"
-                alt="Surface projections of major trunk organs relative to ribs and spine"
-                loading="lazy" decoding="async">
-            </figure>
-            <div class="ky-cap">Image: “Surface projections of the organs of the trunk”. Wikimedia Commons. Public domain/CC per file page.</div>
-            <ul>
-              <li>Doctors use landmarks (ribs, belly button) to find organs.</li>
-              <li>Right side: liver sits high; left side: stomach and spleen.</li>
-              <li>The appendix lives low on the right (McBurney’s point).</li>
-            </ul>
-          </article>
-
-          <!-- Body outline with organs (NIH) -->
-          <article class="ky-card">
-            <h3>Body Map (Brain & Kidneys)</h3>
-            <figure>
-              <img
-                src="https://niddk.nih.gov/-/media/Images/News/Media-Library/18227/18227.jpg"
-                alt="Human body outline showing brain and kidneys highlights"
-                loading="lazy" decoding="async">
-            </figure>
-            <div class="ky-cap">Image: NIDDK/NIH media asset. Credit: National Institute of Diabetes and Digestive and Kidney Diseases (NIH).</div>
-            <ul>
-              <li>Your brain is the control room; kidneys filter your blood.</li>
-              <li>Kidneys balance water, minerals, and remove wastes.</li>
-              <li>Drink water and move often—your organs love it.</li>
-            </ul>
-          </article>
-        </div>
-
-        <div class="ky-note">
-          Want front/back full-body views (with modesty/age-appropriate styling) or a labeled skeleton/muscle set? Say the word and I’ll add them next.
-        </div>
-      </div>
-    </div>
-  </section>
-
 <script>
-/* ===== XP (read from localStorage) ===== */
 function loadXP(){ try{ return JSON.parse(localStorage.getItem("xp_v1")) || {level:0, xp:0}; } catch { return {level:0, xp:0}; } }
 const MAX_LEVEL = 100;
 function xpForNext(level){ if(level>=MAX_LEVEL) return Infinity; const base=200, growth=1.12; return Math.round(base * Math.pow(growth, level)); }
@@ -346,401 +104,7 @@ function updateXPUI(){
 }
 updateXPUI();
 document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) updateXPUI(); });
-
-/* ===== Simple sound engine (fiery SFX via Web Audio API) ===== */
-const SFX = (()=>{
-  let ctx = null;
-  const ensure = ()=>{
-    if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); }
-    if(ctx.state === 'suspended'){ ctx.resume(); }
-    return ctx;
-  };
-  const env = (node, t, a=0.005, d=0.12, s=0.0, r=0.15, peak=0.9)=>{
-    const g = node.gain || node; // allow passing a GainNode or AudioParam
-    const now = t;
-    g.cancelScheduledValues(now);
-    g.setValueAtTime(0.0001, now);
-    g.linearRampToValueAtTime(peak, now+a);
-    g.linearRampToValueAtTime(s, now+a+d);
-    g.exponentialRampToValueAtTime(0.0001, Math.max(now+a+d+r, now+a+d+0.15));
-  };
-  const noiseBuffer = ()=>{
-    const c = ensure();
-    const len = c.sampleRate * 0.35;
-    const buf = c.createBuffer(1, len, c.sampleRate);
-    const d = buf.getChannelData(0);
-    for(let i=0;i<len;i++) d[i] = (Math.random()*2-1) * (1 - i/len); // slight tail
-    return buf;
-  };
-  const cachedNoise = noiseBuffer();
-
-  function whoosh(){
-    const c = ensure(); const t = c.currentTime;
-    const n = c.createBufferSource(); n.buffer = cachedNoise;
-    const g = c.createGain();
-    const bp = c.createBiquadFilter(); bp.type='highpass'; bp.frequency.value=400;
-    n.connect(bp); bp.connect(g); g.connect(c.destination);
-    env(g, t, 0.005, 0.25, 0.0008, 0.25, 0.7);
-    n.playbackRate.value = 1.2;
-    n.start(t);
-  }
-  function ignite(){
-    const c = ensure(); const t = c.currentTime;
-    // click + short noise burst
-    const o = c.createOscillator(); o.type='square'; o.frequency.setValueAtTime(280, t);
-    const og = c.createGain(); env(og, t, 0.001, 0.05, 0.0, 0.05, 0.8);
-    const n = c.createBufferSource(); n.buffer = cachedNoise;
-    const ng = c.createGain(); env(ng, t, 0.001, 0.08, 0.0, 0.06, 0.6);
-    const hp = c.createBiquadFilter(); hp.type='highpass'; hp.frequency.value=1200;
-
-    o.connect(og).connect(c.destination);
-    n.connect(hp).connect(ng).connect(c.destination);
-    o.start(t); o.stop(t+0.15); n.start(t);
-  }
-  function boom(){
-    const c = ensure(); const t = c.currentTime;
-    const o = c.createOscillator(); o.type='triangle'; o.frequency.setValueAtTime(160, t);
-    o.frequency.exponentialRampToValueAtTime(60, t+0.25);
-    const g = c.createGain(); env(g, t, 0.002, 0.18, 0.0008, 0.4, 0.9);
-    const lp = c.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=600;
-    o.connect(lp).connect(g).connect(c.destination);
-    o.start(t); o.stop(t+0.5);
-  }
-  return { whoosh, ignite, boom, ensure };
-})();
-
-/* ===== Data ===== */
-const LIBRARIES = {
-  home: [
-    { id:"pushup", name:"Push-Up", muscles:["Chest","Triceps","Anterior delts","Core"], level:"Beginner+", equipment:"Bodyweight", setsReps:"3–4 × 6–12",
-      steps:["Hands under shoulders, body in a straight line, glutes/abs tight.","Lower with elbows ~45° from torso until chest is close to floor.","Press through palms, keeping ribs tucked and neck neutral."],
-      cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"], mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"] },
-    { id:"squat-bw", name:"Bodyweight Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3–4 × 10–15",
-      steps:["Feet shoulder-width, toes slightly out.","Sit hips back/down, knees track over toes, chest tall.","Descend to comfortable depth; drive mid-foot to stand."],
-      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"], mistakes:["Heels lifting","Knees caving in","Losing brace at bottom"] },
-    { id:"glute-bridge", name:"Glute Bridge", muscles:["Glutes","Hamstrings","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 12–15 (1–2s squeeze top)",
-      steps:["Heels close to glutes, ribs down, pelvis neutral.","Drive through heels to lift hips; squeeze glutes at top.","Lower under control; avoid over-arching lower back."],
-      cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"], mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"] },
-    { id:"plank", name:"Forearm Plank", muscles:["Core","Glutes","Shoulders"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 20–40s",
-      steps:["Elbows under shoulders, forearms parallel.","Squeeze glutes, slight pelvic tuck, ribs down.","Hold straight line from ears to ankles; breathe."],
-      cues:["Crush the floor","Long spine","Soft nasal inhale"], mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"] }
-  ],
-  gym: [
-    { id:"bb-squat", name:"Barbell Back Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Intermediate", equipment:"Barbell/Rack", setsReps:"3–5 × 3–8",
-      steps:["Bar set just below traps; hands even, elbows under bar.","Unrack, step back, feet shoulder-width, brace hard.","Sit back/down keeping knees tracking; stand through mid-foot."],
-      cues:["Big breath/brace","Knees out","Chest over mid-foot"], mistakes:["Soft brace","Heels popping","Knees collapsing in"] },
-    { id:"bench", name:"Barbell Bench Press", muscles:["Chest","Triceps","Anterior delts"], level:"Intermediate", equipment:"Barbell/Bench", setsReps:"3–5 × 4–8",
-      steps:["Eyes under bar; upper-back set; feet planted.","Lower to lower-sternum with forearms vertical.","Press back/up; keep shoulder blades retracted."],
-      cues:["Row it down","Press the floor","No bounce"], mistakes:["Elbow flare","Loose upper back","Bouncing off chest"] },
-    { id:"latpd", name:"Lat Pulldown", muscles:["Lats","Biceps","Mid-back"], level:"Beginner+", equipment:"Pulldown machine", setsReps:"3–4 × 8–12",
-      steps:["Set thigh pad; grasp bar slightly wider than shoulders.","Pull elbows to ribs/chest up; pause near collarbone.","Control the return to full stretch without shrugging."],
-      cues:["Elbows in pockets","Chest tall","Lead with lats"], mistakes:["Leaning way back","Half reps","Shrugging neck"] },
-    { id:"cable-row", name:"Seated Cable Row", muscles:["Lats","Rhomboids","Rear delts","Biceps"], level:"Beginner", equipment:"Cable/Row", setsReps:"3–4 × 8–12",
-      steps:["Neutral spine, chest tall, shoulders down/back.","Pull handle to lower ribs; pause; return with control.","Keep wrists neutral; avoid excessive lean."],
-      cues:["Pull with elbows","Squeeze shoulder blades","Stay tall"], mistakes:["Shrugging","Rounding lower back","Using momentum"] }
-  ],
-  lazy: [
-    { id:"toe-curls", name:"Toe Curls (Seated/Standing)", muscles:["Intrinsic foot","Calves"], level:"Super easy", equipment:"None / Towel", setsReps:"2–3 × 10–20 each foot",
-      steps:["Barefoot if possible. Spread toes, then curl to scrunch a towel or the floor.","Hold 1s, then release and actively spread toes again.","Keep ankle neutral; avoid cramping by easing range."],
-      cues:["Slow squeeze","Full release","Breathe easy"], mistakes:["Cramping from rushing","Ankle rolling in/out"] },
-    { id:"neck-rolls", name:"Neck Rolls (Gentle)", muscles:["Neck flexors/extensors"], level:"Super easy", equipment:"None", setsReps:"1–2 × 3 slow circles each way",
-      steps:["Sit/stand tall. Draw small comfortable circles with nose.","Go slow, pain-free range only.","Switch directions; keep shoulders relaxed."],
-      cues:["Tiny circles","Relax jaw","Easy breath"], mistakes:["Forcing end-range","Shrugging shoulders"] },
-    { id:"shrugs", name:"Shoulder Shrugs", muscles:["Upper traps"], level:"Super easy", equipment:"None", setsReps:"2–3 × 10–15",
-      steps:["Stand tall. Lift shoulders toward ears without craning neck.","Pause 1s at top; lower under control.","Option: add light objects for load."],
-      cues:["Long neck","Even lift","Smooth lower"], mistakes:["Chin jutting","Rolling shoulders excessively"] },
-    { id:"breathing", name:"Deep Breathing (Box/4-7-8)", muscles:["Diaphragm","Parasympathetic"], level:"Super easy", equipment:"None", setsReps:"3–5 cycles",
-      steps:["Nasal inhale 4s → hold 4s → exhale 4s → hold 4s (box).","Or 4-7-8: inhale 4s → hold 7s → exhale 8s.","Keep ribs down, shoulders relaxed, slow & quiet."],
-      cues:["Belly expands 360°","Soft jaw","Long exhale"], mistakes:["Chest-only breathing","Rushing counts"] },
-    { id:"eye-moves", name:"Eye Movement Drills", muscles:["Extraocular muscles"], level:"Super easy", equipment:"None", setsReps:"2–3 × 20–30s",
-      steps:["Keep head still; move eyes: left↔right, up↕down, diagonals.","Finish with smooth circles both ways.","Blink normally; stop if dizzy."],
-      cues:["Slow tracks","Relax face","Blink and breathe"], mistakes:["Straining at extremes","Holding breath"] }
-  ]
-};
-
-/* ===== EXERCISES Drawer Controls ===== */
-const drawerExercises = document.getElementById('drawerExercises');
-const scrimExercises = document.getElementById('scrimExercises');
-const openExercises = document.getElementById('openExercises');
-const closeExercises = document.getElementById('closeExercises');
-
-function openDrawer(el,scrim){ el.classList.add('show'); scrim.classList.add('show'); el.setAttribute('aria-hidden','false'); scrim.setAttribute('aria-hidden','false'); }
-function closeDrawer(el,scrim){ el.classList.remove('show'); scrim.classList.remove('show'); el.setAttribute('aria-hidden','true'); scrim.setAttribute('aria-hidden','true'); }
-
-openExercises.addEventListener('click', ()=>{ openDrawer(drawerExercises, scrimExercises); closeExercises.focus(); });
-closeExercises.addEventListener('click', ()=>{ closeDrawer(drawerExercises, scrimExercises); });
-scrimExercises.addEventListener('click', ()=>{ closeDrawer(drawerExercises, scrimExercises); });
-
-/* Tabs & Search */
-const q = document.getElementById('q');
-const tabHome = document.getElementById('tabHome');
-const tabGym = document.getElementById('tabGym');
-const tabLazy = document.getElementById('tabLazy');
-const tabGames = document.getElementById('tabGames');
-const cards = document.getElementById('cards');
-const gamesHub = document.getElementById('gamesHub');
-const tapPane = document.getElementById('tapPane');
-const reflexPane = document.getElementById('reflexPane');
-
-let currentTab = 'home';
-let searchTerm = '';
-
-function setTab(tab){
-  currentTab = tab;
-  [tabHome,tabGym,tabLazy,tabGames].forEach(b=>b.classList.toggle('active', b===(
-    tab==='home'?tabHome:tab==='gym'?tabGym:tab==='lazy'?tabLazy:tabGames
-  )));
-  tabHome.setAttribute('aria-selected', tab==='home');
-  tabGym.setAttribute('aria-selected', tab==='gym');
-  tabLazy.setAttribute('aria-selected', tab==='lazy');
-  tabGames.setAttribute('aria-selected', tab==='games');
-
-  // Reset game panes when switching tabs
-  showGamesHub();
-
-  if(tab==='games'){
-    cards.style.display='none';
-    gamesHub.style.display='grid';
-  } else {
-    gamesHub.style.display='none';
-    cards.style.display='grid';
-    const list = tab==='home' ? LIBRARIES.home : tab==='gym' ? LIBRARIES.gym : LIBRARIES.lazy;
-    renderList(list);
-  }
-}
-tabHome.addEventListener('click', ()=>setTab('home'));
-tabGym.addEventListener('click', ()=>setTab('gym'));
-tabLazy.addEventListener('click', ()=>setTab('lazy'));
-tabGames.addEventListener('click', ()=>setTab('games'));
-
-q.addEventListener('input', ()=>{
-  searchTerm = q.value.toLowerCase();
-  if(currentTab==='games') return;
-  const list = currentTab==='home' ? LIBRARIES.home : currentTab==='gym' ? LIBRARIES.gym : LIBRARIES.lazy;
-  renderList(list);
-});
-
-function renderList(list){
-  const data = !searchTerm ? list : list.filter(item=>{
-    const hay = (item.name+' '+item.muscles.join(' ')+' '+(item.equipment||'')+' '+(item.level||'')).toLowerCase();
-    return hay.includes(searchTerm);
-  });
-  cards.innerHTML = data.map(renderCard).join('');
-}
-function renderCard(ex){
-  return `
-    <article class="card" data-id="${ex.id}">
-      <h3>${ex.name}</h3>
-      <div class="meta">
-        ${ex.level?`<span class="badge">${ex.level}</span>`:''}
-        ${ex.equipment?`<span class="badge">${ex.equipment}</span>`:''}
-        ${ex.setsReps?`<span class="badge">${ex.setsReps}</span>`:''}
-        ${ex.muscles?.length? ex.muscles.slice(0,3).map(m=>`<span class="badge">${m}</span>`).join('') : ''}
-      </div>
-      <details>
-        <summary>Technique steps</summary>
-        <ul>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ul>
-      </details>
-      ${ex.cues?`<details><summary>Coaching cues</summary><ul>${ex.cues.map(c=>`<li>${c}</li>`).join('')}</ul></details>`:''}
-      ${ex.mistakes?`<details><summary>Common mistakes</summary><ul>${ex.mistakes.map(m=>`<li>${m}</li>`).join('')}</ul></details>`:''}
-    </article>
-  `;
-}
-
-/* ===== Games: Hub control ===== */
-const pickTap = document.getElementById('pickTap');
-const pickReflex = document.getElementById('pickReflex');
-const tapBack = document.getElementById('tapBack');
-const reflexBack = document.getElementById('reflexBack');
-
-function showGamesHub(){
-  gamesHub.style.display='grid';
-  tapPane.classList.remove('active'); tapPane.style.display='none';
-  reflexPane.classList.remove('active'); reflexPane.style.display='none';
-  // stop games when leaving pane
-  tapStopGame(); reflexStopGame();
-}
-function showTapGame(){
-  gamesHub.style.display='none';
-  tapPane.style.display='block'; tapPane.classList.add('active');
-  reflexPane.style.display='none'; reflexPane.classList.remove('active');
-}
-function showReflexGame(){
-  gamesHub.style.display='none';
-  reflexPane.style.display='block'; reflexPane.classList.add('active');
-  tapPane.style.display='none'; tapPane.classList.remove('active');
-}
-pickTap.addEventListener('click', showTapGame);
-pickReflex.addEventListener('click', showReflexGame);
-tapBack.addEventListener('click', showGamesHub);
-reflexBack.addEventListener('click', showGamesHub);
-
-/* ========= Tap Sprint (wave-based, “Score” only) ========= */
-const tapArena = document.getElementById('tapArena');
-const tapStart = document.getElementById('tapStart');
-const tapStopBtn  = document.getElementById('tapStop');
-const tapReset = document.getElementById('tapReset');
-const tapStat  = document.getElementById('tapStat');
-
-let tapRunning = false;
-let tapScore = 0;
-let tapTargets = new Map(); // id -> element
-let tapNextId = 1;
-
-function tapUpdateStat(){ tapStat.textContent = `Score: ${tapScore}`; }
-function tapWaveSize(){ return Math.min(5, Math.floor(tapScore / 8) + 1); }
-function tapSpawnWave(){
-  if(!tapRunning) return;
-  if(tapTargets.size > 0) return;
-  SFX.whoosh();
-  const n = tapWaveSize();
-  for(let i=0;i<n;i++) tapSpawnOne();
-}
-function tapSpawnOne(){
-  const id = tapNextId++;
-  const el = document.createElement('button');
-  el.type='button'; el.className='target'; el.textContent='•'; el.setAttribute('aria-label','tap target');
-  const pad = 60, rect = tapArena.getBoundingClientRect();
-  const x = Math.floor(Math.random() * Math.max(1, rect.width  - pad));
-  const y = Math.floor(Math.random() * Math.max(1, rect.height - pad));
-  el.style.left = `${x}px`; el.style.top = `${y}px`;
-  el.dataset.id = String(id);
-  const hit = (e)=>{
-    e.preventDefault(); e.stopPropagation();
-    if(!tapTargets.has(id)) return;
-    tapScore += 1; tapUpdateStat(); SFX.ignite();
-    const node = tapTargets.get(id); tapTargets.delete(id); node?.remove();
-    if(tapRunning && tapTargets.size === 0){ setTimeout(tapSpawnWave, 0); }
-  };
-  el.addEventListener('pointerdown', hit, {passive:false});
-  el.addEventListener('click', hit, {passive:false});
-  tapArena.appendChild(el); tapTargets.set(id, el);
-}
-function tapStartGame(){ if(tapRunning) return; SFX.ensure(); SFX.whoosh(); tapRunning = true; tapSpawnWave(); }
-function tapStopGame(){ tapRunning = false; }
-function tapResetGame(){ tapStopGame(); tapScore = 0; tapUpdateStat(); tapTargets.forEach(n=>n.remove()); tapTargets.clear(); }
-
-tapStart.addEventListener('click', tapStartGame);
-tapStopBtn.addEventListener('click', tapStopGame);
-tapReset.addEventListener('click', tapResetGame);
-tapUpdateStat();
-
-/* ========= Reflex Sprint (tap or swipe; wrong => reset) ========= */
-const reflexArena = document.getElementById('reflexArena');
-const reflexStart = document.getElementById('reflexStart');
-const reflexStopBtn  = document.getElementById('reflexStop');
-const reflexReset = document.getElementById('reflexReset');
-const reflexStat  = document.getElementById('reflexStat');
-const reflexActionEl = document.getElementById('reflexAction');
-
-let reflexRunning = false;
-let reflexScore = 0;
-let currentAction = null; // 'tap','left','right','up','down'
-
-function setActionText(a){
-  reflexActionEl.textContent = a === 'tap' ? 'TAP' : a === 'left' ? '←' : a === 'right' ? '→' : a === 'up' ? '↑' : '↓';
-}
-function nextAction(){
-  const actions = ['tap','left','right','up','down'];
-  currentAction = actions[Math.floor(Math.random()*actions.length)];
-  setActionText(currentAction);
-}
-function reflexUpdate(){ reflexStat.textContent = `Score: ${reflexScore}`; }
-function flashBad(){ reflexArena.classList.add('flashBad'); setTimeout(()=>reflexArena.classList.remove('flashBad'), 150); }
-function failReset(){ reflexScore = 0; reflexUpdate(); flashBad(); SFX.boom(); nextAction(); }
-function success(){ reflexScore += 1; reflexUpdate(); SFX.ignite(); nextAction(); }
-
-function reflexStartGame(){ if(reflexRunning) return; SFX.ensure(); reflexRunning = true; reflexScore = 0; reflexUpdate(); SFX.whoosh(); nextAction(); }
-function reflexStopGame(){ reflexRunning = false; }
-function reflexResetGame(){ reflexStopGame(); reflexScore = 0; reflexUpdate(); currentAction = null; reflexActionEl.textContent = '—'; }
-
-reflexStart.addEventListener('click', reflexStartGame);
-reflexStopBtn.addEventListener('click', reflexStopGame);
-reflexReset.addEventListener('click', reflexResetGame);
-
-/* ----- Mobile-solid gesture handling (phones/tablets) ----- */
-let sx=0, sy=0, st=0, tracking=false;
-const MAX_TIME = 700, MIN_DIST = 35, TAP_MAX_DIST = 14, TAP_MAX_TIME = 300;
-
-/* Get consistent clientX/Y from any event type */
-function getPoint(e, useChanged=false){
-  if (e.changedTouches && e.changedTouches.length && useChanged){
-    return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
-  }
-  if (e.touches && e.touches.length){
-    return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  }
-  return { x: e.clientX, y: e.clientY };
-}
-
-function onReflexDownEvent(e){
-  if(!reflexRunning) return;
-  // prevent page scroll during swipe on iOS Safari
-  if(e.cancelable) e.preventDefault();
-  const p = getPoint(e, false);
-  tracking = true; sx = p.x; sy = p.y; st = performance.now();
-}
-function onReflexUpEvent(e){
-  if(!reflexRunning || !tracking) return;
-  tracking = false;
-  const p = getPoint(e, true);
-  const dx = p.x - sx, dy = p.y - sy, dt = performance.now() - st;
-
-  let input = null;
-  if(dt <= TAP_MAX_TIME && Math.hypot(dx,dy) <= TAP_MAX_DIST){
-    input = 'tap';
-  } else if(dt <= MAX_TIME){
-    if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) >= MIN_DIST){
-      input = dx > 0 ? 'right' : 'left';
-    } else if(Math.abs(dy) >= MIN_DIST){
-      input = dy > 0 ? 'down' : 'up';
-    }
-  }
-
-  if(!input){ failReset(); return; }
-  if(input === currentAction) success(); else failReset();
-}
-
-/* Pointer & mouse (desktop), Touch (phones) */
-reflexArena.addEventListener('pointerdown', onReflexDownEvent, {passive:false});
-reflexArena.addEventListener('mousedown', onReflexDownEvent, {passive:false});
-reflexArena.addEventListener('touchstart', onReflexDownEvent, {passive:false});
-
-/* Listen for “up” on window so lifting outside still counts */
-window.addEventListener('pointerup', onReflexUpEvent, {passive:true});
-window.addEventListener('mouseup', onReflexUpEvent, {passive:true});
-window.addEventListener('touchend', onReflexUpEvent, {passive:true});
-window.addEventListener('touchcancel', onReflexUpEvent, {passive:true});
-window.addEventListener('pointercancel', onReflexUpEvent, {passive:true});
-
-/* ===== KNOW YOURSELF Drawer Controls ===== */
-const drawerKnow = document.getElementById('drawerKnow');
-const scrimKnow = document.getElementById('scrimKnow');
-const openKnow = document.getElementById('openKnow');
-const closeKnow = document.getElementById('closeKnow');
-
-openKnow.addEventListener('click', ()=>{ openDrawer(drawerKnow, scrimKnow); closeKnow.focus(); });
-closeKnow.addEventListener('click', ()=>{ closeDrawer(drawerKnow, scrimKnow); });
-scrimKnow.addEventListener('click', ()=>{ closeDrawer(drawerKnow, scrimKnow); });
-
-/* ===== Init ===== */
-function initialRender(){ setTab('home'); }
-initialRender();
-
-/* ESC closes whichever drawer is open */
-addEventListener('keydown', e=>{
-  if(e.key==='Escape'){
-    if(drawerExercises.classList.contains('show')) closeDrawer(drawerExercises, scrimExercises);
-    if(drawerKnow.classList.contains('show')) closeDrawer(drawerKnow, scrimKnow);
-  }
-});
 </script>
 </body>
 </html>
-
-
-
-
-
-
 
