@@ -28,15 +28,11 @@
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
-
   .nav{display:flex;justify-content:space-between;padding:12px 14px;position:sticky;top:0;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
   .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
   .pill-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
-
   .wrap{padding:22px}
-  .title{text-align:center;font-family:var(--title-font);font-size:clamp(32px,8vw,72px);
-    color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:20px 0}
-
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(32px,8vw,72px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:20px 0}
   .grid{max-width:1000px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
   .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px}
   .btn{width:100%;padding:18px;font-weight:900;border:none;border-radius:16px;cursor:pointer}
@@ -64,7 +60,6 @@
 </div>
 
 <script>
-/* stars bg */
 const stars=document.getElementById('stars'),sctx=stars.getContext('2d');
 function resize(){stars.width=innerWidth;stars.height=innerHeight;}resize();addEventListener('resize',resize);
 const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
@@ -74,3 +69,4 @@ const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math
 </script>
 </body>
 </html>
+
