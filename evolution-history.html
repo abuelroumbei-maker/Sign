@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Evolution • What Has Been</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#3b82f6;--info1:#7dd3fc;--bg1:#0b0d12;--bg2:#0e1320;--tyrian:#66023C;--outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;--body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .bg{position:fixed;inset:0;z-index:-4;background:
+    radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+    radial-gradient(900px 700px at 85% 30%, color-mix(in oklab, var(--info1) 35%, transparent), transparent 60%),
+    linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:-3}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:10px 0 16px}
+  .timeline{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;max-height:44vh;overflow:auto}
+  .node{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px;cursor:pointer;text-align:left}
+  .panel{max-width:980px;margin:12px auto 8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:16px;display:none}
+  .actions{display:flex;gap:10px;align-items:center}.spacer{flex:1}
+  .btn{appearance:none;border:none;border-radius:12px;padding:10px 14px;font-weight:900;cursor:pointer}
+  .btn-primary{background:linear-gradient(90deg,#3b82f6,#60a5fa);color:#0b0d12}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+</style>
+</head>
+<body>
+<div class="bg"></div><canvas id="stars"></canvas>
+<div class="nav"><a class="pill" href="evolution.html">← Evolution</a></div>
+
+<div class="wrap">
+  <h1 class="title">What Has Been</h1>
+
+  <div id="timeline" class="timeline"></div>
+
+  <div id="detail" class="panel">
+    <div id="meta" style="font-size:12px;color:#cbd5e1"></div>
+    <p id="text" style="font-size:18px;margin:.2rem 0 0"></p>
+    <div class="actions" style="margin-top:10px">
+      <button id="btnNext" class="btn btn-primary">EVOLVE</button>
+      <span class="spacer"></span>
+      <button id="btnClose" class="btn btn-ghost">Close</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* stars */
+const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+function resize(){stars.width=innerWidth;stars.height=innerHeight;} resize(); addEventListener('resize',resize);
+const STARS=Array.from({length:140}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
+(function draw(){requestAnimationFrame(draw);sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{s.x+=s.dx*s.z;s.y+=s.dy*s.z;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+
+/* timeline data */
+const EVENTS=[
+  { id:'bigbang',  time:'~13.8 Ga', title:'Big Bang', blurb:'Universe begins expanding.', layers:[
+    'CMB is relic radiation from the early universe.',
+    'Light elements formed minutes after the Big Bang.',
+    'Structure grew from tiny density fluctuations.'
+  ]},
+  { id:'solarsys', time:'~4.6 Ga', title:'Solar System', blurb:'Sun ignites; planets accrete.', layers:[
+    'Inner rocky, outer gas/ice giants across frost line.',
+    'Heavy bombardment cratered early worlds.',
+    'Giant impact likely formed the Moon.'
+  ]},
+  { id:'firstlife', time:'≥3.5 Ga', title:'Earliest Life', blurb:'Microbial oceans.', layers:[
+    'Stromatolites record ancient mats.',
+    'Hydrothermal or shallow chemistries possible origins.',
+    'Oxygenation reshaped atmosphere.'
+  ]},
+  { id:'cambrian', time:'~541 Ma', title:'Cambrian', blurb:'Rapid diversification.', layers:[
+    'Trilobites, anomalocaridids in fossils.',
+    'Predator–prey arms races.',
+    'Most major phyla appear.'
+  ]},
+  { id:'dinos', time:'252–66 Ma', title:'Dinosaurs', blurb:'Mesozoic dominance.', layers:[
+    'Pangaea split into continents.',
+    'Birds from theropods.',
+    'Angiosperms spread in Cretaceous.'
+  ]},
+  { id:'kpg', time:'66 Ma', title:'K–Pg', blurb:'Asteroid mass extinction.', layers:[
+    'Chicxulub impact tossed aerosols.',
+    'Food chains collapsed.',
+    'Mammals diversified later.'
+  ]},
+  { id:'humans', time:'~300 ka', title:'H. sapiens', blurb:'Modern humans emerge.', layers:[
+    'Tools, art, language accelerate.',
+    'Migrations out of Africa.',
+    'Gene flow with Neanderthals/Denisovans.'
+  ]},
+  { id:'ancient', time:'~3000–500 BCE', title:'Ancient Civs', blurb:'Cities, writing, trade.', layers:[
+    'Law codes, monuments.',
+    'Math, astronomy, calendars.',
+    'Long-distance networks.'
+  ]},
+  { id:'middle', time:'~500–1500 CE', title:'Middle Ages', blurb:'Knowledge persisted.', layers:[
+    'Byzantine & Islamic scholarship.',
+    'Universities and innovations.',
+    'Gothic architecture, exchange.'
+  ]},
+  { id:'renaissance', time:'~1300–1600', title:'Renaissance', blurb:'Arts & science bloom.', layers:[
+    'Printing press spreads ideas.',
+    'Heliocentrism challenges dogma.',
+    'Global exploration connects worlds.'
+  ]},
+  { id:'industrial', time:'~1760–1900', title:'Industrial', blurb:'Mechanization & steam.', layers:[
+    'Urbanization and new economies.',
+    'Rail & telegraph compress distance.',
+    'Public health & labor shifts.'
+  ]},
+  { id:'space', time:'~1957–', title:'Space Age', blurb:'Satellites & Moon.', layers:[
+    'Global comms & navigation.',
+    'Robotic exploration.',
+    'Telescopes probe deep space.'
+  ]},
+  { id:'digital', time:'~1970–today', title:'Digital Era', blurb:'Computing & AI.', layers:[
+    'Connectivity & data abundance.',
+    'Automation transforms work.',
+    'Privacy & ethics central.'
+  ]}
+];
+
+/* render timeline */
+const tl=document.getElementById('timeline');
+EVENTS.forEach(e=>{
+  const n=document.createElement('button'); n.className='node';
+  n.innerHTML=`<div style="opacity:.8;font-size:12px">${e.time}</div><div style="font-weight:900">${e.title}</div><p style="margin:.3rem 0 0;opacity:.9">${e.blurb}</p>`;
+  n.onclick=()=>openEvent(e.id); tl.appendChild(n);
+});
+
+/* detail evolve */
+let cur=null, idx=0; const detail=document.getElementById('detail'), meta=document.getElementById('meta'), text=document.getElementById('text');
+function openEvent(id){cur=EVENTS.find(x=>x.id===id);idx=0;render();detail.style.display='block';}
+function render(){meta.textContent=`Layer ${idx+1} of ${cur.layers.length} • ${cur.title}`;text.textContent=cur.layers[idx];
+  document.getElementById('btnNext').disabled=(idx>=cur.layers.length-1);}
+document.getElementById('btnNext').onclick=()=>{if(idx<cur.layers.length-1){idx++;render();}};
+document.getElementById('btnClose').onclick=()=>{detail.style.display='none';};
+</script>
+</body>
+</html>
