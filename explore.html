@@ -42,7 +42,7 @@
          box-shadow:0 0 24px var(--bar-glow); }
   .meta{ margin-top:8px; font-size:13px; color:#9aa4b2; }
 
-  .top-row{ position:absolute; left:12px; top:12px; display:flex; gap:8px; }
+  .top-row{ position:absolute; left:12px; top:12px; display:flex; gap:8px; z-index:10; }
   .btn{ appearance:none; border:0; border-radius:12px; padding:8px 12px; font-weight:800; cursor:pointer; text-decoration:none; color:#0b0d12;
         background:#fff; box-shadow:0 10px 24px rgba(0,0,0,.28); }
 
@@ -57,7 +57,8 @@
   <canvas id="trail"></canvas>
 
   <div class="top-row">
-    <a class="btn" href="index.html">⟵ Home</a>
+    <!-- Back Home button linking to index.html -->
+    <a class="btn" href="./index.html">⟵ Back Home</a>
   </div>
 
   <div class="wrap">
