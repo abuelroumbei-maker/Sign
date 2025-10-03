@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Tried and Liked • Body</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#eef2ff; --muted:#b4c1d9;
+    --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
+    --play2:#06b6d4; --play1:#22c55e; --ink:#0a0b0f;
+    --title-font:"Anton",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+    --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--body-font); color:#fff;
+    background:
+      radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--play2) 35%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--play1) 22%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+  }
+  .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{min-height:100dvh; display:grid; place-items:center; padding:96px 18px 28px}
+  .card{
+    width:min(820px, 92vw);
+    background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22);
+    border-radius:18px; padding:22px; box-shadow:0 16px 32px rgba(0,0,0,.35);
+  }
+  h1{
+    margin:0 0 10px 0; font-family:var(--title-font);
+    font-size:clamp(36px, 9vw, 72px); line-height:0.95; letter-spacing:1px;
+    background: linear-gradient(180deg, #fff 0%, #f5f5f5 40%, #c8facc 90%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  p{margin:0 0 12px 0; color:#e2e8f0; font-weight:600}
+  .empty{
+    margin-top:8px; padding:14px; border-radius:14px;
+    background:rgba(255,255,255,.08); border:1px dashed rgba(255,255,255,.25); color:#cbd5e1;
+  }
+</style>
+</head>
+<body>
+  <div class="nav">
+    <a class="pill" href="body.html">← Back to Body</a>
+    <a class="pill" href="index.html">Home</a>
+  </div>
+
+  <main class="wrap">
+    <section class="card" aria-live="polite">
+      <h1>Tried and Liked</h1>
+      <p>This page is empty for now. Later, we can store workouts, movements, stretches, or games you’ve tried and liked—so they’re easy to find.</p>
+      <div class="empty">No items yet.</div>
+    </section>
+  </main>
+</body>
+</html>
