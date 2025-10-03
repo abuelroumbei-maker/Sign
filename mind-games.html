@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mind • Games</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#3b82f6; --accent2:#bfdbfe; --accent3:#60a5fa;
+    --warn1:#f59e0b; --warn2:#fbbf24;
+    --success1:#10b981; --success2:#34d399;
+    --bg1:#0b0d12; --bg2:#0e1320; --tyrian:#66023C; --outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;
+    --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .bg{position:fixed;inset:0;z-index:-4;background:
+    radial-gradient(1000px 700px at 18% 22%, color-mix(in oklab, var(--accent) 40%, transparent), transparent 60%),
+    radial-gradient(900px 650px at 82% 28%, color-mix(in oklab, var(--accent2) 35%, transparent), transparent 60%),
+    linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:8px 0 18px}
+  .grid{max-width:900px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px}
+  .btn{display:inline-block;width:100%;text-align:center;padding:18px;font-weight:900;border-radius:16px;text-decoration:none;cursor:pointer}
+  .btn-accent{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
+  .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
+  .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+  @media (max-width:480px){.wrap{padding:86px 14px 18px}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+
+<div class="nav"><a class="pill" href="mind.html">← Mind</a></div>
+
+<div class="wrap">
+  <h1 class="title">Mind Games</h1>
+  <div class="grid">
+    <div class="card"><a class="btn btn-accent" href="game-memory.html">Memory Challenge</a></div>
+    <div class="card"><a class="btn btn-success" href="game-quiz.html">Quick Quiz</a></div>
+    <div class="card"><a class="btn btn-warn" href="game-puzzle.html">Logic Puzzle</a></div>
+    <div class="card"><a class="btn btn-accent" href="game-riddle.html">Daily Riddle</a></div>
+  </div>
+</div>
+</body>
+</html>
