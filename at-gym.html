@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>At the Gym • Body</title>
+<meta name="theme-color" content="#0b0d12" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
+    --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
+    --ink:#0a0b0f;
+    --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
+    --play1:#22c55e; --play2:#06b6d4;
+    --title-font:"Anton",sans-serif;
+    --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--body-font); color:#fff;
+    background:linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg3));
+    overflow:auto;
+  }
+
+  /* Header */
+  .wrap{min-height:100dvh; display:grid; place-items:center; padding:80px 18px 28px}
+  .title{
+    margin:0; font-family:var(--title-font);
+    font-size:clamp(48px,12vw,112px); line-height:0.95; text-align:center;
+    background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
+  }
+
+  /* Search bar */
+  .lib-top{display:flex; align-items:center; justify-content:center; margin:16px auto 10px; max-width:680px; width:100%; padding:0 18px}
+  .search{flex:1; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,.14); border-radius:12px; padding:8px 12px}
+  .search input{flex:1; background:transparent; border:none; color:#fff; outline:none; font-weight:700; font-size:14px}
+
+  /* Cards grid */
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:14px; padding:0 18px 28px}
+  .card{background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22); border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px}
+  .card h3{margin:0; font-size:18px; letter-spacing:.2px}
+  .meta{font-size:12px; color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
+  .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:11px}
+  details{border-top:1px dashed rgba(255,255,255,.2); padding-top:8px}
+  details > summary{cursor:pointer; font-weight:800; list-style:none}
+  details > summary::-webkit-details-marker{display:none}
+  ul{margin:.4em 0 .2em 1.1em}
+  li{margin:.2em 0}
+</style>
+</head>
+<body>
+  <!-- Header -->
+  <main class="wrap">
+    <header style="text-align:center">
+      <h1 class="title">At the Gym</h1>
+    </header>
+  </main>
+
+  <!-- Search -->
+  <div class="lib-top">
+    <label class="search" aria-label="Search exercises">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <input id="q" placeholder="Search movement, muscle, equipment…" />
+    </label>
+  </div>
+
+  <!-- Exercise cards -->
+  <div class="grid" id="cards" aria-live="polite"></div>
+
+<script>
+/* ===== Data: original Gym list ===== */
+const LIB_GYM = [
+  { id:"bb-squat", name:"Barbell Back Squat", muscles:["Quads","Glutes","Adductors","Core"], level:"Intermediate", equipment:"Barbell/Rack", setsReps:"3–5 × 3–8",
+    steps:["Bar set just below traps; hands even, elbows under bar.","Unrack, step back, feet shoulder-width, brace hard.","Sit back/down keeping knees tracking; stand through mid-foot."],
+    cues:["Big breath/brace","Knees out","Chest over mid-foot"], mistakes:["Soft brace","Heels popping","Knees collapsing in"] },
+  { id:"bench", name:"Barbell Bench Press", muscles:["Chest","Triceps","Anterior delts"], level:"Intermediate", equipment:"Barbell/Bench", setsReps:"3–5 × 4–8",
+    steps:["Eyes under bar; upper-back set; feet planted.","Lower to lower-sternum with forearms vertical.","Press back/up; keep shoulder blades retracted."],
+    cues:["Row it down","Press the floor","No bounce"], mistakes:["Elbow flare","Loose upper back","Bouncing off chest"] },
+  { id:"latpd", name:"Lat Pulldown", muscles:["Lats","Biceps","Mid-back"], level:"Beginner+", equipment:"Pulldown machine", setsReps:"3–4 × 8–12",
+    steps:["Set thigh pad; grasp bar slightly wider than shoulders.","Pull elbows to ribs/chest up; pause near collarbone.","Control the return to full stretch without shrugging."],
+    cues:["Elbows in pockets","Chest tall","Lead with lats"], mistakes:["Leaning way back","Half reps","Shrugging neck"] },
+  { id:"cable-row", name:"Seated Cable Row", muscles:["Lats","Rhomboids","Rear delts","Biceps"], level:"Beginner", equipment:"Cable/Row", setsReps:"3–4 × 8–12",
+    steps:["Neutral spine, chest tall, shoulders down/back.","Pull handle to lower ribs; pause; return with control.","Keep wrists neutral; avoid excessive lean."],
+    cues:["Pull with elbows","Squeeze shoulder blades","Stay tall"], mistakes:["Shrugging","Rounding lower back","Using momentum"] }
+];
+
+/* ===== Search + render ===== */
+let searchTerm = '';
+const q = document.getElementById('q');
+const cards = document.getElementById('cards');
+
+function renderList(list){
+  const data = !searchTerm ? list : list.filter(item=>{
+    const hay = (item.name+' '+item.muscles.join(' ')+' '+(item.equipment||'')+' '+(item.level||'')).toLowerCase();
+    return hay.includes(searchTerm);
+  });
+  cards.innerHTML = data.map(renderCard).join('');
+}
+
+function renderCard(ex){
+  return `
+    <article class="card" data-id="${ex.id}">
+      <h3>${ex.name}</h3>
+      <div class="meta">
+        ${ex.level?`<span class="badge">${ex.level}</span>`:''}
+        ${ex.equipment?`<span class="badge">${ex.equipment}</span>`:''}
+        ${ex.setsReps?`<span class="badge">${ex.setsReps}</span>`:''}
+        ${ex.muscles?.length? ex.muscles.slice(0,3).map(m=>`<span class="badge">${m}</span>`).join('') : ''}
+      </div>
+      <details>
+        <summary>Technique steps</summary>
+        <ul>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ul>
+      </details>
+      ${ex.cues?`<details><summary>Coaching cues</summary><ul>${ex.cues.map(c=>`<li>${c}</li>`).join('')}</ul></details>`:''}
+      ${ex.mistakes?`<details><summary>Common mistakes</summary><ul>${ex.mistakes.map(m=>`<li>${m}</li>`).join('')}</ul></details>`:''}
+    </article>
+  `;
+}
+
+q.addEventListener('input', ()=>{
+  searchTerm = q.value.toLowerCase();
+  renderList(LIB_GYM);
+});
+
+/* Initial render */
+renderList(LIB_GYM);
+</script>
+</body>
+</html>
