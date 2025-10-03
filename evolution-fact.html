@@ -1,65 +1,76 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Evolution • Fact Evolution</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="theme-color" content="#0b0d12" />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{--accent:#3b82f6;--accent2:#bfdbfe;--accent3:#60a5fa;--bg1:#0b0d12;--bg2:#0e1320;--outline:#FFD700;--tyrian:#66023C;--body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;--title-font:"Press Start 2P",system-ui}
-  *{box-sizing:border-box}body{margin:0;color:#fff;background:#0b0d12;font-family:var(--body-font);overflow:auto;min-height:100dvh}
+  :root{
+    --accent:#3b82f6;--accent2:#bfdbfe;--accent3:#60a5fa;
+    --bg1:#0b0d12;--bg2:#0e1320;--tyrian:#66023C;--outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;--body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh;overflow:auto}
   .bg{position:fixed;inset:0;z-index:-4;background:
     radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
     radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
     radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
     linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
-  #stars{position:fixed;inset:0;z-index:-3;pointer-events:none}
-  .nav{position:sticky;top:0;z-index:50;display:flex;gap:10px;padding:12px 14px;background:linear-gradient(180deg, rgba(11,13,18,.85), rgba(11,13,18,0))}
-  .pill{display:inline-block;padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-  .wrap{min-height:100%;display:grid;grid-template-rows:auto 1fr;gap:8px;padding:22px}
-  .title{margin:0;text-align:center;font:900 clamp(28px,8.5vw,60px)/1.1 var(--title-font);color:var(--tyrian);-webkit-text-stroke:2px var(--outline)}
-  .subtitle{text-align:center;color:#94a3b8;margin:6px 0 0}
-  .fact-grid{max-width:1120px;margin:18px auto 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;align-content:start}
-  .fact-card{--h:210;position:relative;background:linear-gradient(180deg, hsla(var(--h),80%,60%,.16), hsla(var(--h),80%,40%,.08));border:1px solid hsla(var(--h),85%,70%,.35);border-radius:14px;padding:10px 12px 12px;backdrop-filter:blur(6px);transition:.12s;cursor:pointer;min-height:92px;box-shadow:0 6px 18px hsla(var(--h),80%,50%,.18)}
-  .fact-card:hover{transform:translateY(-2px); box-shadow:0 12px 30px hsla(var(--h),80%,55%,.28)}
-  .fact-title{font-weight:900;margin:0 0 4px 0}
-  .panel{max-width:980px;margin:14px auto 24px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:18px 18px 20px;backdrop-filter:blur(8px);display:none;gap:14px;box-shadow:0 18px 36px rgba(0,0,0,.25)}
-  .btn{appearance:none;border:none;border-radius:14px;padding:14px 18px;font-weight:900;cursor:pointer}
-  .btn-primary{color:#0b0d12;background:linear-gradient(90deg,var(--accent),var(--accent3))}
-  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  #stars{position:fixed;inset:0;pointer-events:none;z-index:-3}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px);z-index:10}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:10px 0 16px}
+  .subtitle{text-align:center;color:#cbd5e1;margin:0 0 10px}
+  .grid{max-width:1120px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+  .card{--h:210;background:linear-gradient(180deg,hsla(var(--h),80%,60%,.16),hsla(var(--h),80%,40%,.08));
+    border:1px solid hsla(var(--h),85%,70%,.35);border-radius:14px;padding:12px;backdrop-filter:blur(6px);box-shadow:0 6px 18px hsla(var(--h),80%,50%,.18);
+    cursor:pointer;transition:.12s}
+  .card:hover{transform:translateY(-2px);box-shadow:0 12px 30px hsla(var(--h),80%,55%,.28)}
+  .card h4{margin:.2rem 0 .35rem}
+  .panel{max-width:980px;margin:16px auto 6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);
+    border-radius:18px;padding:18px;backdrop-filter:blur(8px);display:none;gap:12px}
   .actions{display:flex;gap:12px;align-items:center}.spacer{flex:1}
+  .btn{appearance:none;border:none;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-primary{background:linear-gradient(90deg,#3b82f6,#60a5fa);color:#0b0d12}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
 </style>
 </head>
 <body>
 <div class="bg"></div><canvas id="stars"></canvas>
-<div class="nav">
-  <a class="pill" href="evolution.html">← Evolution</a>
-  <a class="pill" href="index.html">Home</a>
-</div>
+<div class="nav"><a class="pill" href="evolution.html">← Evolution</a></div>
+
 <div class="wrap">
   <h1 class="title">Fact Evolution</h1>
-  <p class="subtitle">Pick a card to begin; press EVOLVE to go deeper.</p>
-  <div class="fact-grid" id="factGrid"></div>
-  <div class="panel" id="evoPanel">
-    <div id="evoMeta" style="color:#cbd5e1;font-size:12px"></div>
-    <p id="evoText" style="font-size:18px;margin:0"></p>
+  <p class="subtitle">Tap a card, then press EVOLVE to go deeper.</p>
+
+  <div id="factGrid" class="grid"></div>
+
+  <div id="panel" class="panel">
+    <div id="meta" style="font-size:12px;color:#cbd5e1"></div>
+    <p id="text" style="font-size:18px;margin:0"></p>
     <div class="actions">
-      <button class="btn btn-primary" id="btnDeeper">EVOLVE</button>
+      <button id="btnNext" class="btn btn-primary">EVOLVE</button>
       <span class="spacer"></span>
-      <button class="btn btn-ghost" id="btnClose">Close</button>
+      <button id="btnClose" class="btn btn-ghost">Close</button>
     </div>
   </div>
 </div>
-<script>
-const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
-function resize(){ stars.width=innerWidth; stars.height=innerHeight; } resize(); addEventListener('resize',resize);
-const STARS=Array.from({length:140}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
-(function draw(){ requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
-  STARS.forEach(s=>{ s.x+=s.dx*s.z; s.y+=s.dy*s.z; if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
-    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);})})();
 
-const FACTS = [
+<script>
+/* stars */
+const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+function resize(){stars.width=innerWidth;stars.height=innerHeight;} resize(); addEventListener('resize',resize);
+const STARS=Array.from({length:140}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
+(function draw(){requestAnimationFrame(draw);sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{s.x+=s.dx*s.z;s.y+=s.dy*s.z;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+
+/* data */
+const FACTS=[
   {id:"sahara",title:"Sahara Desert",layers:[
     "The Sahara is the largest hot desert on Earth.",
     "It spans about 9 million km² across North Africa.",
@@ -76,23 +87,30 @@ const FACTS = [
     "Acidity (~pH 3–4.5) and hydrogen peroxide help preservation.",
     "Archaeologists have found edible honey in ancient tombs."]}
 ];
-const factGrid=document.getElementById('factGrid');
+
+/* render cards */
+const hues=[200,265,150,15,330,185,95,40,280,125,355,210];
+const grid=document.getElementById('factGrid');
 FACTS.forEach((f,i)=>{
-  const hues=[200,265,150,15,330,185,95,40,280,125,355,210];
-  const h=hues[i%hues.length];
-  const el=document.createElement('button'); el.className='fact-card'; el.style.setProperty('--h',h);
-  el.innerHTML=`<div class="fact-title">${f.title}</div><p style="margin:0;color:#dbe7ff;font-size:12.5px">${f.layers[0]}</p>`;
-  el.onclick=()=>open(f);
-  factGrid.appendChild(el);
+  const el=document.createElement('button'); el.className='card'; el.style.setProperty('--h',hues[i%hues.length]);
+  el.innerHTML=`<h4>${f.title}</h4><p style="margin:0;color:#dbe7ff;font-size:12.6px">${f.layers[0]}</p>`;
+  el.onclick=()=>openFact(f);
+  grid.appendChild(el);
 });
-let current=null, idx=0; const panel=document.getElementById('evoPanel'), meta=document.getElementById('evoMeta'), text=document.getElementById('evoText');
-function open(f){ current=f; idx=0; render(); panel.style.display='grid'; }
-function render(){ meta.textContent=`Layer ${idx+1} of ${current.layers.length} • ${current.title}`; text.textContent=current.layers[idx]; document.getElementById('btnDeeper').disabled=(idx>=current.layers.length-1);}
-document.getElementById('btnDeeper').onclick=()=>{ if(idx<current.layers.length-1){ idx++; render(); chime(); } };
-document.getElementById('btnClose').onclick=()=>{ panel.style.display='none'; };
-function chime(){ const AC=window.AudioContext||window.webkitAudioContext; const ctx=new AC(); const o=ctx.createOscillator(), g=ctx.createGain(), now=ctx.currentTime;
-  o.type='triangle'; o.frequency.setValueAtTime(620,now); g.gain.setValueAtTime(0.16,now);
-  g.gain.exponentialRampToValueAtTime(0.0001,now+0.25); o.connect(g).connect(ctx.destination); o.start(now); o.stop(now+0.26); }
+
+/* evolve panel */
+let cur=null, idx=0;
+const panel=document.getElementById('panel'), meta=document.getElementById('meta'), text=document.getElementById('text');
+function openFact(f){cur=f;idx=0;render();panel.style.display='grid';}
+function render(){meta.textContent=`Layer ${idx+1} of ${cur.layers.length} • ${cur.title}`;text.textContent=cur.layers[idx];
+  document.getElementById('btnNext').disabled=(idx>=cur.layers.length-1);}
+document.getElementById('btnNext').onclick=()=>{if(idx<cur.layers.length-1){idx++;render();chime();}};
+document.getElementById('btnClose').onclick=()=>{panel.style.display='none';};
+
+/* sfx */
+function chime(){const AC=window.AudioContext||window.webkitAudioContext;const ctx=new AC();const o=ctx.createOscillator(),g=ctx.createGain(),t=ctx.currentTime;
+  o.type='triangle';o.frequency.setValueAtTime(620,t);g.gain.setValueAtTime(0.16,t);g.gain.exponentialRampToValueAtTime(0.0001,t+.25);
+  o.connect(g).connect(ctx.destination);o.start(t);o.stop(t+.26);}
 </script>
 </body>
 </html>
