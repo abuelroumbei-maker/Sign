@@ -9,55 +9,123 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
 <style>
-  /* === Keep all your original styles === */
   :root{
     --fg:#eef2ff; --muted:#b4c1d9; --card:#ffffffee;
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
     --ink:#0a0b0f;
-    --muscle1:#8b1d2c; --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
+    --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
     --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
-    --title-font: "Anton", sans-serif;
-    --body-font: ui-rounded, system-ui, sans-serif;
+    --title-font:"Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+    --safe-top: env(safe-area-inset-top, 16px);
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+    --pad: clamp(12px, 3vw, 18px);
+    --maxw: min(1100px, 96vw);
   }
-  body{margin:0;font-family:var(--body-font);color:#fff;background:linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg3));overflow:auto}
-  .nav{position:fixed;left:16px;top:16px;z-index:5} /* now empty */
-  .wrap{min-height:100dvh;display:grid;place-items:center;padding:80px 18px 160px}
-  .title{margin:0;font-family:var(--title-font);font-size:clamp(48px,12vw,112px);text-align:center;color:#fff}
-  /* CTA buttons row */
-  .ctaRow{
-    position:fixed; left:50%; transform:translateX(-50%);
-    bottom:calc(18px + env(safe-area-inset-bottom,16px)); z-index:4;
-    display:grid; grid-template-columns:repeat(2,1fr); gap:10px;
-    width:min(720px,94vw);
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--body-font); color:#fff;
+    background:
+      radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--play2) 35%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--play1) 28%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+    overflow:auto; -webkit-tap-highlight-color:transparent;
   }
-  @media(max-width:560px){.ctaRow{grid-template-columns:1fr}}
+
+  /* Back to Body */
+  .nav{position:fixed; left:var(--pad); top:var(--safe-top); z-index:10}
+  .pill{
+    display:inline-block; padding:10px 14px; border-radius:999px;
+    background:#ffffffdd; color:#0a0b0f; font-weight:800; text-decoration:none;
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
+  }
+
+  /* Header (de-emphasized; buttons are the star) */
+  .wrap{
+    min-height:28vh; display:grid; place-items:center;
+    padding:calc(72px + var(--safe-top)) var(--pad) 0;
+  }
+  .title{
+    margin:0; font-family:var(--title-font);
+    font-size:clamp(28px, 7vw, 56px); line-height:1; text-align:center; letter-spacing:.5px;
+    background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
+  }
+
+  /* Primary hub (focus on the buttons) */
+  .hub{
+    position:relative; margin:12px auto 22px; max-width:var(--maxw); padding:0 var(--pad);
+  }
+  .hint{
+    margin:0 0 10px 0; color:#e2e8f0; opacity:.9; font-weight:700; font-size:clamp(13px, 3.4vw, 14px);
+    text-align:center;
+  }
+  .ctaGrid{
+    display:grid; gap:12px;
+    grid-template-columns:repeat(2,1fr);
+  }
+  @media (max-width:560px){ .ctaGrid{grid-template-columns:1fr} }
+
   .cta{
-    background:linear-gradient(90deg,var(--play2),var(--play1));
-    color:var(--ink); border:none; padding:16px 18px; font-weight:900;
-    border-radius:18px; box-shadow:0 12px 28px rgba(0,0,0,.35);
-    cursor:pointer; text-align:center; text-decoration:none;
+    display:flex; align-items:center; justify-content:center; text-decoration:none; text-align:center;
+    padding:16px 18px; border-radius:18px; font-weight:900; letter-spacing:.3px;
+    color:var(--ink); background:linear-gradient(90deg, var(--play2), var(--play1));
+    box-shadow:0 12px 28px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.5);
+    transition:transform .06s ease;
   }
+  .cta:active{ transform:translateY(1px) }
+
+  /* Optional secondary area to host your original drawers/tabs/games */
+  .content{
+    margin:18px auto 28px; max-width:var(--maxw); padding:0 var(--pad);
+  }
+  .contentCard{
+    background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22);
+    border-radius:18px; padding:14px; box-shadow:0 12px 28px rgba(0,0,0,.28);
+  }
+  .content h2{
+    margin:0 0 8px 0; font-size:clamp(16px, 4.2vw, 20px); font-weight:900; color:#e5e7eb;
+  }
+  .content p{margin:0; color:#cbd5e1; font-weight:600; font-size:clamp(13px, 3.4vw, 14px)}
 </style>
 </head>
 <body>
-  <!-- Top nav now empty -->
-  <div class="nav"></div>
-
-  <!-- Main header -->
-  <main class="wrap">
-    <header style="text-align:center">
-      <h1 class="title">Exercises</h1>
-    </header>
-  </main>
-
-  <!-- Bottom buttons -->
-  <div class="ctaRow">
-    <a class="cta" href="at-home.html">At Home</a>
-    <a class="cta" href="outside.html">Outside</a>
-    <a class="cta" href="at-gym.html">At the Gym</a>
-    <a class="cta" href="train-now.html">Train Now</a>
+  <!-- Back to Body -->
+  <div class="nav">
+    <a class="pill" href="body.html">← Back to Body</a>
   </div>
 
-  <!-- === Keep all your original drawers, tabs, games, scripts here === -->
+  <!-- Compact header -->
+  <main class="wrap" aria-hidden="true">
+    <h1 class="title">Exercises</h1>
+  </main>
+
+  <!-- Primary hub (buttons first) -->
+  <section class="hub" aria-label="Exercise Destinations">
+    <p class="hint">Pick where you want to train:</p>
+    <div class="ctaGrid">
+      <a class="cta" href="at-home.html">At Home</a>
+      <a class="cta" href="outside.html">Outside</a>
+      <a class="cta" href="at-gym.html">At the Gym</a>
+      <a class="cta" href="train-now.html">Train Now</a>
+    </div>
+  </section>
+
+  <!-- Your original detailed content goes here (left exactly as-is) -->
+  <section class="content" aria-label="Details">
+    <div class="contentCard">
+      <h2>Details & Tools</h2>
+      <p>Place your original drawers, tabs, games, and scripts here unchanged. This section simply provides a neat container.</p>
+      <!-- === KEEP all your original drawers, tabs, games, and scripts BELOW === -->
+      <!--
+        e.g. Drawers markup, search, grids, game panes, and your <script> block.
+        None of that code needs to be modified; just paste it here.
+      -->
+    </div>
+  </section>
 </body>
 </html>
+
