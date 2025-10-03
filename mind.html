@@ -20,25 +20,46 @@
   *{box-sizing:border-box}
   body{margin:0;font-family:var(--body-font);color:#fff;background:#0b0d12;overflow:auto;min-height:100dvh}
   .bg{position:fixed; inset:0; z-index:-4;
-    background:radial-gradient(1100px 700px at 15% 20%, var(--accent) 45%, transparent 60%),
-               radial-gradient(1000px 700px at 85% 30%, var(--accent2) 45%, transparent 60%),
-               radial-gradient(900px 700px at 40% 90%, var(--accent3) 35%, transparent 60%),
-               linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
+    background:
+      radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+      radial-gradient(1000px 700px at 85% 30%, color-mix(in oklab, var(--accent2) 45%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--accent3) 35%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg1));
     animation:bgDrift 20s ease-in-out infinite alternate;
   }
   @keyframes bgDrift{from{transform:translateX(0)} to{transform:translateX(-1.6%)}}
   #stars{position:fixed; inset:0; pointer-events:none; z-index:-3}
-  .nav{display:flex;justify-content:space-between;padding:12px 14px;position:sticky;top:0;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+
+  /* header */
+  .nav{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;position:sticky;top:0;background:rgba(11,13,18,.8);backdrop-filter:blur(2px);z-index:10}
   .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
   .pill-ghost{background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.16)}
+
+  /* layout */
   .wrap{padding:22px}
   .title{text-align:center;font-family:var(--title-font);font-size:clamp(32px,8vw,72px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:20px 0}
   .grid{max-width:1000px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
   .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:14px}
-  .btn{width:100%;padding:18px;font-weight:900;border:none;border-radius:16px;cursor:pointer}
+  .btn{width:100%;padding:18px;font-weight:900;border:none;border-radius:16px;cursor:pointer;transition:transform .08s ease, box-shadow .1s ease}
+  .btn:active{transform:translateY(1px)}
   .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
   .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
   .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+
+  /* sub-panel revealed by "Check" */
+  .subpanel{
+    margin-top:10px; padding:12px;
+    background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.14);
+    border-radius:12px; display:none;
+  }
+  .subgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+  .subpanel a{text-decoration:none}
+
+  @media (max-width:480px){
+    .wrap{padding:86px 14px 18px}
+    .title{-webkit-text-stroke:1px var(--outline);font-size:clamp(26px,9.5vw,44px)}
+    .btn{padding:16px 18px;font-size:15px}
+  }
 </style>
 </head>
 <body>
@@ -52,21 +73,50 @@
 
 <div class="wrap">
   <h1 class="title">Mind</h1>
+
   <div class="grid">
-    <div class="card"><a href="evolution.html"><button class="btn btn-primary">Evolution</button></a></div>
-    <div class="card"><a href="mind-fact-checker.html"><button class="btn btn-success">Fact checker</button></a></div>
-    <div class="card"><a href="mind-grownup.html"><button class="btn btn-warn">Grown up responsibility</button></a></div>
+    <!-- Evolution -->
+    <div class="card">
+      <a href="evolution.html"><button class="btn btn-primary">Evolution</button></a>
+    </div>
+
+    <!-- Check (expands inline options) -->
+    <div class="card" id="checkCard">
+      <button class="btn btn-success" id="btnCheck">Check</button>
+      <div class="subpanel" id="checkPanel" aria-hidden="true">
+        <div class="subgrid">
+          <a href="mind-fact-checker.html"><button class="btn btn-success">Fact Checker</button></a>
+          <a href="fact-dictionary.html"><button class="btn btn-primary">Dictionary of the World</button></a>
+          <a href="fact-conspiracies.html"><button class="btn btn-warn">Fun Conspiracy Theories</button></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grown up responsibility -->
+    <div class="card">
+      <a href="mind-grownup.html"><button class="btn btn-warn">Grown up responsibility</button></a>
+    </div>
   </div>
 </div>
 
 <script>
-const stars=document.getElementById('stars'),sctx=stars.getContext('2d');
-function resize(){stars.width=innerWidth;stars.height=innerHeight;}resize();addEventListener('resize',resize);
+/* stars bg */
+const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
+function resize(){ stars.width=innerWidth; stars.height=innerHeight; } resize(); addEventListener('resize',resize);
 const STARS=Array.from({length:160}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
-(function draw(){requestAnimationFrame(draw);sctx.clearRect(0,0,stars.width,stars.height);
-  STARS.forEach(s=>{s.x+=s.dx*s.z;s.y+=s.dy*s.z;if(s.x<0)s.x+=stars.width;if(s.x>stars.width)s.x-=stars.width;if(s.y<0)s.y+=stars.height;if(s.y>stars.height)s.y-=stars.height;
-    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`;sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+(function draw(){ requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
+  STARS.forEach(s=>{ s.x+=s.dx*s.z; s.y+=s.dy*s.z;
+    if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width; if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
+    sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z); }); })();
+
+/* toggle subpanel */
+const btnCheck=document.getElementById('btnCheck');
+const panel=document.getElementById('checkPanel');
+btnCheck.addEventListener('click', ()=>{
+  const open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  panel.setAttribute('aria-hidden', open ? 'true':'false');
+});
 </script>
 </body>
 </html>
-
