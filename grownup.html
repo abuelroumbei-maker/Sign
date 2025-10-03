@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grown up responsibility</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --warn1:#f59e0b; --warn2:#fbbf24;
+    --accent:#3b82f6; --accent3:#60a5fa;
+    --success1:#10b981; --success2:#34d399;
+    --bg1:#0b0d12; --bg2:#0e1320; --tyrian:#66023C; --outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif;
+    --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .bg{position:fixed;inset:0;z-index:-4;background:
+    radial-gradient(1000px 700px at 18% 22%, color-mix(in oklab, var(--warn2) 35%, transparent), transparent 60%),
+    radial-gradient(900px 650px at 82% 28%, color-mix(in oklab, var(--accent3) 30%, transparent), transparent 60%),
+    linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+
+  .wrap{padding:22px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,60px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:8px 0 18px}
+  .grid{max-width:1000px;margin:0 auto;display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+  .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:16px;display:grid;gap:10px}
+  .card h3{margin:.2rem 0 .2rem}
+  .muted{color:#cbd5e1;font-size:13px}
+  .btn{display:inline-block;width:100%;text-align:center;padding:14px 16px;font-weight:900;border-radius:14px;text-decoration:none;cursor:pointer}
+  .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+  .btn-accent{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
+  .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
+
+  @media (max-width:480px){.wrap{padding:86px 14px 18px}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="nav"><a class="pill" href="mind.html">← Mind</a></div>
+
+<div class="wrap">
+  <h1 class="title">Grown up responsibility</h1>
+
+  <div class="grid">
+    <!-- Budgeting -->
+    <div class="card">
+      <h3>Budgeting</h3>
+      <p class="muted">Track income, expenses, and savings goals.</p>
+      <a class="btn btn-warn" href="#">Open Budget</a>
+    </div>
+
+    <!-- Tasks & Routines -->
+    <div class="card">
+      <h3>Tasks & Routines</h3>
+      <p class="muted">Daily/weekly habits and to-dos to keep life tidy.</p>
+      <a class="btn btn-accent" href="#">Open Tasks</a>
+    </div>
+
+    <!-- Documents & Renewals -->
+    <div class="card">
+      <h3>Documents & Renewals</h3>
+      <p class="muted">IDs, licenses, subscriptions, and renewal dates.</p>
+      <a class="btn btn-success" href="#">Open Vault</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>
