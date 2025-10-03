@@ -14,72 +14,134 @@
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
     --ink:#0a0b0f;
     --muscle2:#c53030; --muscle3:#e07a7a; --muscleHi:#f9c2c2;
-    --play1:#22c55e; --play2:#06b6d4;
+    --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
     --title-font:"Anton",sans-serif;
     --body-font:ui-rounded,system-ui,sans-serif;
-  }
-  body{margin:0;font-family:var(--body-font);color:#fff;
-    background:linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg3));
-  }
-  .wrap{min-height:100dvh;display:grid;place-items:center;padding:80px 18px 160px}
-  .title{margin:0;font-family:var(--title-font);font-size:clamp(48px,12vw,112px);text-align:center;color:#fff}
 
-  .lib-top{display:flex;align-items:center;justify-content:center;margin:20px auto;max-width:640px;width:100%}
-  .search{flex:1;display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border-radius:12px;padding:8px 12px}
-  .search input{flex:1;background:transparent;border:none;color:#fff;outline:none;font-weight:700;font-size:14px}
+    --safe-top: env(safe-area-inset-top, 16px);
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+    --pad: clamp(12px, 3vw, 18px);
+    --maxw: min(1100px, 96vw);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; font-family:var(--body-font); color:#fff;
+    background:
+      radial-gradient(1200px 800px at 15% 20%, color-mix(in oklab, var(--play2) 35%, transparent), transparent 60%),
+      radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--play1) 22%, transparent), transparent 60%),
+      linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
+    -webkit-tap-highlight-color: transparent;
+  }
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;padding:0 18px}
-  .card{background:rgba(255,255,255,.10);border:1.5px solid rgba(255,255,255,.22);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px}
-  .card h3{margin:0;font-size:18px;letter-spacing:.2px}
-  .meta{font-size:12px;color:#cbd5e1;display:flex;flex-wrap:wrap;gap:8px}
-  .badge{background:#ffffff;color:#0a0b0f;border-radius:999px;padding:2px 8px;font-weight:900;font-size:11px}
-  details{border-top:1px dashed rgba(255,255,255,.2);padding-top:8px}
-  details > summary{cursor:pointer;font-weight:800;list-style:none}
+  /* Back button */
+  .nav{position:fixed; left:var(--pad); top:var(--safe-top); z-index:10}
+  .pill{
+    display:inline-block; padding:10px 14px; border-radius:999px;
+    background:#ffffffdd; color:#0a0b0f; font-weight:800; text-decoration:none;
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
+  }
+
+  /* Compact header (content-first) */
+  .wrap{
+    min-height:24vh; display:grid; place-items:center;
+    padding:calc(72px + var(--safe-top)) var(--pad) 0;
+  }
+  .title{
+    margin:0; font-family:var(--title-font);
+    font-size:clamp(28px, 7vw, 56px); line-height:1; text-align:center; letter-spacing:.5px;
+    background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
+  }
+
+  /* Top controls: segment + search + count */
+  .controls{
+    position:sticky; top:calc(10px + var(--safe-top));
+    display:grid; gap:10px; margin:12px auto; padding:0 var(--pad) 8px;
+    max-width:var(--maxw); z-index:5;
+    backdrop-filter:saturate(1.1) blur(6px);
+  }
+  .seg{
+    display:inline-flex; background:rgba(255,255,255,.14); border-radius:12px; padding:4px;
+    width:100%; justify-content:center; gap:6px;
+  }
+  .seg button{
+    border:none; background:transparent; color:#e2e8f0;
+    padding:10px 14px; border-radius:10px; font-weight:900; cursor:pointer;
+  }
+  .seg button.active{background:#ffffff; color:#0a0b0f}
+
+  .search{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.14); border-radius:12px; padding:10px 12px;
+  }
+  .search input{
+    flex:1; background:transparent; border:none; color:#fff; outline:none;
+    font-weight:700; font-size:clamp(14px, 3.8vw, 15px);
+  }
+  .metaRow{
+    display:flex; align-items:center; justify-content:space-between; color:#cbd5e1;
+    font-size:clamp(12px, 3.2vw, 13px);
+  }
+
+  /* Cards grid */
+  .grid{
+    display:grid; gap:14px; margin:0 auto 28px; padding:0 var(--pad);
+    max-width:var(--maxw);
+    grid-template-columns:repeat(auto-fill, minmax(clamp(240px, 46vw, 320px), 1fr));
+  }
+  .card{
+    background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22);
+    border-radius:18px; padding:12px; display:flex; flex-direction:column; gap:10px;
+    box-shadow:0 10px 22px rgba(0,0,0,.28);
+  }
+  .card h3{margin:0; font-size:clamp(16px, 4.2vw, 18px); letter-spacing:.2px}
+  .meta{font-size:clamp(11px, 3.3vw, 12px); color:#cbd5e1; display:flex; flex-wrap:wrap; gap:8px}
+  .badge{background:#ffffff; color:#0a0b0f; border-radius:999px; padding:2px 8px; font-weight:900; font-size:inherit}
+  details{border-top:1px dashed rgba(255,255,255,.2); padding-top:8px}
+  details > summary{cursor:pointer; font-weight:800; list-style:none}
   details > summary::-webkit-details-marker{display:none}
   ul{margin:.4em 0 .2em 1.1em}
   li{margin:.2em 0}
-
-  /* Bottom buttons */
-  .ctaRow{
-    position:fixed;left:50%;transform:translateX(-50%);
-    bottom:calc(18px + env(safe-area-inset-bottom,16px));z-index:4;
-    display:grid;grid-template-columns:1fr 1fr;gap:10px;width:min(720px,94vw)
-  }
-  @media(max-width:560px){.ctaRow{grid-template-columns:1fr}}
-  .cta{
-    background:linear-gradient(90deg,var(--play2),var(--play1));
-    color:var(--ink);border:none;padding:16px 18px;font-weight:900;
-    border-radius:18px;box-shadow:0 12px 28px rgba(0,0,0,.35);
-    cursor:pointer;text-align:center;text-decoration:none;
-  }
 </style>
 </head>
 <body>
-  <main class="wrap">
-    <header style="text-align:center">
-      <h1 class="title">At Home</h1>
-    </header>
+  <!-- Back to Exercises -->
+  <div class="nav">
+    <a class="pill" href="exercises.html">← Back to Exercises</a>
+  </div>
+
+  <!-- Compact header -->
+  <main class="wrap" aria-hidden="true">
+    <h1 class="title">At Home</h1>
   </main>
 
-  <!-- Search -->
-  <div class="lib-top">
-    <label class="search">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/></svg>
+  <!-- Top controls (toggle + search + result count) -->
+  <section class="controls" aria-label="Filters">
+    <div class="seg" role="tablist" aria-label="Section">
+      <button id="btnHome" role="tab" aria-selected="true" class="active">Exercises</button>
+      <button id="btnLazy" role="tab" aria-selected="false">Lazy Gains</button>
+    </div>
+
+    <label class="search" aria-label="Search exercises">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M21 21l-4.2-4.2M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" stroke="white" stroke-opacity=".8" stroke-width="2" stroke-linecap="round"/>
+      </svg>
       <input id="q" placeholder="Search movement, muscle, equipment…" />
     </label>
-  </div>
 
-  <!-- Exercises grid -->
+    <div class="metaRow">
+      <span id="modeLabel">Showing: Exercises</span>
+      <span id="countLabel">0 items</span>
+    </div>
+  </section>
+
+  <!-- Cards -->
   <div class="grid" id="cards" aria-live="polite"></div>
 
-  <!-- Bottom buttons -->
-  <div class="ctaRow">
-    <button class="cta" id="showHome">Exercises</button>
-    <button class="cta" id="showLazy">Lazy Gains</button>
-  </div>
-
 <script>
-/* ===== Data (At Home + Lazy Gains) ===== */
+/* ===== Data (At Home + Lazy Gains) — same content as before ===== */
 const LIBRARIES = {
   home: [
     { id:"pushup", name:"Push-Up", muscles:["Chest","Triceps","Core"], level:"Beginner+", equipment:"Bodyweight", setsReps:"3–4 × 6–12",
@@ -87,29 +149,44 @@ const LIBRARIES = {
       cues:["Squeeze glutes","Screw palms into floor","Exhale as you press"], mistakes:["Elbows flaring wide","Sagging hips","Head jutting forward"] },
     { id:"squat-bw", name:"Bodyweight Squat", muscles:["Quads","Glutes","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3–4 × 10–15",
       steps:["Feet shoulder-width, sit hips back/down.","Knees track over toes, chest tall.","Drive mid-foot to stand."],
-      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"], mistakes:["Heels lifting","Knees caving in"] }
+      cues:["Knees track with toes","Weight mid-foot","Brace before each rep"], mistakes:["Heels lifting","Knees caving in"] },
+    { id:"glute-bridge", name:"Glute Bridge", muscles:["Glutes","Hamstrings","Core"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 12–15 (1–2s squeeze top)",
+      steps:["Heels close to glutes, ribs down, pelvis neutral.","Drive through heels to lift hips; squeeze glutes at top.","Lower under control; avoid over-arching lower back."],
+      cues:["Exhale into brace","Posterior pelvic tilt","Big toe/heel contact"], mistakes:["Flaring ribs","Pushing off toes","Hyperextending at top"] },
+    { id:"plank", name:"Forearm Plank", muscles:["Core","Glutes","Shoulders"], level:"Beginner", equipment:"Bodyweight", setsReps:"3 × 20–40s",
+      steps:["Elbows under shoulders, forearms parallel.","Squeeze glutes, slight pelvic tuck, ribs down.","Hold straight line from ears to ankles; breathe."],
+      cues:["Crush the floor","Long spine","Soft nasal inhale"], mistakes:["Butt too high/low","Shoulder shrugging","Holding breath"] }
   ],
   lazy: [
-    { id:"toe-curls", name:"Toe Curls", muscles:["Intrinsic foot","Calves"], level:"Super easy", equipment:"Towel", setsReps:"2–3 × 10–20 each foot",
-      steps:["Spread toes, curl towel or floor.","Hold 1s, then release.","Keep ankle neutral."],
-      cues:["Slow squeeze","Full release","Breathe easy"], mistakes:["Cramping from rushing"] },
-    { id:"neck-rolls", name:"Neck Rolls", muscles:["Neck flexors/extensors"], level:"Super easy", equipment:"None", setsReps:"1–2 × 3 slow circles",
-      steps:["Sit tall. Draw small circles with nose.","Switch directions."],
-      cues:["Tiny circles","Relax jaw"], mistakes:["Forcing end-range","Shrugging shoulders"] }
+    { id:"toe-curls", name:"Toe Curls (Seated/Standing)", muscles:["Intrinsic foot","Calves"], level:"Super easy", equipment:"None / Towel", setsReps:"2–3 × 10–20 each foot",
+      steps:["Spread toes, then curl to scrunch a towel or the floor.","Hold 1s, then release and actively spread toes again.","Keep ankle neutral; avoid cramping by easing range."],
+      cues:["Slow squeeze","Full release","Breathe easy"], mistakes:["Cramping from rushing","Ankle rolling in/out"] },
+    { id:"neck-rolls", name:"Neck Rolls (Gentle)", muscles:["Neck flexors/extensors"], level:"Super easy", equipment:"None", setsReps:"1–2 × 3 slow circles each way",
+      steps:["Sit/stand tall. Draw small comfortable circles with nose.","Go slow, pain-free range only.","Switch directions; keep shoulders relaxed."],
+      cues:["Tiny circles","Relax jaw","Easy breath"], mistakes:["Forcing end-range","Shrugging shoulders"] },
+    { id:"shrugs", name:"Shoulder Shrugs", muscles:["Upper traps"], level:"Super easy", equipment:"None", setsReps:"2–3 × 10–15",
+      steps:["Stand tall. Lift shoulders toward ears without craning neck.","Pause 1s at top; lower under control.","Option: add light objects for load."],
+      cues:["Long neck","Even lift","Smooth lower"], mistakes:["Chin jutting","Rolling shoulders excessively"] },
+    { id:"breathing", name:"Deep Breathing (Box/4-7-8)", muscles:["Diaphragm","Parasympathetic"], level:"Super easy", equipment:"None", setsReps:"3–5 cycles",
+      steps:["Nasal inhale 4s → hold 4s → exhale 4s → hold 4s (box).","Or 4-7-8: inhale 4s → hold 7s → exhale 8s.","Keep ribs down, shoulders relaxed, slow & quiet."],
+      cues:["Belly expands 360°","Soft jaw","Long exhale"], mistakes:["Chest-only breathing","Rushing counts"] },
+    { id:"eye-moves", name:"Eye Movement Drills", muscles:["Extraocular muscles"], level:"Super easy", equipment:"None", setsReps:"2–3 × 20–30s",
+      steps:["Keep head still; move eyes: left↔right, up↕down, diagonals.","Finish with smooth circles both ways.","Blink normally; stop if dizzy."],
+      cues:["Slow tracks","Relax face","Blink and breathe"], mistakes:["Straining at extremes","Holding breath"] }
   ]
 };
 
+/* ===== State & DOM ===== */
 let currentTab = 'home';
 let searchTerm = '';
 const q = document.getElementById('q');
 const cards = document.getElementById('cards');
-function renderList(list){
-  const data = !searchTerm ? list : list.filter(item=>{
-    const hay=(item.name+' '+item.muscles.join(' ')+' '+(item.equipment||'')+' '+(item.level||'')).toLowerCase();
-    return hay.includes(searchTerm);
-  });
-  cards.innerHTML=data.map(renderCard).join('');
-}
+const btnHome = document.getElementById('btnHome');
+const btnLazy = document.getElementById('btnLazy');
+const modeLabel = document.getElementById('modeLabel');
+const countLabel = document.getElementById('countLabel');
+
+/* ===== Rendering ===== */
 function renderCard(ex){
   return `
     <article class="card" data-id="${ex.id}">
@@ -118,7 +195,7 @@ function renderCard(ex){
         ${ex.level?`<span class="badge">${ex.level}</span>`:''}
         ${ex.equipment?`<span class="badge">${ex.equipment}</span>`:''}
         ${ex.setsReps?`<span class="badge">${ex.setsReps}</span>`:''}
-        ${ex.muscles?.length?ex.muscles.slice(0,3).map(m=>`<span class="badge">${m}</span>`).join(''):''}
+        ${ex.muscles?.length? ex.muscles.slice(0,3).map(m=>`<span class="badge">${m}</span>`).join('') : ''}
       </div>
       <details><summary>Technique steps</summary><ul>${ex.steps.map(s=>`<li>${s}</li>`).join('')}</ul></details>
       ${ex.cues?`<details><summary>Coaching cues</summary><ul>${ex.cues.map(c=>`<li>${c}</li>`).join('')}</ul></details>`:''}
@@ -126,16 +203,41 @@ function renderCard(ex){
     </article>
   `;
 }
-q.addEventListener('input',()=>{
-  searchTerm=q.value.toLowerCase();
-  const list=currentTab==='home'?LIBRARIES.home:LIBRARIES.lazy;
-  renderList(list);
-});
-document.getElementById('showHome').addEventListener('click',()=>{currentTab='home';renderList(LIBRARIES.home);});
-document.getElementById('showLazy').addEventListener('click',()=>{currentTab='lazy';renderList(LIBRARIES.lazy);});
 
-/* Initial render */
-renderList(LIBRARIES.home);
+function currentList(){
+  return currentTab==='home' ? LIBRARIES.home : LIBRARIES.lazy;
+}
+
+function renderList(){
+  const base = currentList();
+  const data = !searchTerm ? base : base.filter(item=>{
+    const hay = (item.name+' '+item.muscles.join(' ')+' '+(item.equipment||'')+' '+(item.level||'')).toLowerCase();
+    return hay.includes(searchTerm);
+  });
+  cards.innerHTML = data.map(renderCard).join('');
+  countLabel.textContent = `${data.length} item${data.length===1?'':'s'}`;
+}
+
+/* ===== Interactions ===== */
+function setTab(tab){
+  currentTab = tab;
+  btnHome.classList.toggle('active', tab==='home');
+  btnHome.setAttribute('aria-selected', tab==='home');
+  btnLazy.classList.toggle('active', tab==='lazy');
+  btnLazy.setAttribute('aria-selected', tab==='lazy');
+  modeLabel.textContent = `Showing: ${tab==='home' ? 'Exercises' : 'Lazy Gains'}`;
+  renderList();
+}
+
+q.addEventListener('input', ()=>{
+  searchTerm = q.value.toLowerCase();
+  renderList();
+});
+btnHome.addEventListener('click', ()=> setTab('home'));
+btnLazy.addEventListener('click', ()=> setTab('lazy'));
+
+/* ===== Init ===== */
+setTab('home');
 </script>
 </body>
 </html>
