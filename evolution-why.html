@@ -1,47 +1,63 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Evolution • Why?</title>
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="theme-color" content="#0b0d12" />
 <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 <style>
-  :root{--accent:#a78bfa;--bg1:#0b0d12;--bg2:#0e1320;--outline:#FFD700;--tyrian:#66023C;--title-font:"Press Start 2P",system-ui;--body-font:ui-rounded,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
-  *{box-sizing:border-box}html,body{height:100%}
-  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);overflow:auto;min-height:100dvh}
+  :root{
+    --accent:#f59e0b; --accent2:#fbbf24; --bg1:#0b0d12; --bg2:#0e1320;
+    --tyrian:#66023C; --outline:#FFD700;
+    --title-font:"Press Start 2P",system-ui,sans-serif; --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh;display:flex;flex-direction:column}
   .bg{position:fixed;inset:0;z-index:-4;background:
-    radial-gradient(1100px 700px at 15% 20%, color-mix(in oklab,var(--accent) 45%,transparent), transparent 60%),
+    radial-gradient(1000px 700px at 20% 20%, color-mix(in oklab, var(--accent) 45%, transparent), transparent 60%),
+    radial-gradient(900px 600px at 80% 30%, color-mix(in oklab, var(--accent2) 35%, transparent), transparent 60%),
     linear-gradient(120deg,var(--bg1),var(--bg2) 50%,var(--bg1))}
-  #stars{position:fixed;inset:0;z-index:-3;pointer-events:none}
-  .nav{position:sticky;top:0;z-index:50;display:flex;gap:10px;padding:12px 14px;background:linear-gradient(180deg, rgba(11,13,18,.85), rgba(11,13,18,0))}
-  .pill{display:inline-block;padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
-  .wrap{padding:24px;display:grid;gap:16px;max-width:900px;margin:0 auto}
-  h1{margin:.2rem 0 0;text-align:center;font:900 clamp(28px,8.5vw,60px)/1.1 var(--title-font);color:var(--tyrian);-webkit-text-stroke:2px var(--outline)}
-  .panel{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:18px;backdrop-filter:blur(8px)}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px);z-index:10}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px;flex:1;display:grid;place-items:center}
+  .pane{max-width:820px;width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:20px;backdrop-filter:blur(8px);box-shadow:0 12px 28px rgba(0,0,0,.25)}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(28px,8vw,56px);color:var(--tyrian);-webkit-text-stroke:2px var(--outline);margin:0 0 10px}
+  .lead{margin:0 0 14px;text-align:center;color:#cbd5e1}
+  .row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .btn{appearance:none;border:none;border-radius:14px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  .btn-primary{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#251a00}
+  .area{width:100%;min-height:120px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:12px;font:600 14px/1.4 var(--body-font);outline:none}
+  .muted{font-size:12px;color:#9fb3d1;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
-<div class="bg"></div><canvas id="stars"></canvas>
-<div class="nav">
-  <a class="pill" href="evolution.html">← Evolution</a>
-  <a class="pill" href="index.html">Home</a>
-</div>
+<div class="bg"></div>
+
+<div class="nav"><a class="pill" href="evolution.html">← Evolution</a></div>
+
 <div class="wrap">
-  <h1>Why?</h1>
-  <div class="panel">
-    <p style="margin:0;font-size:18px;opacity:.9">Coming soon. This page is a placeholder for your “Why?” ideas. For now, it doesn’t do anything.</p>
+  <div class="pane">
+    <h1 class="title">Why?</h1>
+    <p class="lead">A playground for reasons, causes, and first principles. (Placeholder page)</p>
+
+    <textarea class="area" placeholder="Write a question that starts with 'Why...'?  (e.g., Why do stars twinkle?)"></textarea>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn btn-primary" id="btnSoon">Think it through</button>
+      <a href="evolution.html"><button class="btn btn-ghost">Back</button></a>
+    </div>
+
+    <p class="muted" id="msg">Feature coming soon. This page is intentionally a stub so your navigation works end-to-end.</p>
   </div>
 </div>
+
 <script>
-const stars=document.getElementById('stars'), sctx=stars.getContext('2d');
-function resize(){ stars.width=innerWidth; stars.height=innerHeight; } resize(); addEventListener('resize',resize);
-const STARS=Array.from({length:120}).map(()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,z:Math.random()*1.5+.3,dx:(Math.random()-.5)*0.15,dy:(Math.random()-.5)*0.15}));
-(function draw(){ requestAnimationFrame(draw); sctx.clearRect(0,0,stars.width,stars.height);
-STARS.forEach(s=>{ s.x+=s.dx*s.z; s.y+=s.dy*s.z;
-if(s.x<0)s.x+=stars.width; if(s.x>stars.width)s.x-=stars.width;
-if(s.y<0)s.y+=stars.height; if(s.y>stars.height)s.y-=stars.height;
-sctx.fillStyle=`rgba(255,255,255,${0.25*s.z})`; sctx.fillRect(s.x,s.y,1.2*s.z,1.2*s.z);});})();
+document.getElementById('btnSoon').addEventListener('click',()=>{
+  const msg=document.getElementById('msg');
+  msg.textContent="Brain engaged… but the Why-engine isn’t wired yet. We’ll add logic here when you’re ready.";
+});
 </script>
 </body>
 </html>
