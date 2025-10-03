@@ -7,14 +7,14 @@
 <meta name="theme-color" content="#0b0d12" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
   :root{
     --fg:#eef2ff; --muted:#b4c1d9;
     --bg1:#0b0d12; --bg2:#111a2e; --bg3:#15233b;
     --play2:#06b6d4; --play1:#22c55e; --ink:#0a0b0f;
-    --title-font:"Anton",ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-    --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    --title-font:"Anton",sans-serif;
+    --body-font:"Inter",system-ui,sans-serif;
   }
   *{box-sizing:border-box}
   html,body{height:100%}
@@ -26,7 +26,7 @@
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
   }
   .nav{position:fixed;left:16px;top:16px;display:flex;gap:10px;flex-wrap:wrap}
-  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .pill{display:inline-block;padding:8px 12px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:700;text-decoration:none;font-family:var(--body-font)}
   .wrap{min-height:100dvh; display:grid; place-items:center; padding:96px 18px 28px}
   .card{
     width:min(820px, 92vw);
@@ -49,7 +49,6 @@
 <body>
   <div class="nav">
     <a class="pill" href="body.html">← Back to Body</a>
-    <a class="pill" href="index.html">Home</a>
   </div>
 
   <main class="wrap">
@@ -61,3 +60,4 @@
   </main>
 </body>
 </html>
+
