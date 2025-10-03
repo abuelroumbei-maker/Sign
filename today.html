@@ -44,7 +44,7 @@
   .tag{ display:inline-block; font-size:12px; padding:6px 10px; border-radius:999px; background:linear-gradient(90deg,#e9ecff22,#e5f9ff22); border:1px solid rgba(255,255,255,.18) }
   .meta{ font-size:13px; color:#9aa4b2; margin-top:8px }
 
-  a.back{ position:fixed; left:14px; top:14px; color:#cbd5e1; text-decoration:none; font-weight:800; background:#0f172acc; border:1px solid rgba(255,255,255,.12); padding:8px 10px; border-radius:12px; }
+  a.back{ position:fixed; left:14px; top:14px; color:#cbd5e1; text-decoration:none; font-weight:800; background:#0f172acc; border:1px solid rgba(255,255,255,.12); padding:8px 10px; border-radius:12px; z-index:20; }
 </style>
 </head>
 <body>
@@ -52,7 +52,8 @@
   <canvas id="stars"></canvas>
   <canvas id="trail"></canvas>
 
-  <a class="back" href="./index.html">⟵ Home</a>
+  <!-- Back button (JS computes correct base path for GitHub Pages) -->
+  <a class="back" id="homeLink" href="#">⟵ Home</a>
 
   <div class="wrap">
     <section class="card" id="todayCard" aria-live="polite">
@@ -69,6 +70,22 @@
   </div>
 
 <script>
+/* ====== Robust "Home" routing for GitHub Pages ======
+   - Works for user/organization sites (root '/')
+   - Works for project sites served at '/username/repo/'
+*/
+document.getElementById('homeLink').addEventListener('click', function(e){
+  e.preventDefault();
+  const parts = location.pathname.split('/').filter(Boolean);
+  // If it's a project page, URL looks like /username/repo/... -> base '/username/repo/'
+  let base = '/';
+  if (parts.length >= 2) {
+    base = `/${parts[0]}/${parts[1]}/`;
+  }
+  // Navigate to base (index.html at the site root)
+  window.location.assign(base);
+});
+
 /* ====== Data ====== */
 const SIGNS = [
   { text: "Notice one new thing outside.", explain: "Look for a color, a sound, or a tiny detail you’ve never seen.", tag:"Growth" },
