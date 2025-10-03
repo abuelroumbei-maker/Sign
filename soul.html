@@ -143,8 +143,12 @@
     <h1 class="title">Soul</h1>
 
     <div class="actions" aria-label="Soul actions">
-      <!-- Single centered button: Spirit -->
+      <!-- Existing Spirit button -->
       <a class="btn primary" href="spirit.html" id="btnSpirit">Spirit</a>
+      <!-- New Purpose button -->
+      <a class="btn" href="purpose.html" id="btnPurpose">Purpose</a>
+      <!-- New Windows button -->
+      <a class="btn" href="windows.html" id="btnWindows">Windows</a>
     </div>
   </div>
 
@@ -202,7 +206,6 @@
       const cx = rect.left + rect.width/2;
       const cy = rect.top + rect.height/2;
 
-      // Brief glow intensification (but no positional movement)
       const prev = strengthBtn.style.boxShadow;
       strengthBtn.style.boxShadow =
         '0 0 16px rgba(168,85,247,.9), 0 0 36px rgba(59,130,246,.8), inset 0 0 22px rgba(99,102,241,.6)';
@@ -215,6 +218,7 @@
   </script>
 </body>
 </html>
+
 
 
 
