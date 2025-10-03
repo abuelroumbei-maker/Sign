@@ -17,7 +17,12 @@
     --play1:#22c55e; --play2:#06b6d4; --play3:#f59e0b; --play4:#a78bfa;
     --title-font:"Anton", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     --body-font: ui-rounded, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+    --safe-top: env(safe-area-inset-top, 16px);
+    --safe-bottom: env(safe-area-inset-bottom, 16px);
+    --page-pad: clamp(12px, 3vw, 18px);
   }
+
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
@@ -28,27 +33,48 @@
       radial-gradient(900px 700px at 40% 90%, color-mix(in oklab, var(--play4) 22%, transparent), transparent 60%),
       linear-gradient(120deg, var(--bg1), var(--bg2) 50%, var(--bg3));
     overflow:auto;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Back to Exercises (mobile-friendly pill) */
+  .nav{
+    position:fixed; left:var(--page-pad); top:var(--safe-top); z-index:10;
+  }
+  .pill{
+    display:inline-block; padding:10px 14px; border-radius:999px;
+    background:#ffffffdd; color:#0a0b0f; font-weight:800; text-decoration:none;
+    box-shadow:0 8px 18px rgba(0,0,0,.2);
   }
 
   /* Header */
-  .wrap{min-height:100dvh; display:grid; place-items:center; padding:80px 18px 24px}
+  .wrap{
+    min-height:100dvh; display:grid; place-items:center;
+    padding:calc(70px + var(--safe-top)) var(--page-pad) calc(14px + var(--safe-bottom));
+  }
   .title{
     margin:0; font-family:var(--title-font);
-    font-size:clamp(48px, 12vw, 112px); line-height:0.95; text-align:center; letter-spacing:1px;
+    font-size:clamp(40px, 10vw, 96px); line-height:0.95; text-align:center; letter-spacing:1px;
     background: linear-gradient(180deg, var(--muscleHi), #fff 30%, var(--muscle3) 65%, var(--muscle2) 100%);
     -webkit-background-clip:text; background-clip:text; color:transparent;
     text-shadow:0 2px 0 rgba(0,0,0,.35), 0 8px 24px rgba(139,29,44,.45);
   }
 
-  /* Games hub + panes (same as original) */
-  .gamesHub{display:grid; grid-template-columns:1fr 1fr; gap:12px; max-width:min(1100px, 94vw); margin:18px auto; padding:0 18px}
-  @media (max-width:700px){ .gamesHub{grid-template-columns:1fr} }
+  /* Games hub + panes (unchanged behavior, but more mobile-friendly spacing) */
+  .gamesHub{
+    display:grid; grid-template-columns:1fr 1fr; gap:12px;
+    max-width:min(1100px, 96vw); margin:12px auto;
+    padding:0 var(--page-pad);
+  }
+  @media (max-width:760px){ .gamesHub{grid-template-columns:1fr} }
   .gamePick{
     background:linear-gradient(90deg, var(--play3), var(--play4));
-    color:#0a0b0f; border:none; border-radius:18px; padding:16px; font-weight:900; cursor:pointer;
+    color:#0a0b0f; border:none; border-radius:18px; padding:16px;
+    font-weight:900; cursor:pointer; touch-action:manipulation;
     box-shadow:0 12px 24px rgba(0,0,0,.35);
+    font-size:clamp(14px, 3.5vw, 16px);
   }
-  .gamePane{display:none; max-width:min(1100px, 94vw); margin:0 auto 24px; padding:0 18px}
+
+  .gamePane{display:none; max-width:min(1100px, 96vw); margin:0 auto 18px; padding:0 var(--page-pad)}
   .gamePane.active{display:block}
   .gameCard{
     background:rgba(255,255,255,.10); border:1.5px solid rgba(255,255,255,.22);
@@ -56,17 +82,33 @@
     box-shadow:0 16px 32px rgba(0,0,0,.35);
   }
   .controlsRow{display:flex; flex-wrap:wrap; gap:8px; align-items:center}
-  .btn{border:none; background:#ffffff; color:#0a0b0f; padding:8px 10px; border-radius:10px; font-weight:900; cursor:pointer}
-  .stat{font-weight:800; color:#e2e8f0; margin-left:auto}
-  .arena{position:relative; width:100%; height:420px; background:#0b1220; border:2px solid rgba(255,255,255,.25); border-radius:14px; touch-action:none; user-select:none}
+  .btn{
+    border:none; background:#ffffff; color:#0a0b0f; padding:12px 14px;
+    border-radius:12px; font-weight:900; cursor:pointer; touch-action:manipulation;
+    font-size:clamp(13px, 3.8vw, 14px);
+  }
+  .stat{font-weight:800; color:#e2e8f0; margin-left:auto; font-size:clamp(13px, 3.8vw, 14px)}
+
+  /* Arena: responsive height for phones; keep same behavior */
+  .arena{
+    position:relative; width:100%;
+    height:clamp(320px, 52vh, 480px);
+    background:#0b1220; border:2px solid rgba(255,255,255,.25); border-radius:14px;
+    touch-action:none; user-select:none;
+  }
   .target{position:absolute; width:54px; height:54px; border-radius:999px; background:linear-gradient(180deg, var(--muscle3), var(--muscle2)); border:2px solid #fff; display:grid; place-items:center; font-weight:900; color:#0a0b0f}
-  .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0}
+  .dirHint{display:inline-flex; align-items:center; gap:8px; font-weight:800; color:#e2e8f0; font-size:clamp(13px, 3.8vw, 14px)}
   .arrow{display:inline-block; padding:2px 8px; border-radius:8px; background:#ffffff; color:#0a0b0f; font-weight:900}
   .swipeNote{font-size:12px; color:#cbd5e1}
   .flashBad{background:#4a0a14 !important;}
 </style>
 </head>
 <body>
+  <!-- Back to Exercises -->
+  <div class="nav">
+    <a class="pill" href="exercises.html">← Back to Exercises</a>
+  </div>
+
   <!-- Header -->
   <main class="wrap">
     <header style="text-align:center">
@@ -74,7 +116,7 @@
     </header>
   </main>
 
-  <!-- Games hub (same) -->
+  <!-- Games hub (same functionality) -->
   <div id="gamesHub" class="gamesHub" aria-live="polite">
     <button class="gamePick" id="pickTap">▶ Tap Sprint</button>
     <button class="gamePick" id="pickReflex">▶ Reflex Sprint</button>
@@ -114,7 +156,7 @@
   </div>
 
 <script>
-/* ===== Mini SFX engine (same as original) ===== */
+/* ===== Mini SFX engine (unchanged) ===== */
 const SFX = (()=>{
   let ctx = null;
   const ensure = ()=>{ if(!ctx){ ctx = new (window.AudioContext || window.webkitAudioContext)(); } if(ctx.state==='suspended'){ ctx.resume(); } return ctx; };
@@ -142,7 +184,7 @@ const SFX = (()=>{
   return { whoosh, ignite, boom, ensure };
 })();
 
-/* ===== Games hub controls (same) ===== */
+/* ===== Games hub controls (unchanged) ===== */
 const gamesHub = document.getElementById('gamesHub');
 const tapPane = document.getElementById('tapPane');
 const reflexPane = document.getElementById('reflexPane');
@@ -172,7 +214,7 @@ pickReflex.addEventListener('click', showReflexGame);
 tapBack.addEventListener('click', showGamesHub);
 reflexBack.addEventListener('click', showGamesHub);
 
-/* ===== Tap Sprint (same logic) ===== */
+/* ===== Tap Sprint (unchanged) ===== */
 const tapArena = document.getElementById('tapArena');
 const tapStart = document.getElementById('tapStart');
 const tapStopBtn  = document.getElementById('tapStop');
@@ -222,7 +264,7 @@ tapStopBtn.addEventListener('click', tapStopGame);
 tapReset.addEventListener('click', tapResetGame);
 tapUpdateStat();
 
-/* ===== Reflex Sprint (same logic) ===== */
+/* ===== Reflex Sprint (unchanged) ===== */
 const reflexArena = document.getElementById('reflexArena');
 const reflexStart = document.getElementById('reflexStart');
 const reflexStopBtn  = document.getElementById('reflexStop');
@@ -255,7 +297,7 @@ reflexStart.addEventListener('click', reflexStartGame);
 reflexStopBtn.addEventListener('click', reflexStopGame);
 reflexReset.addEventListener('click', reflexResetGame);
 
-/* Mobile / desktop input handling (same) */
+/* Mobile / desktop input handling (unchanged) */
 let sx=0, sy=0, st=0, tracking=false;
 const MAX_TIME = 700, MIN_DIST = 35, TAP_MAX_DIST = 14, TAP_MAX_TIME = 300;
 
