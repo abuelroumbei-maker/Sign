@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>What to Buy / Sell</title>
+<meta name="theme-color" content="#0b0d12" />
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --accent:#3b82f6; --accent3:#60a5fa;
+    --warn1:#f59e0b; --warn2:#fbbf24;
+    --success1:#10b981; --success2:#34d399;
+    --bg1:#0b0d12; --bg2:#0e1320; --card:rgba(255,255,255,.08); --bdr:rgba(255,255,255,.14);
+    --title-font:"Press Start 2P",system-ui,sans-serif; --body-font:ui-rounded,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box} body{margin:0;background:#0b0d12;color:#fff;font-family:var(--body-font);min-height:100dvh}
+  .nav{position:sticky;top:0;padding:12px 14px;background:rgba(11,13,18,.8);backdrop-filter:blur(2px)}
+  .pill{padding:10px 14px;border-radius:999px;background:#ffffffdd;color:#0a0b0f;font-weight:800;text-decoration:none}
+  .wrap{padding:22px;max-width:1100px;margin:0 auto;display:grid;gap:16px}
+  .title{text-align:center;font-family:var(--title-font);font-size:clamp(26px,7.5vw,56px);color:#3b82f6;-webkit-text-stroke:2px #FFD700;margin:6px 0 4px}
+  .subtitle{text-align:center;color:#cbd5e1;margin:0 0 10px}
+  .panel{background:var(--card);border:1px solid var(--bdr);border-radius:16px;padding:14px}
+  .row{display:flex;gap:10px;flex-wrap:wrap}
+  .field{flex:1;min-width:180px;display:grid;gap:6px}
+  label{font-size:12px;color:#cbd5e1}
+  input,select,textarea{width:100%;border-radius:10px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;padding:10px 12px;font:600 14px/1.35 var(--body-font);outline:none}
+  textarea{min-height:72px}
+  .btn{border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer}
+  .btn-accent{background:linear-gradient(90deg,var(--accent),var(--accent3));color:#0b0d12}
+  .btn-success{background:linear-gradient(90deg,var(--success1),var(--success2));color:#052e24}
+  .btn-warn{background:linear-gradient(90deg,var(--warn1),var(--warn2));color:#251a00}
+  .btn-ghost{background:rgba(255,255,255,.08);color:#e2e8f0;border:1px solid rgba(255,255,255,.16)}
+  .lists{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  @media (max-width:860px){.lists{grid-template-columns:1fr}}
+  h2{margin:.2rem 0 .8rem;font-size:18px}
+  .item{display:grid;gap:6px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:10px}
+  .item-top{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .pill{display:inline-block;padding:4px 8px;border-radius:999px;font-size:11px;font-weight:900}
+  .cat{background:#1f2937;color:#cfe2ff;border:1px solid rgba(255,255,255,.18)}
+  .pri-high{background:#f87171;color:#0b0d12}
+  .pri-med{background:#fbbf24;color:#0b0d12}
+  .pri-low{background:#34d399;color:#0b0d12}
+  .price{font-size:12px;color:#cbd5e1}
+  .muted{color:#cbd5e1;font-size:13px}
+  .item-actions{display:flex;gap:8px;flex-wrap:wrap}
+  .tools{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+</style>
+</head>
+<body>
+<div class="nav"><a class="pill" href="grownup.html">← Grown up</a></div>
+
+<div class="wrap">
+  <h1 class="title">What to Buy / Sell</h1>
+  <p class="subtitle">Capture opportunities, compare priorities, and move items between lists.</p>
+
+  <!-- Add form -->
+  <div class="panel">
+    <div class="row">
+      <div class="field">
+        <label for="side">Side</label>
+        <select id="side">
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="title">Title</label>
+        <input id="title" placeholder="e.g., Noise-cancelling headphones">
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <input id="category" placeholder="e.g., Tech, Furniture">
+      </div>
+      <div class="field">
+        <label for="priority">Priority</label>
+        <select id="priority">
+          <option value="high">High</option>
+          <option value="medium" selected>Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="price">Est. Price</label>
+        <input id="price" placeholder="e.g., 200">
+      </div>
+      <div class="field" style="flex-basis:100%">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Why, where, specs, alternatives…"></textarea>
+      </div>
+    </div>
+    <div class="row" style="justify-content:flex-end">
+      <button id="addBtn" class="btn btn-success">Add Item</button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="panel">
+    <div class="tools">
+      <div class="field">
+        <label for="fSide">Filter: Side</label>
+        <select id="fSide">
+          <option value="all">All</option>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="fCat">Filter: Category</label>
+        <input id="fCat" placeholder="e.g., Tech">
+      </div>
+      <div class="field">
+        <label for="fPri">Filter: Priority</label>
+        <select id="fPri">
+          <option value="all">All</option>
+          <option value="high">High</option>
+          <option value="medium">Medium</option>
+          <option value="low">Low</option>
+        </select>
+      </div>
+      <div class="field" style="flex:2;min-width:220px">
+        <label for="fSearch">Search</label>
+        <input id="fSearch" placeholder="Search title/notes…">
+      </div>
+      <button id="clearFilters" class="btn btn-ghost">Clear filters</button>
+      <button id="exportBtn" class="btn btn-accent">Export JSON</button>
+      <button id="importBtn" class="btn btn-warn">Import JSON</button>
+      <input id="importFile" type="file" accept="application/json" style="display:none">
+    </div>
+  </div>
+
+  <!-- Lists -->
+  <div class="lists">
+    <div class="panel">
+      <h2>Buy</h2>
+      <div id="buyList"></div>
+    </div>
+    <div class="panel">
+      <h2>Sell</h2>
+      <div id="sellList"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const KEY='grownup_buy_sell_v1';
+const buyListEl=document.getElementById('buyList');
+const sellListEl=document.getElementById('sellList');
+
+function load(){ try{ return JSON.parse(localStorage.getItem(KEY))||[] }catch{ return [] } }
+function save(items){ localStorage.setItem(KEY, JSON.stringify(items)); }
+
+function addItem(data){
+  const items=load();
+  items.push({ id:crypto.randomUUID(), created:Date.now(), done:false, ...data });
+  save(items); render();
+}
+function removeItem(id){
+  save(load().filter(x=>x.id!==id)); render();
+}
+function toggleDone(id){
+  const items=load(); const it=items.find(x=>x.id===id); if(it){ it.done=!it.done; save(items); render(); }
+}
+function moveSide(id){
+  const items=load(); const it=items.find(x=>x.id===id); if(it){ it.side=it.side==='buy'?'sell':'buy'; save(items); render(); }
+}
+
+function pillPri(p){
+  return p==='high'?'pri-high':p==='low'?'pri-low':'pri-med';
+}
+function fmtPrice(v){ return v?` • <span class="price">~${escapeHTML(v)}</span>`:''; }
+
+function matchFilters(it){
+  const side=fSide.value, cat=fCat.value.trim().toLowerCase(), pri=fPri.value, q=fSearch.value.trim().toLowerCase();
+  if(side!=='all' && it.side!==side) return false;
+  if(pri!=='all' && it.priority!==pri) return false;
+  if(cat && !(it.category||'').toLowerCase().includes(cat)) return false;
+  const blob=[it.title,it.notes,it.category].join(' ').toLowerCase();
+  if(q && !blob.includes(q)) return false;
+  return true;
+}
+
+function render(){
+  const items=load().sort((a,b)=>a.done-b.done || (a.priority>b.priority?-1:1) || b.created-a.created);
+  buyListEl.innerHTML=''; sellListEl.innerHTML='';
+  items.filter(x=>x.side==='buy' && matchFilters(x)).forEach(x=>appendItem(buyListEl,x));
+  items.filter(x=>x.side==='sell' && matchFilters(x)).forEach(x=>appendItem(sellListEl,x));
+}
+function appendItem(root,it){
+  const div=document.createElement('div'); div.className='item';
+  const priClass=pillPri(it.priority);
+  div.innerHTML = `
+    <div class="item-top">
+      <strong>${escapeHTML(it.title||'(untitled)')}</strong>
+      ${it.category?`<span class="pill cat">${escapeHTML(it.category)}</span>`:''}
+      <span class="pill ${priClass}">${it.priority.toUpperCase()}</span>
+      ${fmtPrice(it.price||'')}
+      ${it.done?'<span class="pill" style="background:#22c55e;color:#0b0d12">DONE</span>':''}
+    </div>
+    ${it.notes?`<div class="muted">${escapeHTML(it.notes)}</div>`:''}
+    <div class="item-actions">
+      <button class="btn btn-ghost" data-act="toggle">${it.done?'Mark Undone':'Mark Done'}</button>
+      <button class="btn btn-accent" data-act="move">Move to ${it.side==='buy'?'Sell':'Buy'}</button>
+      <button class="btn btn-warn" data-act="delete">Delete</button>
+    </div>`;
+  div.querySelector('[data-act="toggle"]').onclick=()=>toggleDone(it.id);
+  div.querySelector('[data-act="move"]').onclick=()=>moveSide(it.id);
+  div.querySelector('[data-act="delete"]').onclick=()=>removeItem(it.id);
+  root.appendChild(div);
+}
+
+function escapeHTML(s){return String(s??'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));}
+
+// Form
+const side=document.getElementById('side'), titleEl=document.getElementById('title'), category=document.getElementById('category'),
+      priority=document.getElementById('priority'), price=document.getElementById('price'), notes=document.getElementById('notes');
+document.getElementById('addBtn').onclick=()=>{
+  const title=titleEl.value.trim();
+  if(!title){ titleEl.focus(); return; }
+  addItem({ side:side.value, title, category:category.value.trim(), priority:priority.value, price:price.value.trim(), notes:notes.value.trim() });
+  titleEl.value=''; category.value=''; price.value=''; notes.value='';
+};
+
+// Filters
+const fSide=document.getElementById('fSide'), fCat=document.getElementById('fCat'), fPri=document.getElementById('fPri'), fSearch=document.getElementById('fSearch');
+[fSide,fCat,fPri,fSearch].forEach(el=>el.addEventListener('input',render));
+document.getElementById('clearFilters').onclick=()=>{ fSide.value='all'; fCat.value=''; fPri.value='all'; fSearch.value=''; render(); };
+
+// Export/Import
+document.getElementById('exportBtn').onclick=()=>{
+  const blob=new Blob([JSON.stringify(load(),null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`buy-sell-${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(a.href);
+};
+const importFile=document.getElementById('importFile');
+document.getElementById('importBtn').onclick=()=>importFile.click();
+importFile.onchange=(e)=>{
+  const f=e.target.files?.[0]; if(!f) return;
+  const reader=new FileReader();
+  reader.onload=()=>{ try{ const data=JSON.parse(reader.result); if(Array.isArray(data)){ save(data); render(); } }catch{} };
+  reader.readAsText(f);
+};
+
+render();
+</script>
+</body>
+</html>
